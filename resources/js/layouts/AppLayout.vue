@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import { Toaster } from '@/components/ui/toast';
-import { useToast } from '@/components/ui/toast/use-toast';
 import AppLayout from '@/layouts/app/AppSidebarLayout.vue';
 import type { BreadcrumbItemType, SharedData } from '@/types';
 import { usePage } from '@inertiajs/vue3';
 import { computed, watch } from 'vue';
-
-const { toast } = useToast();
+import { Toaster, toast } from 'vue-sonner';
 
 interface Props {
     breadcrumbs?: BreadcrumbItemType[];
@@ -24,17 +21,9 @@ watch(
     flashMessage,
     (newFlashMessage) => {
         if (newFlashMessage.error) {
-            toast({
-                title: 'Something went wrong!',
-                description: newFlashMessage.error,
-                variant: 'destructive',
-            });
+            toast.error(newFlashMessage.error);
         } else if (newFlashMessage.success) {
-            toast({
-                title: 'Succeed!',
-                description: newFlashMessage.success,
-                variant: 'success',
-            });
+            toast.success(newFlashMessage.success);
         }
     },
     { deep: true, immediate: true },
@@ -44,6 +33,6 @@ watch(
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
         <slot />
-        <Toaster />
+        <Toaster closeButton richColors />
     </AppLayout>
 </template>
