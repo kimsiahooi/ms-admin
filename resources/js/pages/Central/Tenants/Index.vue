@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
+import type { Tenant } from '@/types/Tenant';
 import { Head, Link } from '@inertiajs/vue3';
+import { Trash2 } from 'lucide-vue-next';
+
+defineProps<{
+    tenants: Tenant[];
+}>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -24,35 +28,38 @@ const breadcrumbs: BreadcrumbItem[] = [
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <div>
+            <div class="flex flex-wrap items-center justify-end gap-2">
                 <Link :href="route('tenants.create')" as-child>
                     <Button>Create Tenant</Button>
                 </Link>
             </div>
-            <Card>
-                <CardHeader>
-                    <CardTitle>Tenants</CardTitle>
-                    <CardDescription>Will add filters in future</CardDescription>
-                </CardHeader>
-                <CardContent></CardContent>
-            </Card>
-            <Separator class="my-4" />
+
             <Table>
-                <TableCaption>A list of your tenants.</TableCaption>
+                <TableCaption>{{ tenants.length ? 'A list of your tenants.' : 'No record found.' }}</TableCaption>
                 <TableHeader>
                     <TableRow>
                         <TableHead class="text-center">ID</TableHead>
                         <TableHead class="text-center">Name</TableHead>
                         <TableHead class="text-center">Database</TableHead>
+                        <TableHead class="text-center">Created At</TableHead>
+                        <TableHead class="text-center">Updated At</TableHead>
                         <TableHead class="text-center">Action</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableRow>
-                        <TableCell class="text-center"></TableCell>
-                        <TableCell class="text-center"></TableCell>
-                        <TableCell class="text-center"></TableCell>
-                        <TableCell class="text-center"></TableCell>
+                    <TableRow v-for="tenant in tenants" :key="tenant.id">
+                        <TableCell class="text-center">{{ tenant.id }}</TableCell>
+                        <TableCell class="text-center">{{ tenant.name }}</TableCell>
+                        <TableCell class="text-center">{{ tenant.tenancy_db_name }}</TableCell>
+                        <TableCell class="text-center">{{ tenant.created_at }}</TableCell>
+                        <TableCell class="text-center">{{ tenant.updated_at }}</TableCell>
+                        <TableCell class="text-center">
+                            <Link :href="route('tenants.destroy', tenant.id)" method="delete" as="button">
+                                <Button variant="destructive" size="icon">
+                                    <Trash2 />
+                                </Button>
+                            </Link>
+                        </TableCell>
                     </TableRow>
                 </TableBody>
             </Table>

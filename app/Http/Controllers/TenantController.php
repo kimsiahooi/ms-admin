@@ -12,7 +12,11 @@ class TenantController extends Controller
      */
     public function index()
     {
-        return inertia('Central/Tenants/Index');
+        $tenants = Tenant::latest()->get();
+
+        return inertia('Central/Tenants/Index', [
+            'tenants' => $tenants
+        ]);
     }
 
     /**
@@ -73,8 +77,10 @@ class TenantController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Tenant $tenant)
     {
-        //
+        $tenant->delete();
+
+        return back()->with('success', 'Tenant deleted successfully.');
     }
 }
