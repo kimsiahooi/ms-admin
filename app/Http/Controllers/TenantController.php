@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Tenant;
 use Illuminate\Http\Request;
 
 class TenantController extends Controller
@@ -19,7 +20,7 @@ class TenantController extends Controller
      */
     public function create()
     {
-        //
+        return inertia('Central/Tenants/Create');
     }
 
     /**
@@ -27,7 +28,22 @@ class TenantController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'id' => 'required|string|max:255|unique:tenants,id',
+            'name' => 'required|string|max:255',
+        ]);
+
+        $tenant = Tenant::create([
+            'id' => $request->id,
+            'name' => $request->name,
+            'tenancy_db_name' => 'tenant_' . $request->id,
+        ]);
+
+        $tenant->domains()->create([
+            'domain' => $request->id,
+        ]);
+
+        return back()->with('success', 'Tenant created successfully.');
     }
 
     /**
