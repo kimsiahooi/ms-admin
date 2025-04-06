@@ -43,6 +43,8 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
+                'roles' => $request->user()?->getRoleNames(),
+                'permissions' => $request->user()?->getPermissionNames(),
             ],
             'ziggy' => [...(new Ziggy())->toArray(), 'location' => $request->url()],
             'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
