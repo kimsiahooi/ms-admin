@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Permissions\UserPermissionsEnum;
 use App\Enums\Roles\UserRolesEnum;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
@@ -13,6 +15,8 @@ class UserController extends Controller
      */
     public function index()
     {
+        Gate::authorize(UserPermissionsEnum::ViewUser);
+
         $users = User::orderByDesc('id')->get();
 
         return inertia('Central/Users/Index', [
@@ -25,6 +29,8 @@ class UserController extends Controller
      */
     public function create()
     {
+        Gate::authorize(UserPermissionsEnum::CreateUser);
+
         return inertia('Central/Users/Create');
     }
 
@@ -33,6 +39,8 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        Gate::authorize(UserPermissionsEnum::CreateUser);
+
         User::create($request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
@@ -47,7 +55,7 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        //
+        Gate::authorize(UserPermissionsEnum::ViewUser);
     }
 
     /**
@@ -63,7 +71,7 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        Gate::authorize(UserPermissionsEnum::UpdateUser);
     }
 
     /**
@@ -71,6 +79,8 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        Gate::authorize(UserPermissionsEnum::DeleteUser);
+
         $user->delete();
 
         return back()->with('success', 'User deleted successfully.');
