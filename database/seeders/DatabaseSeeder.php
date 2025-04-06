@@ -35,32 +35,20 @@ class DatabaseSeeder extends Seeder
             'name' => UserRolesEnum::User
         ]);
 
-        $view_role_permission = Permission::firstOrCreate([
-            'name' => RolePermissionsEnum::ViewRole,
-        ], [
-            'name' => RolePermissionsEnum::ViewRole,
-        ]);
+        foreach (RolePermissionsEnum::cases() as $permission) {
+            Permission::firstOrCreate([
+                'name' => $permission,
+            ], [
+                'name' => $permission,
+            ]);
+        }
 
-        $create_role_permission = Permission::firstOrCreate([
-            'name' => RolePermissionsEnum::CreateRole,
-        ], [
-            'name' => RolePermissionsEnum::CreateRole,
-        ]);
+        $superadmin_permissions = Permission::all();
 
-        $update_role_permission = Permission::firstOrCreate([
-            'name' => RolePermissionsEnum::UpdateRole,
-        ], [
-            'name' => RolePermissionsEnum::UpdateRole,
-        ]);
+        $admin_permissions = Permission::whereNotLike('name', '%delete%')->get();
 
-        $delete_role_permission = Permission::firstOrCreate([
-            'name' => RolePermissionsEnum::DeleteRole,
-        ], [
-            'name' => RolePermissionsEnum::DeleteRole,
-        ]);
-
-        $superadmin_role->syncPermissions([$view_role_permission, $create_role_permission, $update_role_permission, $delete_role_permission]);
-        $admin_role->syncPermissions([$view_role_permission]);
+        $superadmin_role->syncPermissions($superadmin_permissions);
+        $admin_role->syncPermissions($admin_permissions);
 
         $this->call([
             // RoleSeeder::class,
