@@ -9,5 +9,7 @@ const authPermissions = computed(() => page.props.auth.permissions);
 
 export const useCheckPermissions = () => {
     return (permissions: AllPermission[]) =>
-        !permissions.filter((permission) => !authPermissions.value?.map((authPermission) => authPermission.name).includes(permission)).length;
+        permissions.length
+            ? !permissions.filter((permission) => !authPermissions.value?.map((authPermission) => authPermission.name).includes(permission)).length
+            : false;
 };
