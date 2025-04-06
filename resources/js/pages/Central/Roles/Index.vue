@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useCheckPermissions } from '@/composables/useCheckPermissions';
 import { useDateTimeFormat } from '@/composables/useDateTimeFormat';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem, SharedData } from '@/types';
@@ -15,9 +16,11 @@ defineProps<{
 
 const page = usePage<SharedData>();
 
-const authPermissions = computed(() => page.props.auth.permissions);
-
 const format = useDateTimeFormat();
+
+const checkPermissions = useCheckPermissions();
+
+const authPermissions = computed(() => page.props.auth.permissions);
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -37,7 +40,12 @@ const breadcrumbs: BreadcrumbItem[] = [
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div
-                v-if="authPermissions?.map((permission) => permission.name).includes('Create Role')"
+                v-if="
+                    checkPermissions(
+                        authPermissions?.map((permission) => permission.name),
+                        ['Create Role'],
+                    )
+                "
                 class="flex flex-wrap items-center justify-end gap-2"
             >
                 <Link :href="route('roles.create')" as-child>
@@ -67,7 +75,12 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <TableCell class="text-center">
                             <div class="space-x-2">
                                 <Link
-                                    v-if="authPermissions?.map((permission) => permission.name).includes('Delete Role')"
+                                    v-if="
+                                        checkPermissions(
+                                            authPermissions?.map((permission) => permission.name),
+                                            ['Delete Role'],
+                                        )
+                                    "
                                     :href="route('roles.destroy', role.id)"
                                     method="delete"
                                     as="button"
