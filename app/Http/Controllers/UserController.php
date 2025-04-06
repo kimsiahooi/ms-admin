@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\RoleEnum;
+use App\Enums\Roles\UserRolesEnum;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -37,7 +37,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|min:8|max:255|confirmed',
-        ]))->assignRole(RoleEnum::User);
+        ]))->assignRole(UserRolesEnum::User);
 
         return back()->with('success', 'User created successfully.');
     }

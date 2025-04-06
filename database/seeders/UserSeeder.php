@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Enums\RoleEnum;
+use App\Enums\Roles\UserRolesEnum;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -23,7 +23,7 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => 'password',
             'remember_token' => Str::random(10),
-        ])->assignRole(RoleEnum::SuperAdmin);
+        ])->assignRole(UserRolesEnum::SuperAdmin);
 
         User::firstOrCreate([
             'email' => 'admin@gmail.com',
@@ -33,7 +33,7 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => 'password',
             'remember_token' => Str::random(10),
-        ])->assignRole(RoleEnum::Admin);
+        ])->assignRole(UserRolesEnum::Admin);;
 
         User::firstOrCreate([
             'email' => 'user@gmail.com',
@@ -43,6 +43,6 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => 'password',
             'remember_token' => Str::random(10),
-        ])->assignRole(RoleEnum::User);
+        ])->assignRole(UserRolesEnum::User);;
     }
 }

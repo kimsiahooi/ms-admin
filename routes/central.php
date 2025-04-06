@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\RoleEnum;
+use App\Enums\Roles\UserRolesEnum;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\UserController;

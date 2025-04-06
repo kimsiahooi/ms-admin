@@ -2,10 +2,15 @@
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import type { NavItem } from '@/types';
-import { Link } from '@inertiajs/vue3';
+import type { NavItem, SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/vue3';
 import { LayoutGrid } from 'lucide-vue-next';
+import { computed } from 'vue';
 import AppLogo from './AppLogo.vue';
+
+const page = usePage<SharedData>();
+
+const auth = computed(() => page.props.auth);
 
 const mainNavItems: NavItem[] = [
     {
@@ -19,6 +24,7 @@ const mainNavItems: NavItem[] = [
         href: route('roles.index'),
         icon: LayoutGrid,
         isActive: route().current('roles.*'),
+        hide: !auth.value.permissions?.map((permission) => permission.name).includes('View Role'),
     },
     {
         title: 'Users',

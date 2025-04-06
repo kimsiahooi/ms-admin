@@ -1,9 +1,13 @@
+import type { Permission } from '@/types/Permission';
+import type { Role } from '@/types/Role';
 import type { PageProps } from '@inertiajs/core';
 import type { LucideIcon } from 'lucide-vue-next';
 import type { Config } from 'ziggy-js';
 
 export interface Auth {
     user: User;
+    roles: Role[] | null;
+    permissions: Permission[] | null;
 }
 
 export interface BreadcrumbItem {
@@ -16,6 +20,7 @@ export interface NavItem {
     href: string;
     icon?: LucideIcon;
     isActive?: boolean;
+    hide?: boolean;
 }
 
 export interface SharedData extends PageProps {
