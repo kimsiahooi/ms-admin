@@ -10,7 +10,7 @@ import AppLogo from './AppLogo.vue';
 
 const page = usePage<SharedData>();
 
-const auth = computed(() => page.props.auth);
+const authPermissions = computed(() => page.props.auth.permissions);
 
 const mainNavItems: NavItem[] = [
     {
@@ -24,7 +24,7 @@ const mainNavItems: NavItem[] = [
         href: route('roles.index'),
         icon: LayoutGrid,
         isActive: route().current('roles.*'),
-        hide: !auth.value.permissions?.map((permission) => permission.name).includes('View Role'),
+        hide: !authPermissions.value?.map((permission) => permission.name).includes('View Role'),
     },
     {
         title: 'Users',

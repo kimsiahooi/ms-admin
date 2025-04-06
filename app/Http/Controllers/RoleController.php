@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Permissions\RolePermissionsEnum;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
@@ -12,6 +14,8 @@ class RoleController extends Controller
      */
     public function index()
     {
+        Gate::authorize(RolePermissionsEnum::ViewRole);
+
         $roles = Role::all();
         return inertia('Central/Roles/Index', [
             'roles' => $roles,
@@ -23,6 +27,8 @@ class RoleController extends Controller
      */
     public function create()
     {
+        Gate::authorize(RolePermissionsEnum::CreateRole);
+
         return inertia('Central/Roles/Create');
     }
 
@@ -31,6 +37,8 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
+        Gate::authorize(RolePermissionsEnum::CreateRole);
+
         $request->validate([
             'name' => 'required|string|max:255|unique:roles,name'
         ]);
@@ -47,7 +55,7 @@ class RoleController extends Controller
      */
     public function show(string $id)
     {
-        //
+        Gate::authorize(RolePermissionsEnum::ViewRole);
     }
 
     /**
@@ -55,7 +63,7 @@ class RoleController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        Gate::authorize(RolePermissionsEnum::UpdateRole);
     }
 
     /**
@@ -63,7 +71,7 @@ class RoleController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        Gate::authorize(RolePermissionsEnum::UpdateRole);
     }
 
     /**
@@ -71,6 +79,8 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
+        Gate::authorize(RolePermissionsEnum::DeleteRole);
+
         $role->delete();
 
         return back()->with('success', 'Role deleted successfully.');
