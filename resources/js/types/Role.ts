@@ -1,5 +1,5 @@
 export interface Role {
-    readonly id: string;
+    readonly id: number;
     name: string;
     guard_name: string;
     created_at: Date;

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TenantController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -16,6 +17,7 @@ Route::domain($domain)->group(function () {
         })->name('dashboard');
 
         Route::resource('roles', RoleController::class);
+        Route::resource('users', UserController::class);
         Route::resource('tenants', TenantController::class);
     });
 

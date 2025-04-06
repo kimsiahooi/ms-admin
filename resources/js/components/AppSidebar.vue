@@ -21,6 +21,12 @@ const mainNavItems: NavItem[] = [
         isActive: route().current('roles.*'),
     },
     {
+        title: 'Users',
+        href: route('users.index'),
+        icon: LayoutGrid,
+        isActive: route().current('users.*'),
+    },
+    {
         title: 'Tenants',
         href: route('tenants.index'),
         icon: LayoutGrid,

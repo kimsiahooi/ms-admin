@@ -33,6 +33,34 @@ declare module 'ziggy-js' {
     "roles.destroy": [
         {
             "name": "role",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "users.index": [],
+    "users.create": [],
+    "users.store": [],
+    "users.show": [
+        {
+            "name": "user",
+            "required": true
+        }
+    ],
+    "users.edit": [
+        {
+            "name": "user",
+            "required": true
+        }
+    ],
+    "users.update": [
+        {
+            "name": "user",
+            "required": true
+        }
+    ],
+    "users.destroy": [
+        {
+            "name": "user",
             "required": true
         }
     ],

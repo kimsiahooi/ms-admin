@@ -1,5 +1,5 @@
 export interface Tenant {
-    readonly id: string;
+    readonly id: number;
     name: string;
     tenancy_db_name: string;
     created_at: Date;
