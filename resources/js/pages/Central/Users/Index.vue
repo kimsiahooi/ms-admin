@@ -37,7 +37,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                 </Link>
             </div>
 
-            <Table>
+            <Table class="min-w-max">
                 <TableCaption>{{ users.length ? 'A list of your users.' : 'No record found.' }}</TableCaption>
                 <TableHeader>
                     <TableRow>

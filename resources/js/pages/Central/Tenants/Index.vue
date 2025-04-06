@@ -42,7 +42,7 @@ const computedLinks = (subdomain: string) => `${location.value.protocol}//${subd
                 </Link>
             </div>
 
-            <Table>
+            <Table class="min-w-max">
                 <TableCaption>{{ tenants.length ? 'A list of your tenants.' : 'No record found.' }}</TableCaption>
                 <TableHeader>
                     <TableRow>
