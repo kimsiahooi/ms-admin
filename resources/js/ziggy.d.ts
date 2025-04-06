@@ -9,6 +9,33 @@ declare module 'ziggy-js' {
     ],
     "home": [],
     "dashboard": [],
+    "roles.index": [],
+    "roles.create": [],
+    "roles.store": [],
+    "roles.show": [
+        {
+            "name": "role",
+            "required": true
+        }
+    ],
+    "roles.edit": [
+        {
+            "name": "role",
+            "required": true
+        }
+    ],
+    "roles.update": [
+        {
+            "name": "role",
+            "required": true
+        }
+    ],
+    "roles.destroy": [
+        {
+            "name": "role",
+            "required": true
+        }
+    ],
     "tenants.index": [],
     "tenants.create": [],
     "tenants.store": [],
@@ -33,7 +60,8 @@ declare module 'ziggy-js' {
     "tenants.destroy": [
         {
             "name": "tenant",
-            "required": true
+            "required": true,
+            "binding": "id"
         }
     ],
     "profile.edit": [],

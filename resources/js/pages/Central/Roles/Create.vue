@@ -13,22 +13,21 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: route('dashboard'),
     },
     {
-        title: 'Tenants',
-        href: route('tenants.index'),
+        title: 'Roles',
+        href: route('roles.index'),
     },
     {
         title: 'Create',
-        href: route('tenants.create'),
+        href: route('roles.create'),
     },
 ];
 
 const form = useForm({
     name: '',
-    id: '',
 });
 
 const submit = () =>
-    form.post(route('tenants.store'), {
+    form.post(route('roles.store'), {
         onSuccess: () => {
             form.reset();
         },
@@ -42,7 +41,7 @@ const submit = () =>
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <Card>
                 <CardHeader>
-                    <CardTitle>Create Tenant</CardTitle>
+                    <CardTitle>Create Role</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <form @submit.prevent="submit">
@@ -52,11 +51,6 @@ const submit = () =>
                                     <Label for="name">Name:</Label>
                                     <Input type="text" name="name" v-model="form.name" />
                                     <p v-if="form.errors.name" class="text-red-500">{{ form.errors.name }}</p>
-                                </div>
-                                <div>
-                                    <Label for="name">ID:</Label>
-                                    <Input type="text" name="id" v-model="form.id" />
-                                    <p v-if="form.errors.id" class="text-red-500">{{ form.errors.id }}</p>
                                 </div>
                             </div>
                             <div>

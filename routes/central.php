@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TenantController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -14,6 +15,7 @@ Route::domain($domain)->group(function () {
             return Inertia::render('Dashboard');
         })->name('dashboard');
 
+        Route::resource('roles', RoleController::class);
         Route::resource('tenants', TenantController::class);
     });
 
