@@ -1,18 +1,26 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useCheckPermissions } from '@/composables/useCheckPermissions';
 import { useDateTimeFormat } from '@/composables/useDateTimeFormat';
 import AppLayout from '@/layouts/AppLayout.vue';
-import type { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem, SharedData } from '@/types';
 import type { User } from '@/types/User';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { Trash2 } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 defineProps<{
     users: User[];
 }>();
 
 const format = useDateTimeFormat();
+
+const page = usePage<SharedData>();
+
+const checkPermissions = useCheckPermissions();
+
+const authPermissions = computed(() => page.props.auth.permissions);
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -31,7 +39,15 @@ const breadcrumbs: BreadcrumbItem[] = [
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <div class="flex flex-wrap items-center justify-end gap-2">
+            <div
+                v-if="
+                    checkPermissions(
+                        authPermissions?.map((permission) => permission.name),
+                        ['Create User'],
+                    )
+                "
+                class="flex flex-wrap items-center justify-end gap-2"
+            >
                 <Link :href="route('users.create')" as-child>
                     <Button>Create User</Button>
                 </Link>
@@ -60,7 +76,17 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <TableCell class="text-center">{{ format(user.updated_at) }}</TableCell>
                         <TableCell class="text-center">
                             <div class="space-x-2">
-                                <Link :href="route('users.destroy', user.id)" method="delete" as="button">
+                                <Link
+                                    v-if="
+                                        checkPermissions(
+                                            authPermissions?.map((permission) => permission.name),
+                                            ['Delete User'],
+                                        )
+                                    "
+                                    :href="route('users.destroy', user.id)"
+                                    method="delete"
+                                    as="button"
+                                >
                                     <Button variant="destructive" size="icon">
                                         <Trash2 />
                                     </Button>

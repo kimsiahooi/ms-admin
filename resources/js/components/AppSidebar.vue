@@ -37,6 +37,10 @@ const mainNavItems: NavItem[] = [
         href: route('users.index'),
         icon: LayoutGrid,
         isActive: route().current('users.*'),
+        hide: !checkPermissions(
+            authPermissions.value?.map((permission) => permission.name),
+            ['View User'],
+        ),
     },
     {
         title: 'Tenants',

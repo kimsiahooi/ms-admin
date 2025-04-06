@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\Permissions\RolePermissionsEnum;
+use App\Enums\Permissions\UserPermissionsEnum;
 use App\Enums\Roles\UserRolesEnum;
 use Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -35,7 +36,9 @@ class DatabaseSeeder extends Seeder
             'name' => UserRolesEnum::User
         ]);
 
-        foreach (RolePermissionsEnum::cases() as $permission) {
+        $combined_permissions = array_merge(RolePermissionsEnum::cases(), UserPermissionsEnum::cases());
+
+        foreach ($combined_permissions as $permission) {
             Permission::firstOrCreate([
                 'name' => $permission,
             ], [
@@ -45,7 +48,7 @@ class DatabaseSeeder extends Seeder
 
         $superadmin_permissions = Permission::all();
 
-        $admin_permissions = Permission::whereNotLike('name', '%delete%')->get();
+        $admin_permissions = Permission::whereNotLike('name', '%delete%')->whereNotLike('name', '%restore%')->get();
 
         $superadmin_role->syncPermissions($superadmin_permissions);
         $admin_role->syncPermissions($admin_permissions);

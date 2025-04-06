@@ -1,6 +1,7 @@
 export type RolePermission = 'View Role' | 'Create Role' | 'Update Role' | 'Delete Role';
+export type UserPermission = 'View User' | 'Create User' | 'Update User' | 'Delete User' | 'Restore User' | 'Force Delete User';
 
-export type AllPermission = RolePermission;
+export type AllPermission = RolePermission | UserPermission;
 
 export interface Permission {
     readonly id: number;
