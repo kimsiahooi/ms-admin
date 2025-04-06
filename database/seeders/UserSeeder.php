@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Enums\RoleEnum;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
@@ -13,9 +15,14 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
+        User::firstOrCreate([
+            'email' => 'admin@gmail.com',
+        ], [
             'name' => 'Central Super Admin',
-            'email' => 'admin@gmail.com'
-        ]);
+            'email' => 'admin@gmail.com',
+            'email_verified_at' => now(),
+            'password' => 'password',
+            'remember_token' => Str::random(10),
+        ])->assignRole(RoleEnum::SuperAdmin);
     }
 }
