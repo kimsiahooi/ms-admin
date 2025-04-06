@@ -16,13 +16,33 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::firstOrCreate([
-            'email' => 'admin@gmail.com',
+            'email' => 'superadmin@gmail.com',
         ], [
             'name' => 'Central Super Admin',
-            'email' => 'admin@gmail.com',
+            'email' => 'superadmin@gmail.com',
             'email_verified_at' => now(),
             'password' => 'password',
             'remember_token' => Str::random(10),
         ])->assignRole(RoleEnum::SuperAdmin);
+
+        User::firstOrCreate([
+            'email' => 'admin@gmail.com',
+        ], [
+            'name' => 'Central Admin',
+            'email' => 'admin@gmail.com',
+            'email_verified_at' => now(),
+            'password' => 'password',
+            'remember_token' => Str::random(10),
+        ])->assignRole(RoleEnum::Admin);
+
+        User::firstOrCreate([
+            'email' => 'user@gmail.com',
+        ], [
+            'name' => 'Central User',
+            'email' => 'user@gmail.com',
+            'email_verified_at' => now(),
+            'password' => 'password',
+            'remember_token' => Str::random(10),
+        ])->assignRole(RoleEnum::User);
     }
 }
