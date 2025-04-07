@@ -61,7 +61,8 @@ declare module 'ziggy-js' {
     "users.destroy": [
         {
             "name": "user",
-            "required": true
+            "required": true,
+            "binding": "id"
         }
     ],
     "tenants.index": [],

@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import Tooltip from '@/components/shared/Tooltip.vue';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useCheckPermissions } from '@/composables/useCheckPermissions';
 import { useDateTimeFormat } from '@/composables/useDateTimeFormat';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
@@ -17,6 +19,8 @@ const location = useBrowserLocation();
 
 const format = useDateTimeFormat();
 
+const checkPermissions = useCheckPermissions();
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
@@ -28,7 +32,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const computedLinks = (subdomain: string) => `${location.value.protocol}//${subdomain}.${location.value.host}`;
+const computedLinks = (subdomain: string) =>
+    location.value.protocol && location.value.host ? `${location.value.protocol}//${subdomain}.${location.value.host}` : '#';
 </script>
 
 <template>
@@ -36,7 +41,7 @@ const computedLinks = (subdomain: string) => `${location.value.protocol}//${subd
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <div class="flex flex-wrap items-center justify-end gap-2">
+            <div v-if="checkPermissions(['Create Tenant'])" class="flex flex-wrap items-center justify-end gap-2">
                 <Link :href="route('tenants.create')" as-child>
                     <Button>Create Tenant</Button>
                 </Link>
@@ -63,16 +68,26 @@ const computedLinks = (subdomain: string) => `${location.value.protocol}//${subd
                         <TableCell class="text-center">{{ format(tenant.updated_at) }}</TableCell>
                         <TableCell class="text-center">
                             <div class="space-x-2">
-                                <Button as-child size="icon">
-                                    <a :href="computedLinks(tenant.id.toString())" target="_blank">
-                                        <SquareArrowOutUpRight />
-                                    </a>
-                                </Button>
-                                <Link :href="route('tenants.destroy', tenant.id)" method="delete" as="button">
-                                    <Button variant="destructive" size="icon">
-                                        <Trash2 />
+                                <Tooltip message="To Website">
+                                    <Button as-child size="icon">
+                                        <a :href="computedLinks(tenant.id.toString())" target="_blank">
+                                            <SquareArrowOutUpRight />
+                                        </a>
                                     </Button>
-                                </Link>
+                                </Tooltip>
+
+                                <Tooltip message="Delete Tenant">
+                                    <Link
+                                        v-if="checkPermissions(['Delete Tenant'])"
+                                        :href="route('tenants.destroy', tenant.id)"
+                                        method="delete"
+                                        as="button"
+                                    >
+                                        <Button variant="destructive" size="icon">
+                                            <Trash2 />
+                                        </Button>
+                                    </Link>
+                                </Tooltip>
                             </div>
                         </TableCell>
                     </TableRow>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Tooltip from '@/components/shared/Tooltip.vue';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useCheckPermissions } from '@/composables/useCheckPermissions';
@@ -63,11 +64,18 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <TableCell class="text-center">{{ format(user.updated_at) }}</TableCell>
                         <TableCell class="text-center">
                             <div class="space-x-2">
-                                <Link v-if="checkPermissions(['Delete User'])" :href="route('users.destroy', user.id)" method="delete" as="button">
-                                    <Button variant="destructive" size="icon">
-                                        <Trash2 />
-                                    </Button>
-                                </Link>
+                                <Tooltip message="Delete User">
+                                    <Link
+                                        v-if="checkPermissions(['Delete User'])"
+                                        :href="route('users.destroy', user.id)"
+                                        method="delete"
+                                        as="button"
+                                    >
+                                        <Button variant="destructive" size="icon">
+                                            <Trash2 />
+                                        </Button>
+                                    </Link>
+                                </Tooltip>
                             </div>
                         </TableCell>
                     </TableRow>

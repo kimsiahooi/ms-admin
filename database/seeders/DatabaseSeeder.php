@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\Permissions\RolePermissionsEnum;
+use App\Enums\Permissions\TenantPermissionsEnum;
 use App\Enums\Permissions\UserPermissionsEnum;
 use App\Enums\Roles\UserRolesEnum;
 use Database\Seeders;
@@ -36,7 +37,7 @@ class DatabaseSeeder extends Seeder
             'name' => UserRolesEnum::User
         ]);
 
-        $combined_permissions = array_merge(RolePermissionsEnum::cases(), UserPermissionsEnum::cases());
+        $combined_permissions = array_merge(RolePermissionsEnum::cases(), UserPermissionsEnum::cases(), TenantPermissionsEnum::cases());
 
         foreach ($combined_permissions as $permission) {
             Permission::firstOrCreate([

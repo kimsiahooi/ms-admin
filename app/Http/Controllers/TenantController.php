@@ -40,7 +40,6 @@ class TenantController extends Controller
         $tenant = Tenant::create([
             'id' => $request->id,
             'name' => $request->name,
-            'tenancy_db_name' => 'tenant_' . $request->id,
         ]);
 
         $tenant->domains()->create([

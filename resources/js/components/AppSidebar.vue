@@ -36,6 +36,7 @@ const mainNavItems: NavItem[] = [
         href: route('tenants.index'),
         icon: LayoutGrid,
         isActive: route().current('tenants.*'),
+        hide: !checkPermissions(['View Tenant']),
     },
 ];
 </script>
