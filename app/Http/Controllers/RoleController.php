@@ -61,17 +61,27 @@ class RoleController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Role $role)
     {
         Gate::authorize(RolePermissionsEnum::UpdateRole);
+
+        return inertia('Central/Roles/Edit', [
+            'role' => $role
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Role $role)
     {
         Gate::authorize(RolePermissionsEnum::UpdateRole);
+
+        $role->update($request->validate([
+            'name' => 'required|string|max:255|unique:roles,name'
+        ]));
+
+        return back()->with('success', 'Role updated successfully.');
     }
 
     /**

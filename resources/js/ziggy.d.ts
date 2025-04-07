@@ -12,16 +12,11 @@ declare module 'ziggy-js' {
     "roles.index": [],
     "roles.create": [],
     "roles.store": [],
-    "roles.show": [
-        {
-            "name": "role",
-            "required": true
-        }
-    ],
     "roles.edit": [
         {
             "name": "role",
-            "required": true
+            "required": true,
+            "binding": "id"
         }
     ],
     "roles.update": [

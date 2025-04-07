@@ -8,7 +8,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Role } from '@/types/Role';
 import { Head, Link } from '@inertiajs/vue3';
-import { Trash2 } from 'lucide-vue-next';
+import { Pencil, Trash2 } from 'lucide-vue-next';
 
 defineProps<{
     roles: Role[];
@@ -62,6 +62,13 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <TableCell class="text-center">{{ format(role.updated_at) }}</TableCell>
                         <TableCell class="text-center">
                             <div class="space-x-2">
+                                <Tooltip message="Edit Role">
+                                    <Link v-if="checkPermissions(['Update Role'])" :href="route('roles.edit', role.id)">
+                                        <Button size="icon" variant="secondary">
+                                            <Pencil />
+                                        </Button>
+                                    </Link>
+                                </Tooltip>
                                 <Tooltip message="Delete Role">
                                     <Link
                                         v-if="checkPermissions(['Delete Role'])"

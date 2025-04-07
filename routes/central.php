@@ -17,7 +17,7 @@ Route::domain($domain)->group(function () {
             return Inertia::render('Dashboard');
         })->name('dashboard');
 
-        Route::resource('roles', RoleController::class);
+        Route::resource('roles', RoleController::class)->except(['show']);
         Route::resource('users', UserController::class);
         Route::resource('tenants', TenantController::class);
     });
