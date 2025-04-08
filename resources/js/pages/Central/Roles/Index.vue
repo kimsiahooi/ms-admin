@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DeleteDialog from '@/components/custom/DeleteDialog.vue';
 import Tooltip from '@/components/shared/Tooltip.vue';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -47,7 +48,6 @@ const breadcrumbs: BreadcrumbItem[] = [
                     <TableRow>
                         <TableHead class="text-center">ID</TableHead>
                         <TableHead class="text-center">Name</TableHead>
-                        <TableHead class="text-center">Guard Name</TableHead>
                         <TableHead class="text-center">Created At</TableHead>
                         <TableHead class="text-center">Updated At</TableHead>
                         <TableHead class="text-center">Action</TableHead>
@@ -57,7 +57,6 @@ const breadcrumbs: BreadcrumbItem[] = [
                     <TableRow v-for="role in roles" :key="role.id">
                         <TableCell class="text-center">{{ role.id }}</TableCell>
                         <TableCell class="text-center">{{ role.name }}</TableCell>
-                        <TableCell class="text-center">{{ role.guard_name }}</TableCell>
                         <TableCell class="text-center">{{ format(role.created_at) }}</TableCell>
                         <TableCell class="text-center">{{ format(role.updated_at) }}</TableCell>
                         <TableCell class="text-center">
@@ -70,16 +69,11 @@ const breadcrumbs: BreadcrumbItem[] = [
                                     </Link>
                                 </Tooltip>
                                 <Tooltip message="Delete Role">
-                                    <Link
-                                        v-if="checkPermissions(['Delete Role'])"
-                                        :href="route('roles.destroy', role.id)"
-                                        method="delete"
-                                        as="button"
-                                    >
+                                    <DeleteDialog :title="`Delete Role ${role.name}`" method="delete" :href="route('roles.destroy', role.id)">
                                         <Button variant="destructive" size="icon">
                                             <Trash2 />
                                         </Button>
-                                    </Link>
+                                    </DeleteDialog>
                                 </Tooltip>
                             </div>
                         </TableCell>

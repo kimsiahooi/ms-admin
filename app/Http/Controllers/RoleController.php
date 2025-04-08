@@ -89,7 +89,7 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
-        Gate::authorize(RolePermissionsEnum::DeleteRole);
+        Gate::authorize(RolePermissionsEnum::FoceDeleteRole);
 
         $role->delete();
 

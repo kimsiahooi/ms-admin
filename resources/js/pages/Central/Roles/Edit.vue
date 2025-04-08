@@ -35,13 +35,13 @@ const submit = () => form.put(route('roles.update', role.id));
 </script>
 
 <template>
-    <Head title="Create Tenant" />
+    <Head title="Edit Role" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <Card>
                 <CardHeader>
-                    <CardTitle>Edit Role</CardTitle>
+                    <CardTitle>Edit Role {{ role.name }}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <form @submit.prevent="submit">
