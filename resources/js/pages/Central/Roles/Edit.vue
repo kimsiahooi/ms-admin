@@ -3,13 +3,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import EditPermissions from '@/components/view/role/EditPermissions.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
+import type { Permission } from '@/types/Permission';
 import type { Role } from '@/types/Role';
 import { Head, useForm } from '@inertiajs/vue3';
 
-const { role } = defineProps<{
+const props = defineProps<{
     role: Role;
+    permissions: Permission[];
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -23,15 +27,15 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
     {
         title: 'Edit',
-        href: route('roles.edit', role.id),
+        href: route('roles.edit', props.role.id),
     },
 ];
 
 const form = useForm({
-    name: role.name,
+    name: props.role.name,
 });
 
-const submit = () => form.put(route('roles.update', role.id));
+const submit = () => form.put(route('roles.update', props.role.id));
 </script>
 
 <template>
@@ -60,6 +64,8 @@ const submit = () => form.put(route('roles.update', role.id));
                     </form>
                 </CardContent>
             </Card>
+            <Separator class="my-4" />
+            <EditPermissions :permissions="permissions" />
         </div>
     </AppLayout>
 </template>

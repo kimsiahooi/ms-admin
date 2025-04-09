@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\Permissions\RolePermissionsEnum;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
@@ -65,8 +66,11 @@ class RoleController extends Controller
     {
         Gate::authorize(RolePermissionsEnum::UpdateRole);
 
+        $permissions = $role->getAllPermissions();
+
         return inertia('Central/Roles/Edit', [
-            'role' => $role
+            'role' => $role,
+            'permissions' => $permissions,
         ]);
     }
 
