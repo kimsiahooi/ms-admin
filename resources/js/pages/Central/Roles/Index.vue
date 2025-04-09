@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import DeleteDialog from '@/components/custom/DeleteDialog.vue';
 import Tooltip from '@/components/shared/Tooltip.vue';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import DeleteRole from '@/components/view/role/DeleteRole.vue';
 import { useCheckPermissions } from '@/composables/useCheckPermissions';
 import { useDateTimeFormat } from '@/composables/useDateTimeFormat';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Role } from '@/types/Role';
 import { Head, Link } from '@inertiajs/vue3';
-import { Pencil, Trash2 } from 'lucide-vue-next';
+import { Pencil } from 'lucide-vue-next';
 
 defineProps<{
     roles: Role[];
@@ -68,13 +68,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                                         </Button>
                                     </Link>
                                 </Tooltip>
-                                <Tooltip message="Delete Role">
-                                    <DeleteDialog :title="`Delete Role ${role.name}`" method="delete" :href="route('roles.destroy', role.id)">
-                                        <Button variant="destructive" size="icon">
-                                            <Trash2 />
-                                        </Button>
-                                    </DeleteDialog>
-                                </Tooltip>
+                                <DeleteRole :role="role" />
                             </div>
                         </TableCell>
                     </TableRow>
