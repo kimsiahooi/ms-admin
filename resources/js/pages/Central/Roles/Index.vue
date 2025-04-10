@@ -61,14 +61,14 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <TableCell class="text-center">{{ format(role.updated_at) }}</TableCell>
                         <TableCell class="text-center">
                             <div class="space-x-2">
-                                <Tooltip message="Edit Role">
-                                    <Link v-if="checkPermissions(['Update Role'])" :href="route('roles.edit', role.id)">
+                                <Tooltip v-if="checkPermissions(['Edit Role'])" message="Edit Role">
+                                    <Link v-if="checkPermissions(['Edit Role'])" :href="route('roles.edit', role.id)">
                                         <Button size="icon" variant="secondary">
                                             <Pencil />
                                         </Button>
                                     </Link>
                                 </Tooltip>
-                                <DeleteRole :role="role" />
+                                <DeleteRole v-if="checkPermissions(['Force Delete Role'])" :role="role" />
                             </div>
                         </TableCell>
                     </TableRow>

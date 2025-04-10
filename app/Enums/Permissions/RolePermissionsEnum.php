@@ -6,6 +6,6 @@ enum RolePermissionsEnum: string
 {
     case ViewRole = 'View Role';
     case CreateRole = 'Create Role';
-    case UpdateRole = 'Update Role';
+    case EditRole = 'Edit Role';
     case FoceDeleteRole = 'Force Delete Role';
 }

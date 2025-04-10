@@ -1,6 +1,6 @@
-export type RolePermission = 'View Role' | 'Create Role' | 'Update Role' | 'Force Delete Role';
-export type UserPermission = 'View User' | 'Create User' | 'Update User' | 'Delete User' | 'Restore User' | 'Force Delete User';
-export type TenantPermission = 'View Tenant' | 'Create Tenant' | 'Update Tenant' | 'Delete Tenant' | 'Restore Tenant' | 'Force Delete Tenant';
+export type RolePermission = 'View Role' | 'Create Role' | 'Edit Role' | 'Force Delete Role';
+export type UserPermission = 'View User' | 'Create User' | 'Edit User' | 'Delete User' | 'Restore User' | 'Force Delete User';
+export type TenantPermission = 'View Tenant' | 'Create Tenant' | 'Edit Tenant' | 'Delete Tenant' | 'Restore Tenant' | 'Force Delete Tenant';
 
 export type AllPermission = RolePermission | UserPermission | TenantPermission;
 

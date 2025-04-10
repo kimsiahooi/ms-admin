@@ -11,10 +11,15 @@ import type { Permission } from '@/types/Permission';
 import type { Role } from '@/types/Role';
 import { Head, useForm } from '@inertiajs/vue3';
 
-const props = defineProps<{
-    role: Role;
+interface RoleWithPermissions extends Role {
     permissions: Permission[];
-}>();
+}
+
+interface Props {
+    role: RoleWithPermissions;
+}
+
+const props = defineProps<Props>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -58,14 +63,14 @@ const submit = () => form.put(route('roles.update', props.role.id));
                                 </div>
                             </div>
                             <div>
-                                <Button type="submit" :disabled="form.processing">Edit</Button>
+                                <Button type="submit" :disabled="form.processing">Update</Button>
                             </div>
                         </div>
                     </form>
                 </CardContent>
             </Card>
             <Separator class="my-4" />
-            <EditPermissions :permissions="permissions" />
+            <EditPermissions :role="role" />
         </div>
     </AppLayout>
 </template>

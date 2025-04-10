@@ -64,13 +64,10 @@ class RoleController extends Controller
      */
     public function edit(Role $role)
     {
-        Gate::authorize(RolePermissionsEnum::UpdateRole);
-
-        $permissions = $role->getAllPermissions();
+        Gate::authorize(RolePermissionsEnum::EditRole);
 
         return inertia('Central/Roles/Edit', [
-            'role' => $role,
-            'permissions' => $permissions,
+            'role' => $role->load(['permissions']),
         ]);
     }
 
@@ -79,7 +76,7 @@ class RoleController extends Controller
      */
     public function update(Request $request, Role $role)
     {
-        Gate::authorize(RolePermissionsEnum::UpdateRole);
+        Gate::authorize(RolePermissionsEnum::EditRole);
 
         $role->update($request->validate([
             'name' => 'required|string|max:255|unique:roles,name'
@@ -98,5 +95,20 @@ class RoleController extends Controller
         $role->delete();
 
         return back()->with('success', 'Role deleted successfully.');
+    }
+
+    public function updatePermissions(Request $request, Role $role)
+    {
+        Gate::authorize(RolePermissionsEnum::EditRole);
+
+        $request->validate([
+            'permissions.*' => 'required|string|max:255|exists:permissions,name'
+        ]);
+
+        $permissions = Permission::whereIn('name', $request->permissions)->get();
+
+        $role->syncPermissions($permissions);
+
+        return back()->with('success', 'Permissions synced successfully.');
     }
 }

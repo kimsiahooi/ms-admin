@@ -3,14 +3,21 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { AllPermission, Permission } from '@/types/Permission';
+import type { Role } from '@/types/Role';
 import { useForm } from '@inertiajs/vue3';
 
-const { permissions } = defineProps<{
+interface RoleWithPermissions extends Role {
     permissions: Permission[];
-}>();
+}
+
+interface Props {
+    role: RoleWithPermissions;
+}
+
+const props = defineProps<Props>();
 
 const form = useForm({
-    permissions: permissions.map((permission) => permission.name),
+    permissions: props.role.permissions.map((permission) => permission.name),
 });
 
 const showPermissions = (permission: AllPermission) => form.permissions.includes(permission);
@@ -23,7 +30,7 @@ const permissionHandler = (permission: AllPermission) => {
     }
 };
 
-const submit = () => console.log(form);
+const submit = () => form.put(route('roles.updatePermissions', props.role.id));
 </script>
 
 <template>
@@ -52,9 +59,9 @@ const submit = () => console.log(form);
                             </div>
 
                             <div class="flex items-center space-x-2">
-                                <Checkbox :model-value="showPermissions('Update Role')" @click="permissionHandler('Update Role')" />
+                                <Checkbox :model-value="showPermissions('Edit Role')" @click="permissionHandler('Edit Role')" />
                                 <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                    Update Role
+                                    Edit Role
                                 </label>
                             </div>
 
@@ -85,9 +92,9 @@ const submit = () => console.log(form);
                             </div>
 
                             <div class="flex items-center space-x-2">
-                                <Checkbox :model-value="showPermissions('Update User')" @click="permissionHandler('Update User')" />
+                                <Checkbox :model-value="showPermissions('Edit User')" @click="permissionHandler('Edit User')" />
                                 <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                    Update User
+                                    Edit User
                                 </label>
                             </div>
 
@@ -118,9 +125,9 @@ const submit = () => console.log(form);
                             </div>
 
                             <div class="flex items-center space-x-2">
-                                <Checkbox :model-value="showPermissions('Update Tenant')" @click="permissionHandler('Update Tenant')" />
+                                <Checkbox :model-value="showPermissions('Edit Tenant')" @click="permissionHandler('Edit Tenant')" />
                                 <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                    Update Tenant
+                                    Edit Tenant
                                 </label>
                             </div>
 
