@@ -22,7 +22,7 @@ class UserController extends Controller
         $users = User::with('roles')->orderByDesc('id')->get();
 
         return inertia('Central/Users/Index', [
-            'users' => $users
+            'users' => $users,
         ]);
     }
 
@@ -43,11 +43,13 @@ class UserController extends Controller
     {
         Gate::authorize(UserPermissionsEnum::CreateUser);
 
-        User::create($request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email',
-            'password' => 'required|min:8|max:255|confirmed',
-        ]))->assignRole(UserRolesEnum::User);
+        User::create(
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255|unique:users,email',
+                'password' => 'required|min:8|max:255|confirmed',
+            ]),
+        )->assignRole(UserRolesEnum::User);
 
         return back()->with('success', 'User created successfully.');
     }
@@ -80,11 +82,13 @@ class UserController extends Controller
     {
         Gate::authorize(UserPermissionsEnum::EditUser);
 
-        $user->update($request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'role' => ['required', 'exists:roles,name'],
-        ]));
+        $user->update(
+            $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+                'role' => ['required', 'exists:roles,name'],
+            ]),
+        );
 
         $user->syncRoles($request->role);
 
@@ -114,16 +118,33 @@ class UserController extends Controller
         ]);
     }
 
-    public function restore(Request $request, User $user)
+    public function restore(Request $request)
     {
         Gate::authorize(UserPermissionsEnum::RestoreUser);
 
-        dd($user);
+        $request->validate([
+            'id' => ['required', 'exists:users,id'],
+        ]);
+
+        $user = User::onlyTrashed()->where('id', $request->id)->first();
 
         $user->restore();
 
         return back()->with('success', 'User restored successfully.');
     }
 
-    public function forceDelete() {}
+    public function forceDelete(Request $request)
+    {
+        Gate::authorize(UserPermissionsEnum::ForceDeleteUser);
+
+        $request->validate([
+            'id' => ['required', 'exists:users,id'],
+        ]);
+
+        $user = User::onlyTrashed()->where('id', $request->id)->first();
+
+        $user->forceDelete();
+
+        return back()->with('success', 'User permanent deleted successfully.');
+    }
 }

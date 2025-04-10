@@ -88,8 +88,7 @@ declare module 'ziggy-js' {
     "users.restore": [
         {
             "name": "user",
-            "required": true,
-            "binding": "id"
+            "required": true
         }
     ],
     "users.forceDelete": [

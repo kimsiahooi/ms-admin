@@ -19,7 +19,7 @@ const submit = () => form.delete(route('users.forceDelete', props.user.id));
 
 <template>
     <Dialog>
-        <Tooltip message="Force Delete User">
+        <Tooltip message="Permanent Delete User">
             <DialogTrigger as-child>
                 <Button variant="destructive" size="icon">
                     <Trash2 />
@@ -28,14 +28,14 @@ const submit = () => form.delete(route('users.forceDelete', props.user.id));
         </Tooltip>
         <DialogContent class="sm:max-w-[425px]">
             <DialogHeader>
-                <DialogTitle>Force Delete {{ props.user.name }}</DialogTitle>
-                <DialogDescription>Are you sure you want to force delete this user?</DialogDescription>
+                <DialogTitle>Permanent Delete {{ props.user.name }}</DialogTitle>
+                <DialogDescription>Are you sure you want to permanent delete this user?</DialogDescription>
                 <div class="mt-2 flex flex-wrap items-center justify-end gap-3">
                     <DialogClose as-child>
                         <Button type="button" variant="secondary">Close</Button>
                     </DialogClose>
                     <form @submit.prevent="submit">
-                        <Button type="submit" variant="destructive" :disabled="form.processing">Delete</Button>
+                        <Button type="submit" variant="destructive" :disabled="form.processing">Permanent Delete</Button>
                     </form>
                 </div>
             </DialogHeader>

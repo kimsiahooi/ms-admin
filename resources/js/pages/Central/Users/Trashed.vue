@@ -54,6 +54,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <TableHead class="text-center">Email Verified At</TableHead>
                         <TableHead class="text-center">Created At</TableHead>
                         <TableHead class="text-center">Updated At</TableHead>
+                        <TableHead class="text-center">Deleted At</TableHead>
                         <TableHead class="text-center">Action</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -68,6 +69,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <TableCell class="text-center">{{ format(user.email_verified_at) }}</TableCell>
                         <TableCell class="text-center">{{ format(user.created_at) }}</TableCell>
                         <TableCell class="text-center">{{ format(user.updated_at) }}</TableCell>
+                        <TableCell class="text-center">{{ format(user.deleted_at) }}</TableCell>
                         <TableCell class="text-center">
                             <div class="space-x-2">
                                 <RestoreUser v-if="checkPermissions(['Restore User'])" :user="user" />
