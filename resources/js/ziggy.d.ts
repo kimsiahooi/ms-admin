@@ -29,13 +29,6 @@ declare module 'ziggy-js' {
     ],
     "home": [],
     "dashboard": [],
-    "roles.updatePermissions": [
-        {
-            "name": "role",
-            "required": true,
-            "binding": "id"
-        }
-    ],
     "roles.index": [],
     "roles.create": [],
     "roles.store": [],
@@ -60,25 +53,28 @@ declare module 'ziggy-js' {
             "binding": "id"
         }
     ],
+    "roles.updatePermissions": [
+        {
+            "name": "role",
+            "required": true,
+            "binding": "id"
+        }
+    ],
     "users.index": [],
     "users.create": [],
     "users.store": [],
-    "users.show": [
-        {
-            "name": "user",
-            "required": true
-        }
-    ],
     "users.edit": [
         {
             "name": "user",
-            "required": true
+            "required": true,
+            "binding": "id"
         }
     ],
     "users.update": [
         {
             "name": "user",
-            "required": true
+            "required": true,
+            "binding": "id"
         }
     ],
     "users.destroy": [
@@ -86,6 +82,20 @@ declare module 'ziggy-js' {
             "name": "user",
             "required": true,
             "binding": "id"
+        }
+    ],
+    "users.trashed": [],
+    "users.restore": [
+        {
+            "name": "user",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "users.forceDelete": [
+        {
+            "name": "user",
+            "required": true
         }
     ],
     "tenants.index": [],

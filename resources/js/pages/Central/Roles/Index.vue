@@ -2,7 +2,7 @@
 import Tooltip from '@/components/shared/Tooltip.vue';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import DeleteRole from '@/components/view/role/DeleteRole.vue';
+import DeleteRole from '@/components/view/roles/DeleteRole.vue';
 import { useCheckPermissions } from '@/composables/useCheckPermissions';
 import { useDateTimeFormat } from '@/composables/useDateTimeFormat';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -36,8 +36,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <div v-if="checkPermissions(['Create Role'])" class="flex flex-wrap items-center justify-end gap-2">
-                <Link :href="route('roles.create')" as-child>
+            <div class="flex flex-wrap items-center justify-end gap-3">
+                <Link v-if="checkPermissions(['Create Role'])" :href="route('roles.create')" as-child>
                     <Button>Create Role</Button>
                 </Link>
             </div>
@@ -62,7 +62,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <TableCell class="text-center">
                             <div class="space-x-2">
                                 <Tooltip v-if="checkPermissions(['Edit Role'])" message="Edit Role">
-                                    <Link v-if="checkPermissions(['Edit Role'])" :href="route('roles.edit', role.id)">
+                                    <Link :href="route('roles.edit', role.id)">
                                         <Button size="icon" variant="secondary">
                                             <Pencil />
                                         </Button>

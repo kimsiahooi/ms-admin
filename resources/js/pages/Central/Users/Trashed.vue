@@ -1,16 +1,14 @@
 <script setup lang="ts">
-import Tooltip from '@/components/shared/Tooltip.vue';
-import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import DeleteUser from '@/components/view/users/DeleteUser.vue';
+import ForceDeleteUser from '@/components/view/users/ForceDeleteUser.vue';
+import RestoreUser from '@/components/view/users/RestoreUser.vue';
 import { useCheckPermissions } from '@/composables/useCheckPermissions';
 import { useDateTimeFormat } from '@/composables/useDateTimeFormat';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Role } from '@/types/Role';
 import type { User } from '@/types/User';
-import { Head, Link } from '@inertiajs/vue3';
-import { Pencil } from 'lucide-vue-next';
+import { Head } from '@inertiajs/vue3';
 
 interface UserWithRoles extends User {
     roles: Role[];
@@ -33,24 +31,18 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Users',
         href: route('users.index'),
     },
+    {
+        title: 'Trashed',
+        href: route('users.trashed'),
+    },
 ];
 </script>
 
 <template>
-    <Head title="User List" />
+    <Head title="Trashed User List" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <div class="flex flex-wrap items-center justify-end gap-3">
-                <Link v-if="checkPermissions(['Create User'])" :href="route('users.create')" as-child>
-                    <Button>Create User</Button>
-                </Link>
-
-                <Link v-if="checkPermissions(['Restore User'])" :href="route('users.trashed')" as-child>
-                    <Button>View Trashed</Button>
-                </Link>
-            </div>
-
             <Table class="min-w-max">
                 <TableCaption>{{ users.length ? 'A list of your users.' : 'No record found.' }}</TableCaption>
                 <TableHeader>
@@ -78,14 +70,8 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <TableCell class="text-center">{{ format(user.updated_at) }}</TableCell>
                         <TableCell class="text-center">
                             <div class="space-x-2">
-                                <Tooltip v-if="checkPermissions(['Edit User'])" message="Edit User">
-                                    <Link :href="route('users.edit', user.id)">
-                                        <Button size="icon" variant="secondary">
-                                            <Pencil />
-                                        </Button>
-                                    </Link>
-                                </Tooltip>
-                                <DeleteUser v-if="checkPermissions(['Delete User'])" :user="user" />
+                                <RestoreUser v-if="checkPermissions(['Restore User'])" :user="user" />
+                                <ForceDeleteUser v-if="checkPermissions(['Force Delete User'])" :user="user" />
                             </div>
                         </TableCell>
                     </TableRow>

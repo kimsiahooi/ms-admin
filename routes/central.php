@@ -1,7 +1,5 @@
 <?php
 
-use App\Enums\Roles\UserRolesEnum;
-use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\UserController;
@@ -18,9 +16,15 @@ Route::domain($domain)->group(function () {
             return Inertia::render('Dashboard');
         })->name('dashboard');
 
-        Route::put('roles/{role}/permissions/update', [RoleController::class, 'updatePermissions'])->name('roles.updatePermissions');
+
         Route::resource('roles', RoleController::class)->except(['show']);
-        Route::resource('users', UserController::class);
+        Route::match(['put', 'patch'], 'roles/{role}/permissions/update', [RoleController::class, 'updatePermissions'])->name('roles.updatePermissions');
+        Route::resource('users', UserController::class)->except(['show']);
+        Route::prefix('users')->name('users.')->group(function () {
+            Route::get('trashed', [UserController::class, 'trashed'])->name('trashed');
+            Route::post('{user}/restore', [UserController::class, 'restore'])->name('restore');
+            Route::delete('{user}/force-delete', [UserController::class, 'forceDelete'])->name('forceDelete');
+        });
         Route::resource('tenants', TenantController::class);
     });
 

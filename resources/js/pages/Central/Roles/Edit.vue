@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import EditPermissions from '@/components/view/role/EditPermissions.vue';
+import EditPermissions from '@/components/view/roles/EditPermissions.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Permission } from '@/types/Permission';
@@ -15,11 +15,9 @@ interface RoleWithPermissions extends Role {
     permissions: Permission[];
 }
 
-interface Props {
+const props = defineProps<{
     role: RoleWithPermissions;
-}
-
-const props = defineProps<Props>();
+}>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -50,7 +48,7 @@ const submit = () => form.put(route('roles.update', props.role.id));
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <Card>
                 <CardHeader>
-                    <CardTitle>Edit Role {{ role.name }}</CardTitle>
+                    <CardTitle>Edit {{ role.name }}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <form @submit.prevent="submit">

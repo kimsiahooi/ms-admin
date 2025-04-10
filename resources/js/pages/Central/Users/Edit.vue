@@ -3,9 +3,24 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useCheckPermissions } from '@/composables/useCheckPermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
+import type { Role } from '@/types/Role';
+import type { User } from '@/types/User';
 import { Head, useForm } from '@inertiajs/vue3';
+
+interface UserWithRole extends User {
+    roles: Role[];
+}
+
+const props = defineProps<{
+    user: UserWithRole;
+    roles: Role[];
+}>();
+
+const checkPermissions = useCheckPermissions();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,34 +32,28 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: route('users.index'),
     },
     {
-        title: 'Create',
-        href: route('users.create'),
+        title: 'Edit',
+        href: route('users.edit', props.user.id),
     },
 ];
 
 const form = useForm({
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
+    name: props.user.name,
+    email: props.user.email,
+    role: props.user.roles.map((role) => role.name)[0],
 });
 
-const submit = () =>
-    form.post(route('users.store'), {
-        onSuccess: () => {
-            form.reset();
-        },
-    });
+const submit = () => form.put(route('users.update', props.user.id));
 </script>
 
 <template>
-    <Head title="Create User" />
+    <Head title="Edit User" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <Card>
                 <CardHeader>
-                    <CardTitle>Create User</CardTitle>
+                    <CardTitle>Edit {{ user.name }}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <form @submit.prevent="submit">
@@ -60,19 +69,23 @@ const submit = () =>
                                     <Input type="text" name="email" v-model="form.email" />
                                     <p v-if="form.errors.email" class="text-red-500">{{ form.errors.email }}</p>
                                 </div>
-                                <div>
-                                    <Label for="name">Password:</Label>
-                                    <Input type="password" name="email" v-model="form.password" />
-                                    <p v-if="form.errors.password" class="text-red-500">{{ form.errors.password }}</p>
-                                </div>
-                                <div>
-                                    <Label for="name">Confirm Password:</Label>
-                                    <Input type="password" name="email" v-model="form.password_confirmation" />
-                                    <p v-if="form.errors.password_confirmation" class="text-red-500">{{ form.errors.password_confirmation }}</p>
+                                <div v-if="checkPermissions(['Edit Role'])">
+                                    <Label for="name">Role:</Label>
+                                    <Select v-model="form.role">
+                                        <SelectTrigger class="w-full">
+                                            <SelectValue placeholder="Select Role" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectItem v-for="role in roles" :key="role.id" :value="role.name">{{ role.name }}</SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <p v-if="form.errors.role" class="text-red-500">{{ form.errors.role }}</p>
                                 </div>
                             </div>
                             <div>
-                                <Button type="submit" :disabled="form.processing">Create</Button>
+                                <Button type="submit" :disabled="form.processing">Update</Button>
                             </div>
                         </div>
                     </form>

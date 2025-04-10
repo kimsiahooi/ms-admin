@@ -105,9 +105,7 @@ class RoleController extends Controller
             'permissions.*' => 'required|string|max:255|exists:permissions,name'
         ]);
 
-        $permissions = Permission::whereIn('name', $request->permissions)->get();
-
-        $role->syncPermissions($permissions);
+        $role->syncPermissions($request->permissions);
 
         return back()->with('success', 'Permissions synced successfully.');
     }

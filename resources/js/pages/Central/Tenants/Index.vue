@@ -41,8 +41,8 @@ const computedLinks = (subdomain: string) =>
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <div v-if="checkPermissions(['Create Tenant'])" class="flex flex-wrap items-center justify-end gap-2">
-                <Link :href="route('tenants.create')" as-child>
+            <div class="flex flex-wrap items-center justify-end gap-3">
+                <Link v-if="checkPermissions(['Create Tenant'])" :href="route('tenants.create')" as-child>
                     <Button>Create Tenant</Button>
                 </Link>
             </div>
