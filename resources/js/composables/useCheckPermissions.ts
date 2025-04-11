@@ -5,12 +5,14 @@ import { computed } from 'vue';
 
 const page = usePage<SharedData>();
 
-const authPermissions = computed(() => page.props.auth.permissions);
+const authPermissions = computed(() => page.props.auth.permissions?.map((authPermission) => authPermission.name));
 
 export const useCheckPermissions = () => {
     const checkPermissions = (permissions: AllPermission[]) =>
-        permissions.length
-            ? !permissions.filter((permission) => !authPermissions.value?.map((authPermission) => authPermission.name).includes(permission)).length
-            : false;
-    return { checkPermissions };
+        permissions.length ? !permissions.filter((permission) => !authPermissions.value?.includes(permission)).length : false;
+
+    const checkAnyPermissions = (permissions: AllPermission[]) =>
+        permissions.length ? permissions.filter((permission) => authPermissions.value?.includes(permission)).length : false;
+
+    return { checkPermissions, checkAnyPermissions };
 };

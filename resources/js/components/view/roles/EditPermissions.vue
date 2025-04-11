@@ -17,7 +17,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const { checkPermissions } = useCheckPermissions();
+const { checkPermissions, checkAnyPermissions } = useCheckPermissions();
 
 const form = useForm({
     permissions: props.role.permissions.map((permission) => permission.name),
@@ -44,7 +44,7 @@ const submit = () => form.put(route('roles.updatePermissions', props.role.id));
         <CardContent>
             <form @submit.prevent="submit">
                 <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    <div>
+                    <div v-if="checkAnyPermissions(['View Role', 'Create Role', 'Edit Role', 'Force Delete Role'])">
                         <h6 class="mb-3 font-bold">Role</h6>
                         <div class="space-y-2">
                             <div v-if="checkPermissions(['View Role'])" class="flex items-center space-x-2">
@@ -77,7 +77,7 @@ const submit = () => form.put(route('roles.updatePermissions', props.role.id));
                         </div>
                     </div>
 
-                    <div>
+                    <div v-if="checkAnyPermissions(['View User', 'Create User', 'Edit User', 'Delete User', 'Restore User', 'Force Delete User'])">
                         <h6 class="mb-3 font-bold">User</h6>
                         <div class="space-y-2">
                             <div v-if="checkPermissions(['View User'])" class="flex items-center space-x-2">
@@ -124,7 +124,7 @@ const submit = () => form.put(route('roles.updatePermissions', props.role.id));
                         </div>
                     </div>
 
-                    <div>
+                    <div v-if="checkAnyPermissions(['View Tenant', 'Create Tenant', 'Edit Tenant', 'Force Delete Tenant'])">
                         <h6 class="mb-3 font-bold">Tenant</h6>
                         <div class="space-y-2">
                             <div v-if="checkPermissions(['View Tenant'])" class="flex items-center space-x-2">
