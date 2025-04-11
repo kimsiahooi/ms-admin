@@ -19,7 +19,7 @@ const submit = () => form.delete(route('roles.destroy', props.role.id));
 
 <template>
     <Dialog>
-        <Tooltip message="Delete Role">
+        <Tooltip message="Permanent Delete Role">
             <DialogTrigger as-child>
                 <Button variant="destructive" size="icon">
                     <Trash2 />
@@ -28,14 +28,14 @@ const submit = () => form.delete(route('roles.destroy', props.role.id));
         </Tooltip>
         <DialogContent class="sm:max-w-[425px]">
             <DialogHeader>
-                <DialogTitle>Delete {{ props.role.name }}</DialogTitle>
+                <DialogTitle>Permanent Delete {{ props.role.name }}</DialogTitle>
                 <DialogDescription>Are you sure you want to delete this role?</DialogDescription>
                 <div class="mt-2 flex flex-wrap items-center justify-end gap-3">
                     <DialogClose as-child>
                         <Button type="button" variant="secondary">Close</Button>
                     </DialogClose>
                     <form @submit.prevent="submit">
-                        <Button type="submit" variant="destructive" :disabled="form.processing">Delete</Button>
+                        <Button type="submit" variant="destructive" :disabled="form.processing">Permananet Delete</Button>
                     </form>
                 </div>
             </DialogHeader>
