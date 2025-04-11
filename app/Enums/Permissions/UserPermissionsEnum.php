@@ -11,4 +11,5 @@ enum UserPermissionsEnum: string
     case ViewTrashedUser = 'View Trashed User';
     case RestoreUser = 'Restore User';
     case ForceDeleteUser = 'Force Delete User';
+    case AuditUser = 'Audit User';
 }

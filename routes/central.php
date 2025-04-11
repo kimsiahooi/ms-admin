@@ -24,6 +24,7 @@ Route::domain($domain)->group(function () {
             Route::get('trashed', [UserController::class, 'trashed'])->name('trashed');
             Route::post('{user}/restore', [UserController::class, 'restore'])->name('restore');
             Route::delete('{user}/force-delete', [UserController::class, 'forceDelete'])->name('forceDelete');
+            Route::get('audits', [UserController::class, 'audits'])->name('audits');
         });
         Route::resource('tenants', TenantController::class);
     });

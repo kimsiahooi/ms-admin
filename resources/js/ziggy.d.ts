@@ -97,6 +97,7 @@ declare module 'ziggy-js' {
             "required": true
         }
     ],
+    "users.audits": [],
     "tenants.index": [],
     "tenants.create": [],
     "tenants.store": [],

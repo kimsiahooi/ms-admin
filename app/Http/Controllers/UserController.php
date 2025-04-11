@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ActivityLogs\LogNamesEnum;
 use App\Enums\Permissions\UserPermissionsEnum;
 use App\Enums\Roles\UserRolesEnum;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -56,7 +58,7 @@ class UserController extends Controller
 
         $user->syncRoles($request->roles);
 
-        return redirect()->route('users.index')->with('success', 'User created successfully.');
+        return back()->with('success', 'User created successfully.');
     }
 
     /**
@@ -161,5 +163,14 @@ class UserController extends Controller
         $user->forceDelete();
 
         return back()->with('success', 'User permanent deleted successfully.');
+    }
+
+    public function audits()
+    {
+        $audits = Activity::with(['causer'])->where('log_name', LogNamesEnum::User->value)->orderByDesc('id')->get();
+
+        return inertia('Central/Users/Audit', [
+            'audits' => $audits,
+        ]);
     }
 }
