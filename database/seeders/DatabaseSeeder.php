@@ -50,6 +50,7 @@ class DatabaseSeeder extends Seeder
         $superadmin_permissions = Permission::all();
 
         $superadmin_role->syncPermissions($superadmin_permissions);
+        $admin_role->syncPermissions($superadmin_permissions);
 
         $this->call([
             // RoleSeeder::class,

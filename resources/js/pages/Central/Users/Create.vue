@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import TagInput from '@/components/shared/TagInput.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useCheckPermissions } from '@/composables/useCheckPermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
+import type { Role, UserRole } from '@/types/Role';
 import { Head, useForm } from '@inertiajs/vue3';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -22,11 +25,28 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const form = useForm({
+defineProps<{
+    roles: Role[];
+}>();
+
+const { checkPermissions } = useCheckPermissions();
+
+const updateUserRoles = (roles: UserRole[]) => {
+    form.roles = roles;
+};
+
+const form = useForm<{
+    name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+    roles: UserRole[];
+}>({
     name: '',
     email: '',
     password: '',
     password_confirmation: '',
+    roles: [],
 });
 
 const submit = () =>
@@ -69,6 +89,16 @@ const submit = () =>
                                     <Label for="name">Confirm Password:</Label>
                                     <Input type="password" name="email" v-model="form.password_confirmation" />
                                     <p v-if="form.errors.password_confirmation" class="text-red-500">{{ form.errors.password_confirmation }}</p>
+                                </div>
+                                <div v-if="checkPermissions(['Edit Role'])">
+                                    <Label for="name">Roles:</Label>
+                                    <TagInput
+                                        :values="roles.map((role) => role.name)"
+                                        :model-value="form.roles"
+                                        placeholder="Search Roles"
+                                        @update-values="updateUserRoles"
+                                    />
+                                    <p v-if="form.errors.roles" class="text-red-500">{{ form.errors.roles }}</p>
                                 </div>
                             </div>
                             <div>

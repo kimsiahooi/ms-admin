@@ -17,7 +17,7 @@ defineProps<{
 
 const format = useDateTimeFormat();
 
-const { checkPermissions } = useCheckPermissions();
+const { checkPermissions, checkAnyPermissions } = useCheckPermissions();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -50,7 +50,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <TableHead class="text-center">Name</TableHead>
                         <TableHead class="text-center">Created At</TableHead>
                         <TableHead class="text-center">Updated At</TableHead>
-                        <TableHead class="text-center">Action</TableHead>
+                        <TableHead v-if="checkAnyPermissions(['Edit Role', 'Force Delete Role'])" class="text-center">Action</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -59,7 +59,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <TableCell class="text-center">{{ role.name }}</TableCell>
                         <TableCell class="text-center">{{ format(role.created_at) }}</TableCell>
                         <TableCell class="text-center">{{ format(role.updated_at) }}</TableCell>
-                        <TableCell class="text-center">
+                        <TableCell v-if="checkAnyPermissions(['Edit Role', 'Force Delete Role'])" class="text-center">
                             <div class="space-x-2">
                                 <Tooltip v-if="checkPermissions(['Edit Role'])" message="Edit Role">
                                     <Link :href="route('roles.edit', role.id)">

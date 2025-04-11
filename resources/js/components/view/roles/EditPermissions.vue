@@ -12,6 +12,7 @@ interface RoleWithPermissions extends Role {
 }
 
 interface Props {
+    title: string;
     role: RoleWithPermissions;
 }
 
@@ -39,7 +40,7 @@ const submit = () => form.put(route('roles.updatePermissions', props.role.id));
 <template>
     <Card>
         <CardHeader>
-            <CardTitle>Role Permissions</CardTitle>
+            <CardTitle>{{ title }} Permissions</CardTitle>
         </CardHeader>
         <CardContent>
             <form @submit.prevent="submit">

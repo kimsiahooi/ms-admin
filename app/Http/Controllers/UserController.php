@@ -33,7 +33,9 @@ class UserController extends Controller
     {
         Gate::authorize(UserPermissionsEnum::CreateUser);
 
-        return inertia('Central/Users/Create');
+        return inertia('Central/Users/Create', [
+            'roles' => Role::whereNot('name', UserRolesEnum::SuperAdmin)->get(),
+        ]);
     }
 
     /**
@@ -43,15 +45,18 @@ class UserController extends Controller
     {
         Gate::authorize(UserPermissionsEnum::CreateUser);
 
-        User::create(
+        $user = User::create(
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
                 'password' => ['required', 'min:8', 'max:255', 'confirmed'],
+                'roles.*' => ['required', Rule::exists('roles', 'name')],
             ]),
-        )->assignRole(UserRolesEnum::User);
+        );
 
-        return back()->with('success', 'User created successfully.');
+        $user->syncRoles($request->roles);
+
+        return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
 
     /**
@@ -90,11 +95,11 @@ class UserController extends Controller
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-                'role' => ['required', 'exists:roles,name'],
+                'roles.*' => ['required', Rule::exists('roles', 'name')],
             ]),
         );
 
-        $user->syncRoles($request->role);
+        $user->syncRoles($request->roles);
 
         return back()->with('success', 'User updated successfully.');
     }

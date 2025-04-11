@@ -1,15 +1,16 @@
 <script setup lang="ts">
+import TagInput from '@/components/shared/TagInput.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCheckPermissions } from '@/composables/useCheckPermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import type { Role } from '@/types/Role';
+import type { Role, UserRole } from '@/types/Role';
 import type { User } from '@/types/User';
 import { Head, useForm } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 interface UserWithRole extends User {
     roles: Role[];
@@ -19,6 +20,8 @@ const props = defineProps<{
     user: UserWithRole;
     roles: Role[];
 }>();
+
+const computedUserRoles = computed(() => props.user.roles.map((role) => role.name));
 
 const { checkPermissions } = useCheckPermissions();
 
@@ -40,8 +43,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 const form = useForm({
     name: props.user.name,
     email: props.user.email,
-    role: props.user.roles.map((role) => role.name)[0],
+    roles: computedUserRoles.value,
 });
+
+const updateUserRoles = (roles: UserRole[]) => {
+    form.roles = roles;
+};
 
 const submit = () => form.put(route('users.update', props.user.id));
 </script>
@@ -70,20 +77,14 @@ const submit = () => form.put(route('users.update', props.user.id));
                                     <p v-if="form.errors.email" class="text-red-500">{{ form.errors.email }}</p>
                                 </div>
                                 <div v-if="checkPermissions(['Edit Role'])">
-                                    <Label for="name">Role:</Label>
-                                    <Select v-model="form.role">
-                                        <SelectTrigger class="w-full">
-                                            <SelectValue placeholder="Select Role" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectGroup>
-                                                <template v-for="role in roles" :key="role.id">
-                                                    <SelectItem :value="role.name">{{ role.name }}</SelectItem>
-                                                </template>
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
-                                    <p v-if="form.errors.role" class="text-red-500">{{ form.errors.role }}</p>
+                                    <Label for="name">Roles:</Label>
+                                    <TagInput
+                                        :values="roles.map((role) => role.name)"
+                                        :model-value="form.roles"
+                                        placeholder="Search Roles"
+                                        @update-values="updateUserRoles"
+                                    />
+                                    <p v-if="form.errors.roles" class="text-red-500">{{ form.errors.roles }}</p>
                                 </div>
                             </div>
                             <div>

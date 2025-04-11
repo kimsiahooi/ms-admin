@@ -68,7 +68,7 @@ const submit = () => form.put(route('roles.update', props.role.id));
                 </CardContent>
             </Card>
             <Separator class="my-4" />
-            <EditPermissions :role="role" />
+            <EditPermissions :role="role" :title="role.name" />
         </div>
     </AppLayout>
 </template>

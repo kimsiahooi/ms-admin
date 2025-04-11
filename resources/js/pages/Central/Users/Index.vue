@@ -22,7 +22,7 @@ defineProps<{
 
 const format = useDateTimeFormat();
 
-const { checkPermissions } = useCheckPermissions();
+const { checkPermissions, checkAnyPermissions } = useCheckPermissions();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -62,7 +62,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <TableHead class="text-center">Email Verified At</TableHead>
                         <TableHead class="text-center">Created At</TableHead>
                         <TableHead class="text-center">Updated At</TableHead>
-                        <TableHead class="text-center">Action</TableHead>
+                        <TableHead v-if="checkAnyPermissions(['Edit User', 'Delete User'])" class="text-center">Action</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -70,13 +70,13 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <TableCell class="text-center">{{ user.id }}</TableCell>
                         <TableCell class="text-center">{{ user.name }}</TableCell>
                         <TableCell v-if="checkPermissions(['View Role'])" class="text-center">{{
-                            user.roles.map((role) => role.name).join(',')
+                            user.roles.map((role) => role.name).join(', ')
                         }}</TableCell>
                         <TableCell class="text-center">{{ user.email }}</TableCell>
                         <TableCell class="text-center">{{ format(user.email_verified_at) }}</TableCell>
                         <TableCell class="text-center">{{ format(user.created_at) }}</TableCell>
                         <TableCell class="text-center">{{ format(user.updated_at) }}</TableCell>
-                        <TableCell class="text-center">
+                        <TableCell v-if="checkAnyPermissions(['Edit User', 'Delete User'])" class="text-center">
                             <div class="space-x-2">
                                 <Tooltip v-if="checkPermissions(['Edit User'])" message="Edit User">
                                     <Link :href="route('users.edit', user.id)">
