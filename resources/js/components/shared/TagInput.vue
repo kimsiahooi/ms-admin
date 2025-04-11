@@ -2,7 +2,7 @@
 import { Combobox, ComboboxAnchor, ComboboxEmpty, ComboboxGroup, ComboboxInput, ComboboxItem, ComboboxList } from '@/components/ui/combobox';
 import { TagsInput, TagsInputInput, TagsInputItem, TagsInputItemDelete, TagsInputItemText } from '@/components/ui/tags-input';
 import { useFilter } from 'reka-ui';
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps<{
     values: string[];
@@ -10,31 +10,30 @@ const props = defineProps<{
     placeholder: string;
 }>();
 
-const emit = defineEmits(['updateValues']);
+const emit = defineEmits(['pushValue', 'removeValue']);
 
-const modelValue = ref(props.modelValue);
 const open = ref(false);
 const searchTerm = ref('');
 
 const { contains } = useFilter({ sensitivity: 'base' });
 const filteredValues = computed(() => {
-    const options = props.values.filter((i) => !modelValue.value.includes(i));
+    const options = props.values.filter((i) => !props.modelValue.includes(i));
     return searchTerm.value ? options.filter((option) => contains(option, searchTerm.value)) : options;
 });
 
-watch(modelValue, (newValue) => {
-    emit('updateValues', newValue);
-});
+const selectHandler = (value: string) => emit('pushValue', value);
+
+const deleteHandler = (value: string) => emit('removeValue', value);
 </script>
 
 <template>
-    <Combobox v-model="modelValue" v-model:open="open" :ignore-filter="true">
+    <Combobox :model-value="props.modelValue" v-model:open="open" :ignore-filter="true">
         <ComboboxAnchor as-child>
-            <TagsInput v-model="modelValue" class="w-full gap-2 px-2">
+            <TagsInput :model-value="props.modelValue" class="w-full gap-2 px-2">
                 <div class="flex flex-wrap items-center gap-2">
-                    <TagsInputItem v-for="item in modelValue" :key="item" :value="item">
+                    <TagsInputItem v-for="item in props.modelValue" :key="item" :value="item">
                         <TagsInputItemText />
-                        <TagsInputItemDelete />
+                        <TagsInputItemDelete @click="deleteHandler(item)" />
                     </TagsInputItem>
                 </div>
 
@@ -58,7 +57,7 @@ watch(modelValue, (newValue) => {
                             (ev) => {
                                 if (typeof ev.detail.value === 'string') {
                                     searchTerm = '';
-                                    modelValue.push(ev.detail.value);
+                                    selectHandler(ev.detail.value);
                                 }
 
                                 if (filteredValues.length === 0) {

@@ -31,8 +31,10 @@ defineProps<{
 
 const { checkPermissions } = useCheckPermissions();
 
-const updateUserRoles = (roles: UserRole[]) => {
-    form.roles = roles;
+const pushRole = (role: UserRole) => form.roles.push(role);
+
+const removeRole = (role: UserRole) => {
+    form.roles = form.roles.filter((r) => r !== role);
 };
 
 const form = useForm<{
@@ -96,7 +98,8 @@ const submit = () =>
                                         :values="roles.map((role) => role.name)"
                                         :model-value="form.roles"
                                         placeholder="Search Roles"
-                                        @update-values="updateUserRoles"
+                                        @push-value="pushRole"
+                                        @remove-value="removeRole"
                                     />
                                     <p v-if="form.errors.roles" class="text-red-500">{{ form.errors.roles }}</p>
                                 </div>
