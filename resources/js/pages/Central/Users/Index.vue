@@ -46,7 +46,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                     <Button>Create User</Button>
                 </Link>
 
-                <Link v-if="checkPermissions(['Restore User'])" :href="route('users.trashed')" as-child>
+                <Link v-if="checkPermissions(['View Trashed User'])" :href="route('users.trashed')" as-child>
                     <Button>View Trashed</Button>
                 </Link>
             </div>

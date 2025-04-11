@@ -120,7 +120,7 @@ class UserController extends Controller
 
     public function trashed()
     {
-        Gate::authorize(UserPermissionsEnum::RestoreUser);
+        Gate::authorize(UserPermissionsEnum::ViewTrashedUser);
 
         $users = User::onlyTrashed()->with('roles')->withoutRole(UserRolesEnum::SuperAdmin)->get();
 

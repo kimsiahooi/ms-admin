@@ -20,7 +20,7 @@ defineProps<{
 
 const format = useDateTimeFormat();
 
-const { checkPermissions } = useCheckPermissions();
+const { checkPermissions, checkAnyPermissions } = useCheckPermissions();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -55,7 +55,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <TableHead class="text-center">Created At</TableHead>
                         <TableHead class="text-center">Updated At</TableHead>
                         <TableHead class="text-center">Deleted At</TableHead>
-                        <TableHead class="text-center">Action</TableHead>
+                        <TableHead v-if="checkAnyPermissions(['Restore User', 'Force Delete User'])" class="text-center">Action</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -70,7 +70,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <TableCell class="text-center">{{ format(user.created_at) }}</TableCell>
                         <TableCell class="text-center">{{ format(user.updated_at) }}</TableCell>
                         <TableCell class="text-center">{{ format(user.deleted_at) }}</TableCell>
-                        <TableCell class="text-center">
+                        <TableCell v-if="checkAnyPermissions(['Restore User', 'Force Delete User'])" class="text-center">
                             <div class="space-x-2">
                                 <RestoreUser v-if="checkPermissions(['Restore User'])" :user="user" />
                                 <ForceDeleteUser v-if="checkPermissions(['Force Delete User'])" :user="user" />

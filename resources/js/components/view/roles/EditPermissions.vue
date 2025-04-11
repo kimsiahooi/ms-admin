@@ -109,6 +109,13 @@ const submit = () => form.put(route('roles.updatePermissions', props.role.id));
                                 </label>
                             </div>
 
+                            <div v-if="checkPermissions(['View Trashed User'])" class="flex items-center space-x-2">
+                                <Checkbox :model-value="showPermissions('View Trashed User')" @click="permissionHandler('View Trashed User')" />
+                                <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    View Trashed User
+                                </label>
+                            </div>
+
                             <div v-if="checkPermissions(['Restore User'])" class="flex items-center space-x-2">
                                 <Checkbox :model-value="showPermissions('Restore User')" @click="permissionHandler('Restore User')" />
                                 <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
