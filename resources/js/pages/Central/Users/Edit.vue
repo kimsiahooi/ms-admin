@@ -20,7 +20,7 @@ const props = defineProps<{
     roles: Role[];
 }>();
 
-const checkPermissions = useCheckPermissions();
+const { checkPermissions } = useCheckPermissions();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

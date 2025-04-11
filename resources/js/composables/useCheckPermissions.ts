@@ -8,8 +8,9 @@ const page = usePage<SharedData>();
 const authPermissions = computed(() => page.props.auth.permissions);
 
 export const useCheckPermissions = () => {
-    return (permissions: AllPermission[]) =>
+    const checkPermissions = (permissions: AllPermission[]) =>
         permissions.length
             ? !permissions.filter((permission) => !authPermissions.value?.map((authPermission) => authPermission.name).includes(permission)).length
             : false;
+    return { checkPermissions };
 };

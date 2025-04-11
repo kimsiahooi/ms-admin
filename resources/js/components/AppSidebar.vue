@@ -8,7 +8,7 @@ import { Link } from '@inertiajs/vue3';
 import { LayoutGrid } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
-const checkPermissions = useCheckPermissions();
+const { checkPermissions } = useCheckPermissions();
 
 const mainNavItems: NavItem[] = [
     {

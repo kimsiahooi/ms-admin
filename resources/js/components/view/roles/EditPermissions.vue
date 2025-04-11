@@ -17,7 +17,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const checkPermissions = useCheckPermissions();
+const { checkPermissions } = useCheckPermissions();
 
 const form = useForm({
     permissions: props.role.permissions.map((permission) => permission.name),

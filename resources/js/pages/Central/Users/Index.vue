@@ -22,7 +22,7 @@ defineProps<{
 
 const format = useDateTimeFormat();
 
-const checkPermissions = useCheckPermissions();
+const { checkPermissions } = useCheckPermissions();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
