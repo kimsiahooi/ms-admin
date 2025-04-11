@@ -5,7 +5,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { useCheckPermissions } from '@/composables/useCheckPermissions';
 import type { NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { LayoutGrid } from 'lucide-vue-next';
+import { Gauge, KeySquare, UserCog, Users } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const { checkPermissions } = useCheckPermissions();
@@ -14,27 +14,27 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: route('dashboard'),
-        icon: LayoutGrid,
+        icon: Gauge,
         isActive: route().current('dashboard'),
     },
     {
         title: 'Roles',
         href: route('roles.index'),
-        icon: LayoutGrid,
+        icon: UserCog,
         isActive: route().current('roles.*'),
         hide: !checkPermissions(['View Role']),
     },
     {
         title: 'Users',
         href: route('users.index'),
-        icon: LayoutGrid,
+        icon: Users,
         isActive: route().current('users.*'),
         hide: !checkPermissions(['View User']),
     },
     {
         title: 'Tenants',
         href: route('tenants.index'),
-        icon: LayoutGrid,
+        icon: KeySquare,
         isActive: route().current('tenants.*'),
         hide: !checkPermissions(['View Tenant']),
     },
