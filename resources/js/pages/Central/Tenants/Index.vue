@@ -2,6 +2,7 @@
 import Tooltip from '@/components/shared/Tooltip.vue';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import DeleteTenant from '@/components/view/tenants/DeleteTenant.vue';
 import { useCheckPermissions } from '@/composables/useCheckPermissions';
 import { useDateTimeFormat } from '@/composables/useDateTimeFormat';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -9,7 +10,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { Tenant } from '@/types/Tenant';
 import { Head, Link } from '@inertiajs/vue3';
 import { useBrowserLocation } from '@vueuse/core';
-import { SquareArrowOutUpRight, Trash2 } from 'lucide-vue-next';
+import { SquareArrowOutUpRight } from 'lucide-vue-next';
 
 defineProps<{
     tenants: Tenant[];
@@ -75,19 +76,7 @@ const computedLinks = (subdomain: string) =>
                                         </a>
                                     </Button>
                                 </Tooltip>
-
-                                <Tooltip message="Delete Tenant">
-                                    <Link
-                                        v-if="checkPermissions(['Delete Tenant'])"
-                                        :href="route('tenants.destroy', tenant.id)"
-                                        method="delete"
-                                        as="button"
-                                    >
-                                        <Button variant="destructive" size="icon">
-                                            <Trash2 />
-                                        </Button>
-                                    </Link>
-                                </Tooltip>
+                                <DeleteTenant v-if="checkPermissions(['Force Delete Tenant'])" :tenant="tenant" />
                             </div>
                         </TableCell>
                     </TableRow>

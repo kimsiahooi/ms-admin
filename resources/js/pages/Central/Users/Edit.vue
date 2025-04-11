@@ -77,7 +77,9 @@ const submit = () => form.put(route('users.update', props.user.id));
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
-                                                <SelectItem v-for="role in roles" :key="role.id" :value="role.name">{{ role.name }}</SelectItem>
+                                                <template v-for="role in roles" :key="role.id">
+                                                    <SelectItem :value="role.name">{{ role.name }}</SelectItem>
+                                                </template>
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>

@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
         User::firstOrCreate([
             'email' => 'superadmin@gmail.com',
         ], [
-            'name' => 'Central Super Admin',
+            'name' => 'Super Admin',
             'email' => 'superadmin@gmail.com',
             'email_verified_at' => now(),
             'password' => 'password',
@@ -28,7 +28,7 @@ class UserSeeder extends Seeder
         User::firstOrCreate([
             'email' => 'admin@gmail.com',
         ], [
-            'name' => 'Central Admin',
+            'name' => 'Admin',
             'email' => 'admin@gmail.com',
             'email_verified_at' => now(),
             'password' => 'password',
@@ -38,7 +38,7 @@ class UserSeeder extends Seeder
         User::firstOrCreate([
             'email' => 'user@gmail.com',
         ], [
-            'name' => 'Central User',
+            'name' => 'User',
             'email' => 'user@gmail.com',
             'email_verified_at' => now(),
             'password' => 'password',

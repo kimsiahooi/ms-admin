@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Permissions\RolePermissionsEnum;
+use App\Enums\Permissions\TenantPermissionsEnum;
+use App\Enums\Permissions\UserPermissionsEnum;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class TenantController extends Controller
 {
@@ -12,10 +17,12 @@ class TenantController extends Controller
      */
     public function index()
     {
+        Gate::authorize(TenantPermissionsEnum::ViewTenant);
+
         $tenants = Tenant::latest()->get();
 
         return inertia('Central/Tenants/Index', [
-            'tenants' => $tenants
+            'tenants' => $tenants,
         ]);
     }
 
@@ -24,6 +31,8 @@ class TenantController extends Controller
      */
     public function create()
     {
+        Gate::authorize(TenantPermissionsEnum::CreateTenant);
+
         return inertia('Central/Tenants/Create');
     }
 
@@ -32,9 +41,11 @@ class TenantController extends Controller
      */
     public function store(Request $request)
     {
+        Gate::authorize(TenantPermissionsEnum::CreateTenant);
+
         $request->validate([
-            'id' => 'required|string|max:255|unique:tenants,id',
-            'name' => 'required|string|max:255',
+            'id' => ['required', 'string', 'max:255', Rule::unique('tenants', 'id')],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         $tenant = Tenant::create([
@@ -54,7 +65,7 @@ class TenantController extends Controller
      */
     public function show(string $id)
     {
-        //
+        Gate::authorize(TenantPermissionsEnum::ViewTenant);
     }
 
     /**
@@ -62,7 +73,7 @@ class TenantController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        Gate::authorize(TenantPermissionsEnum::EditTenant);
     }
 
     /**
@@ -70,7 +81,7 @@ class TenantController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        Gate::authorize(TenantPermissionsEnum::EditTenant);
     }
 
     /**
@@ -78,6 +89,8 @@ class TenantController extends Controller
      */
     public function destroy(Tenant $tenant)
     {
+        Gate::authorize(TenantPermissionsEnum::DeleteTenant);
+
         $tenant->delete();
 
         return back()->with('success', 'Tenant deleted successfully.');

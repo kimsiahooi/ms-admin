@@ -71,7 +71,7 @@ const submit = () => form.put(route('roles.updatePermissions', props.role.id));
                             <div v-if="checkPermissions(['Force Delete Role'])" class="flex items-center space-x-2">
                                 <Checkbox :model-value="showPermissions('Force Delete Role')" @click="permissionHandler('Force Delete Role')" />
                                 <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                    Force Delete Role
+                                    Permanant Delete Role
                                 </label>
                             </div>
                         </div>
@@ -118,7 +118,7 @@ const submit = () => form.put(route('roles.updatePermissions', props.role.id));
                             <div v-if="checkPermissions(['Force Delete User'])" class="flex items-center space-x-2">
                                 <Checkbox :model-value="showPermissions('Force Delete User')" @click="permissionHandler('Force Delete User')" />
                                 <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                    Force Delete User
+                                    Permanant Delete User
                                 </label>
                             </div>
                         </div>
@@ -148,10 +148,10 @@ const submit = () => form.put(route('roles.updatePermissions', props.role.id));
                                 </label>
                             </div>
 
-                            <div v-if="checkPermissions(['Delete Tenant'])" class="flex items-center space-x-2">
-                                <Checkbox :model-value="showPermissions('Delete Tenant')" @click="permissionHandler('Delete Tenant')" />
+                            <div v-if="checkPermissions(['Force Delete Tenant'])" class="flex items-center space-x-2">
+                                <Checkbox :model-value="showPermissions('Force Delete Tenant')" @click="permissionHandler('Force Delete Tenant')" />
                                 <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                    Delete Tenant
+                                    Permanant Delete Tenant
                                 </label>
                             </div>
                         </div>

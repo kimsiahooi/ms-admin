@@ -19,7 +19,7 @@ class UserController extends Controller
     {
         Gate::authorize(UserPermissionsEnum::ViewUser);
 
-        $users = User::with('roles')->orderByDesc('id')->get();
+        $users = User::with('roles')->withoutRole(UserRolesEnum::SuperAdmin)->orderByDesc('id')->get();
 
         return inertia('Central/Users/Index', [
             'users' => $users,
@@ -45,9 +45,9 @@ class UserController extends Controller
 
         User::create(
             $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|max:255|unique:users,email',
-                'password' => 'required|min:8|max:255|confirmed',
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
+                'password' => ['required', 'min:8', 'max:255', 'confirmed'],
             ]),
         )->assignRole(UserRolesEnum::User);
 
@@ -69,9 +69,11 @@ class UserController extends Controller
     {
         Gate::authorize(UserPermissionsEnum::EditUser);
 
+        Gate::denyIf($user->hasRole(UserRolesEnum::SuperAdmin));
+
         return inertia('Central/Users/Edit', [
             'user' => $user->load(['roles']),
-            'roles' => Role::all(),
+            'roles' => Role::whereNot('name', UserRolesEnum::SuperAdmin)->get(),
         ]);
     }
 
@@ -81,6 +83,8 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         Gate::authorize(UserPermissionsEnum::EditUser);
+
+        Gate::denyIf($user->hasRole(UserRolesEnum::SuperAdmin));
 
         $user->update(
             $request->validate([
@@ -102,6 +106,8 @@ class UserController extends Controller
     {
         Gate::authorize(UserPermissionsEnum::DeleteUser);
 
+        Gate::denyIf($user->hasRole(UserRolesEnum::SuperAdmin));
+
         $user->delete();
 
         return back()->with('success', 'User deleted successfully.');
@@ -111,7 +117,7 @@ class UserController extends Controller
     {
         Gate::authorize(UserPermissionsEnum::RestoreUser);
 
-        $users = User::onlyTrashed()->with('roles')->get();
+        $users = User::onlyTrashed()->with('roles')->withoutRole(UserRolesEnum::SuperAdmin)->get();
 
         return inertia('Central/Users/Trashed', [
             'users' => $users,
@@ -123,10 +129,12 @@ class UserController extends Controller
         Gate::authorize(UserPermissionsEnum::RestoreUser);
 
         $request->validate([
-            'id' => ['required', 'exists:users,id'],
+            'id' => ['required', Rule::exists('users', 'id')],
         ]);
 
         $user = User::onlyTrashed()->where('id', $request->id)->first();
+
+        Gate::denyIf($user->hasRole(UserRolesEnum::SuperAdmin));
 
         $user->restore();
 
@@ -138,10 +146,12 @@ class UserController extends Controller
         Gate::authorize(UserPermissionsEnum::ForceDeleteUser);
 
         $request->validate([
-            'id' => ['required', 'exists:users,id'],
+            'id' => ['required', Rule::exists('users', 'id')],
         ]);
 
         $user = User::onlyTrashed()->where('id', $request->id)->first();
+
+        Gate::denyIf($user->hasRole(UserRolesEnum::SuperAdmin));
 
         $user->forceDelete();
 

@@ -49,8 +49,6 @@ class DatabaseSeeder extends Seeder
 
         $superadmin_permissions = Permission::all();
 
-        $admin_permissions = Permission::whereNotLike('name', '%delete%')->whereNotLike('name', '%restore%')->get();
-
         $superadmin_role->syncPermissions($superadmin_permissions);
 
         $this->call([
