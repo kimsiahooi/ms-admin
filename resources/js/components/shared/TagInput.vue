@@ -1,16 +1,19 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends string">
 import { Combobox, ComboboxAnchor, ComboboxEmpty, ComboboxGroup, ComboboxInput, ComboboxItem, ComboboxList } from '@/components/ui/combobox';
 import { TagsInput, TagsInputInput, TagsInputItem, TagsInputItemDelete, TagsInputItemText } from '@/components/ui/tags-input';
 import { useFilter } from 'reka-ui';
 import { computed, ref } from 'vue';
 
 const props = defineProps<{
-    values: string[];
-    modelValue: string[];
+    values: T[];
+    modelValue: T[];
     placeholder: string;
 }>();
 
-const emit = defineEmits(['pushValue', 'removeValue']);
+const emit = defineEmits<{
+    (event: 'pushValue', payload: T): void;
+    (event: 'removeValue', payload: T): void;
+}>();
 
 const open = ref(false);
 const searchTerm = ref('');
@@ -21,9 +24,9 @@ const filteredValues = computed(() => {
     return searchTerm.value ? options.filter((option) => contains(option, searchTerm.value)) : options;
 });
 
-const selectHandler = (value: string) => emit('pushValue', value);
+const selectHandler = (value: T) => emit('pushValue', value);
 
-const deleteHandler = (value: string) => emit('removeValue', value);
+const deleteHandler = (value: T) => emit('removeValue', value);
 </script>
 
 <template>
@@ -54,11 +57,9 @@ const deleteHandler = (value: string) => emit('removeValue', value);
                         :key="value"
                         :value="value"
                         @select.prevent="
-                            (ev) => {
-                                if (typeof ev.detail.value === 'string') {
-                                    searchTerm = '';
-                                    selectHandler(ev.detail.value);
-                                }
+                            () => {
+                                searchTerm = '';
+                                selectHandler(value);
 
                                 if (filteredValues.length === 0) {
                                     open = false;

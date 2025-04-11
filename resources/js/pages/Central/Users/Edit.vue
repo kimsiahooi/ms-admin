@@ -46,7 +46,9 @@ const form = useForm({
     roles: computedUserRoles.value,
 });
 
-const pushRole = (role: UserRole) => form.roles.push(role);
+const pushRole = (role: UserRole) => {
+    form.roles.push(role);
+};
 
 const removeRole = (role: UserRole) => {
     form.roles = form.roles.filter((r) => r !== role);
