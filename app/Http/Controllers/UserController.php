@@ -167,7 +167,10 @@ class UserController extends Controller
 
     public function audits()
     {
-        $audits = Activity::with(['causer'])->where('log_name', LogNamesEnum::User->value)->orderByDesc('id')->get();
+        $audits = Activity::with(['causer'])
+            ->where('log_name', LogNamesEnum::User->value)
+            ->orderByDesc('id')
+            ->get();
 
         return inertia('Central/Users/Audit', [
             'audits' => $audits,
