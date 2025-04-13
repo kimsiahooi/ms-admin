@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ActivityLogs\LogNamesEnum;
 use App\Enums\Permissions\RolePermissionsEnum;
 use App\Enums\Roles\UserRolesEnum;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use Spatie\Activitylog\Models\Activity;
+use App\Models\Role;
 
 class RoleController extends Controller
 {
@@ -86,9 +86,11 @@ class RoleController extends Controller
 
         Gate::denyIf($role->name === UserRolesEnum::SuperAdmin->value);
 
-        $role->update($request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique('roles', 'name')->ignore($role->id)],
-        ]));
+        $role->update(
+            $request->validate([
+                'name' => ['required', 'string', 'max:255', Rule::unique('roles', 'name')->ignore($role->id)],
+            ]),
+        );
 
         return back()->with('success', 'Role updated successfully.');
     }
@@ -120,5 +122,19 @@ class RoleController extends Controller
         $role->syncPermissions($request->permissions);
 
         return back()->with('success', 'Permissions synced successfully.');
+    }
+
+    public function audits()
+    {
+        Gate::authorize(RolePermissionsEnum::AuditRole);
+
+        $audits = Activity::with(['causer'])
+            ->where('log_name', LogNamesEnum::Role->value)
+            ->orderByDesc('id')
+            ->get();
+
+        return inertia('Central/Roles/Audit', [
+            'audits' => $audits,
+        ]);
     }
 }

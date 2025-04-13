@@ -37,6 +37,10 @@ const breadcrumbs: BreadcrumbItem[] = [
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="flex flex-wrap items-center justify-end gap-3">
+                <Link v-if="checkPermissions(['Audit Role'])" :href="route('roles.audits')" as-child>
+                    <Button>View Audits</Button>
+                </Link>
+
                 <Link v-if="checkPermissions(['Create Role'])" :href="route('roles.create')" as-child>
                     <Button>Create Role</Button>
                 </Link>

@@ -53,6 +53,7 @@ declare module 'ziggy-js' {
             "binding": "id"
         }
     ],
+    "roles.audits": [],
     "roles.updatePermissions": [
         {
             "name": "role",

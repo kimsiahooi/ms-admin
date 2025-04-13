@@ -20,7 +20,7 @@ Route::domain($domain)->group(function () {
         Route::prefix('roles')
             ->name('roles.')
             ->group(function () {
-                Route::get('audits', [UserController::class, 'audits'])->name('audits');
+                Route::get('audits', [RoleController::class, 'audits'])->name('audits');
             });
         Route::match(['put', 'patch'], 'roles/{role}/permissions/update', [RoleController::class, 'updatePermissions'])->name('roles.updatePermissions');
         Route::resource('users', UserController::class)->except(['show']);

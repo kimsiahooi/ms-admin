@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use App\Enums\ActivityLogs\LogNamesEnum;
 use App\Enums\Permissions\UserPermissionsEnum;
 use App\Enums\Roles\UserRolesEnum;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Spatie\Activitylog\Models\Activity;
-use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -167,6 +167,8 @@ class UserController extends Controller
 
     public function audits()
     {
+        Gate::authorize(UserPermissionsEnum::AuditUser);
+
         $audits = Activity::with(['causer'])
             ->where('log_name', LogNamesEnum::User->value)
             ->orderByDesc('id')

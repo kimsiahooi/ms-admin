@@ -1,4 +1,4 @@
-export type RolePermission = 'View Role' | 'Create Role' | 'Edit Role' | 'Force Delete Role';
+export type RolePermission = 'View Role' | 'Create Role' | 'Edit Role' | 'Force Delete Role' | 'Audit Role';
 export type UserPermission =
     | 'View User'
     | 'Create User'
