@@ -129,6 +129,13 @@ const submit = () => form.put(route('roles.updatePermissions', props.role.id));
                                     Permanant Delete User
                                 </label>
                             </div>
+
+                            <div v-if="checkPermissions(['Audit User'])" class="flex items-center space-x-2">
+                                <Checkbox :model-value="showPermissions('Audit User')" @click="permissionHandler('Audit User')" />
+                                <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Audit User
+                                </label>
+                            </div>
                         </div>
                     </div>
 

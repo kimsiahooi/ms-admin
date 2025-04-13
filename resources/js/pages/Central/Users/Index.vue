@@ -42,12 +42,16 @@ const breadcrumbs: BreadcrumbItem[] = [
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="flex flex-wrap items-center justify-end gap-3">
-                <Link v-if="checkPermissions(['Create User'])" :href="route('users.create')" as-child>
-                    <Button>Create User</Button>
+                <Link v-if="checkPermissions(['Audit User'])" :href="route('users.audits')" as-child>
+                    <Button>View Audits</Button>
                 </Link>
 
                 <Link v-if="checkPermissions(['View Trashed User'])" :href="route('users.trashed')" as-child>
                     <Button>View Trashed</Button>
+                </Link>
+
+                <Link v-if="checkPermissions(['Create User'])" :href="route('users.create')" as-child>
+                    <Button>Create User</Button>
                 </Link>
             </div>
 
