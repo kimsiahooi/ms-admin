@@ -9,14 +9,11 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Tenant } from '@/types/Tenant';
 import { Head, Link } from '@inertiajs/vue3';
-import { useBrowserLocation } from '@vueuse/core';
 import { SquareArrowOutUpRight } from 'lucide-vue-next';
 
 defineProps<{
     tenants: Tenant[];
 }>();
-
-const location = useBrowserLocation();
 
 const format = useDateTimeFormat();
 
@@ -32,9 +29,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: route('tenants.index'),
     },
 ];
-
-const computedLinks = (subdomain: string) =>
-    location.value.protocol && location.value.host ? `${location.value.protocol}//${subdomain}.${location.value.host}` : '#';
 </script>
 
 <template>
@@ -71,7 +65,7 @@ const computedLinks = (subdomain: string) =>
                             <div class="space-x-2">
                                 <Tooltip message="To Website">
                                     <Button as-child size="icon">
-                                        <a :href="computedLinks(tenant.id.toString())" target="_blank">
+                                        <a :href="route('home', tenant.id)" target="_blank">
                                             <SquareArrowOutUpRight />
                                         </a>
                                     </Button>
