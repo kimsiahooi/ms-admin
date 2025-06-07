@@ -23,6 +23,10 @@ export type AppPageProps<T extends Record<string, unknown> = Record<string, unkn
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    tenant: {
+        readonly id: string;
+        readonly name: string;
+    } | null;
     flash: {
         success: string | null;
         error: string | null;

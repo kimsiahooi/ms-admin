@@ -57,7 +57,10 @@ const columns: ColumnDef<Tenant>[] = [
     {
         accessorKey: 'id',
         header: () => h('div', null, 'ID'),
-        cell: ({ row }) => h('div', null, row.getValue('id')),
+        cell: ({ row }) => {
+            const id = row.original.id;
+            return h('div', null, id);
+        },
     },
     {
         accessorKey: 'name',
