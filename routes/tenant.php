@@ -29,6 +29,10 @@ Route::middleware([
     'web',
     InitializeTenancyByPath::class
 ])->prefix('{tenant}')->group(function () {
+    Route::get('/', function () {
+        return to_route('dashboard', ['tenant' => tenant('id')]);
+    });
+
     Route::middleware('guest')->group(function () {
         Route::get('register', [RegisteredUserController::class, 'create'])
             ->name('register');

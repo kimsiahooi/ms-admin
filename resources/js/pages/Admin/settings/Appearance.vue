@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 
-import AppearanceTabs from '@/components/Tenant/AppearanceTabs.vue';
-import HeadingSmall from '@/components/Tenant/HeadingSmall.vue';
+import AppearanceTabs from '@/components/Admin/AppearanceTabs.vue';
+import HeadingSmall from '@/components/Admin/HeadingSmall.vue';
 // biome-ignore lint/style/useImportType: <explanation>
 import { type BreadcrumbItem } from '@/types';
 
-import AppLayout from '@/layouts/Tenant/AppLayout.vue';
-import SettingsLayout from '@/layouts/Tenant/settings/Layout.vue';
+import AppLayout from '@/layouts/Admin/AppLayout.vue';
+import SettingsLayout from '@/layouts/Admin/settings/Layout.vue';
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {

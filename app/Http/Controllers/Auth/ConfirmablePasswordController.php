@@ -17,7 +17,7 @@ class ConfirmablePasswordController extends Controller
      */
     public function show(): Response
     {
-        return Inertia::render('auth/ConfirmPassword');
+        return Inertia::render('Admin/auth/ConfirmPassword');
     }
 
     /**
@@ -25,7 +25,7 @@ class ConfirmablePasswordController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        if (! Auth::guard('web')->validate([
+        if (! Auth::guard('admin')->validate([
             'email' => $request->user()->email,
             'password' => $request->password,
         ])) {

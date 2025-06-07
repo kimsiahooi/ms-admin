@@ -5,8 +5,8 @@ import type { Filter, SearchConfig, VisibilityState } from '@/components/shared/
 import { Button } from '@/components/ui/button';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
 import { entryOptions } from '@/constants/entries/options';
-import AppLayout from '@/layouts/AppLayout.vue';
-import AppMainLayout from '@/layouts/AppMainLayout.vue';
+import AppLayout from '@/layouts/Admin/AppLayout.vue';
+import AppMainLayout from '@/layouts/Admin/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Tenant } from '@/types/tenants';
 import { Head, Link, router } from '@inertiajs/vue3';
