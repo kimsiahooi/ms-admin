@@ -18,7 +18,7 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
-        return Inertia::render('settings/Profile', [
+        return Inertia::render('Tenant/settings/Profile', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
         ]);
@@ -37,7 +37,7 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return to_route('admin.profile.edit');
+        return to_route('profile.edit', ['tenant' => tenant('id')]);
     }
 
     /**
@@ -58,6 +58,6 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return to_route('login', ['tenant' => tenant('id')]);
     }
 }

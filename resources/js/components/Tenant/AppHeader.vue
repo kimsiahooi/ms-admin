@@ -10,7 +10,7 @@ import { NavigationMenu, NavigationMenuItem, NavigationMenuList, navigationMenuT
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getInitials } from '@/composables/useInitials';
-import type { BreadcrumbItem, NavItem } from '@/types';
+import type { AppPageProps, BreadcrumbItem, NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
 import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-vue-next';
 import { computed } from 'vue';
@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
 });
 
-const page = usePage();
+const page = usePage<AppPageProps>();
 const auth = computed(() => page.props.auth);
 
 const isCurrentRoute = computed(() => (url: string) => page.url === url);
@@ -32,10 +32,12 @@ const activeItemStyles = computed(
     () => (url: string) => (isCurrentRoute.value(url) ? 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100' : ''),
 );
 
+const tenant = computed(() => page.props.tenant?.id || '');
+
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: route('dashboard', { tenant: tenant.value }),
         icon: LayoutGrid,
     },
 ];
@@ -102,7 +104,7 @@ const rightNavItems: NavItem[] = [
                     </Sheet>
                 </div>
 
-                <Link :href="route('dashboard')" class="flex items-center gap-x-2">
+                <Link :href="route('dashboard', { tenant })" class="flex items-center gap-x-2">
                     <AppLogo />
                 </Link>
 

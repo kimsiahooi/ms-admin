@@ -2,19 +2,23 @@
 import InputError from '@/components/Tenant/InputError.vue';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import SettingsLayout from '@/layouts/Tenant/settings/Layout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
 
 import HeadingSmall from '@/components/Tenant/HeadingSmall.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import type { BreadcrumbItem } from '@/types';
+import type { AppPageProps, BreadcrumbItem } from '@/types';
+
+const page = usePage<AppPageProps>();
+
+const tenant = computed(() => page.props.tenant?.id || '');
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
         title: 'Password settings',
-        href: route('admin.password.edit'),
+        href: route('password.edit', { tenant: tenant.value }),
     },
 ];
 
@@ -28,7 +32,7 @@ const form = useForm({
 });
 
 const updatePassword = () => {
-    form.put(route('admin.password.update'), {
+    form.put(route('password.update', { tenant: tenant.value }), {
         preserveScroll: true,
         onSuccess: () => form.reset(),
         onError: (errors: any) => {

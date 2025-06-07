@@ -2,25 +2,28 @@
 import Heading from '@/components/Tenant/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import type { NavItem } from '@/types';
+import type { AppPageProps, NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+
+const page = usePage<AppPageProps>();
+
+const tenant = computed(() => page.props.tenant?.id || '');
 
 const sidebarNavItems: NavItem[] = [
     {
         title: 'Profile',
-        href: route('admin.profile.edit'),
+        href: route('profile.edit', { tenant: tenant.value }),
     },
     {
         title: 'Password',
-        href: route('admin.password.edit'),
+        href: route('password.edit', { tenant: tenant.value }),
     },
     {
         title: 'Appearance',
-        href: route('admin.appearance'),
+        href: route('appearance', { tenant: tenant.value }),
     },
 ];
-
-const page = usePage();
 
 const currentPath = page.props.ziggy?.location ? new URL(page.props.ziggy.location).pathname : '';
 </script>

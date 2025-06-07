@@ -9,7 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import SettingsLayout from '@/layouts/Tenant/settings/Layout.vue';
-import type { BreadcrumbItem, User } from '@/types';
+import type { AppPageProps, BreadcrumbItem, User } from '@/types';
+import { computed } from 'vue';
 
 interface Props {
     mustVerifyEmail: boolean;
@@ -18,14 +19,17 @@ interface Props {
 
 defineProps<Props>();
 
+const page = usePage<AppPageProps>();
+
+const tenant = computed(() => page.props.tenant?.id || '');
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Profile settings',
-        href: route('admin.profile.edit'),
+        href: route('profile.edit', { tenant: tenant.value }),
     },
 ];
 
-const page = usePage();
 const user = page.props.auth.user as User;
 
 const form = useForm({
@@ -34,7 +38,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.patch(route('admin.profile.update'), {
+    form.patch(route('profile.update', { tenant: tenant.value }), {
         preserveScroll: true,
     });
 };
@@ -73,7 +77,7 @@ const submit = () => {
                         <p class="-mt-4 text-sm text-muted-foreground">
                             Your email address is unverified.
                             <Link
-                                :href="route('verification.send')"
+                                :href="route('verification.send', { tenant })"
                                 method="post"
                                 as="button"
                                 class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"

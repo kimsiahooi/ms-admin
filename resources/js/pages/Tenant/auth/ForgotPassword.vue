@@ -5,19 +5,25 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/Tenant/AuthLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import type { AppPageProps } from '@/types';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 defineProps<{
     status?: string;
 }>();
+
+const page = usePage<AppPageProps>();
+
+const tenant = computed(() => page.props.tenant?.id || '');
 
 const form = useForm({
     email: '',
 });
 
 const submit = () => {
-    form.post(route('password.email'));
+    form.post(route('password.email', { tenant: tenant.value }));
 };
 </script>
 
@@ -47,7 +53,7 @@ const submit = () => {
 
             <div class="space-x-1 text-center text-sm text-muted-foreground">
                 <span>Or, return to</span>
-                <TextLink :href="route('login')">log in</TextLink>
+                <TextLink :href="route('login', { tenant })">log in</TextLink>
             </div>
         </div>
     </AuthLayout>

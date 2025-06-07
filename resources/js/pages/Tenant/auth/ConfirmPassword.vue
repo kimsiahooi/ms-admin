@@ -4,15 +4,21 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/Tenant/AuthLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import type { AppPageProps } from '@/types';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+import { computed } from 'vue';
+
+const page = usePage<AppPageProps>();
+
+const tenant = computed(() => page.props.tenant?.id || '');
 
 const form = useForm({
     password: '',
 });
 
 const submit = () => {
-    form.post(route('password.confirm'), {
+    form.post(route('password.confirm', { tenant: tenant.value }), {
         onFinish: () => {
             form.reset();
         },

@@ -4,8 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/Tenant/AuthLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import type { AppPageProps } from '@/types';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 interface Props {
     token: string;
@@ -13,6 +15,10 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const page = usePage<AppPageProps>();
+
+const tenant = computed(() => page.props.tenant?.id || '');
 
 const form = useForm({
     token: props.token,
@@ -22,7 +28,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route('password.store'), {
+    form.post(route('password.store', { tenant: tenant.value }), {
         onFinish: () => {
             form.reset('password', 'password_confirmation');
         },

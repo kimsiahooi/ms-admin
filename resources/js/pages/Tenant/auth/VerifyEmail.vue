@@ -2,17 +2,23 @@
 import TextLink from '@/components/Tenant/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/Tenant/AuthLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import type { AppPageProps } from '@/types';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 defineProps<{
     status?: string;
 }>();
 
+const page = usePage<AppPageProps>();
+
+const tenant = computed(() => page.props.tenant?.id || '');
+
 const form = useForm({});
 
 const submit = () => {
-    form.post(route('verification.send'));
+    form.post(route('verification.send', { tenant: tenant.value }));
 };
 </script>
 
@@ -30,7 +36,7 @@ const submit = () => {
                 Resend verification email
             </Button>
 
-            <TextLink :href="route('logout')" method="post" as="button" class="mx-auto block text-sm"> Log out </TextLink>
+            <TextLink :href="route('logout', { tenant })" method="post" as="button" class="mx-auto block text-sm"> Log out </TextLink>
         </form>
     </AuthLayout>
 </template>

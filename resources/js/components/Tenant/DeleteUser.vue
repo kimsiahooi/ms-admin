@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { useForm, usePage } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
 
 // Components
 import HeadingSmall from '@/components/Tenant/HeadingSmall.vue';
@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import type { AppPageProps } from '@/types';
 
 const passwordInput = ref<HTMLInputElement | null>(null);
 
@@ -25,10 +26,14 @@ const form = useForm({
     password: '',
 });
 
+const page = usePage<AppPageProps>();
+
+const tenant = computed(() => page.props.tenant?.id || '');
+
 const deleteUser = (e: Event) => {
     e.preventDefault();
 
-    form.delete(route('profile.destroy'), {
+    form.delete(route('profile.destroy', { tenant: tenant.value }), {
         preserveScroll: true,
         onSuccess: () => closeModal(),
         onError: () => passwordInput.value?.focus(),
