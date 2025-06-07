@@ -14,6 +14,11 @@ const mainNavItems: NavItem[] = [
         href: route('admin.dashboard'),
         icon: LayoutGrid,
     },
+    {
+        title: 'Tenants',
+        href: route('admin.tenants.index'),
+        icon: LayoutGrid,
+    },
 ];
 
 const footerNavItems: NavItem[] = [

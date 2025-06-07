@@ -1,0 +1,74 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Tenant;
+use Illuminate\Http\Request;
+
+class TenantController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $tenants = Tenant::paginate();
+
+        return inertia('Admin/Tenants/Index', [
+            'tenants' => $tenants,
+        ]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return inertia('Admin/Tenants/Create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        Tenant::create($request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'id' => ['required', 'string', 'max:255', 'alpha_dash', 'unique:tenants,id'],
+        ]));
+
+        return back()->with('success', 'Tenant created successfully.');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Tenant $tenant)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Tenant $tenant)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Tenant $tenant)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Tenant $tenant)
+    {
+        //
+    }
+}
