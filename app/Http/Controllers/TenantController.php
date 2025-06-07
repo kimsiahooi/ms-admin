@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tenant;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class TenantController extends Controller
@@ -10,9 +11,14 @@ class TenantController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $tenants = Tenant::paginate();
+        $entries = $request->input('entries', 10);
+
+        $tenants = Tenant::when($request->search, function ($query, $search) {
+            $query->where('name', 'like', "%{$search}%");
+        })
+            ->paginate($entries);
 
         return inertia('Admin/Tenants/Index', [
             'tenants' => $tenants,
@@ -37,7 +43,7 @@ class TenantController extends Controller
             'id' => ['required', 'string', 'max:255', 'alpha_dash', 'unique:tenants,id'],
         ]));
 
-        return back()->with('success', 'Tenant created successfully.');
+        return to_route('admin.tenants.index')->with('success', 'Tenant created successfully.');
     }
 
     /**

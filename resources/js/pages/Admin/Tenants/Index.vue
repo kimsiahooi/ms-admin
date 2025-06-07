@@ -3,6 +3,7 @@ import type { PaginateData } from '@/components/shared/pagination/types';
 import { DataTable } from '@/components/shared/table';
 import type { Filter, SearchConfig, VisibilityState } from '@/components/shared/table/types';
 import { Button } from '@/components/ui/button';
+import { useFormatDateTime } from '@/composables/useFormatDateTime';
 import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AppMainLayout from '@/layouts/AppMainLayout.vue';
@@ -19,6 +20,8 @@ defineOptions({
 defineProps<{
     tenants: PaginateData<Tenant[]>;
 }>();
+
+const { formatDateTime } = useFormatDateTime();
 
 const routeParams = computed(() => route().params);
 
@@ -46,13 +49,46 @@ const filterChangeHandler = (filter: Filter) => {
     router.visit(route('admin.tenants.index', { ...filter }));
 };
 
-const columnVisibility: VisibilityState = {};
+const columnVisibility = <VisibilityState<Partial<Tenant>>>{
+    updated_at: false,
+};
 
 const columns: ColumnDef<Tenant>[] = [
+    {
+        accessorKey: 'id',
+        header: () => h('div', null, 'ID'),
+        cell: ({ row }) => h('div', null, row.getValue('id')),
+    },
     {
         accessorKey: 'name',
         header: () => h('div', null, 'Name'),
         cell: ({ row }) => h('div', null, row.getValue('name')),
+    },
+    {
+        accessorKey: 'created_at',
+        header: () => h('div', null, 'Created At'),
+        cell: ({ row }) => {
+            const value = formatDateTime(row.original.created_at);
+
+            if (!value) {
+                return h('div', null);
+            }
+
+            return h('div', null, value);
+        },
+    },
+    {
+        accessorKey: 'updated_at',
+        header: () => h('div', null, 'Updated At'),
+        cell: ({ row }) => {
+            const value = formatDateTime(row.original.updated_at);
+
+            if (!value) {
+                return h('div', null);
+            }
+
+            return h('div', null, value);
+        },
     },
 ];
 </script>
