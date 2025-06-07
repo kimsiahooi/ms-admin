@@ -3,6 +3,7 @@ import { Head } from '@inertiajs/vue3';
 
 import AppearanceTabs from '@/components/AppearanceTabs.vue';
 import HeadingSmall from '@/components/HeadingSmall.vue';
+// biome-ignore lint/style/useImportType: <explanation>
 import { type BreadcrumbItem } from '@/types';
 
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -11,7 +12,7 @@ import SettingsLayout from '@/layouts/settings/Layout.vue';
 const breadcrumbItems: BreadcrumbItem[] = [
     {
         title: 'Appearance settings',
-        href: '/settings/appearance',
+        href: route('admin.appearance'),
     },
 ];
 </script>

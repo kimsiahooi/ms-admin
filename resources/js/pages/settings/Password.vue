@@ -9,12 +9,12 @@ import HeadingSmall from '@/components/HeadingSmall.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { type BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
         title: 'Password settings',
-        href: '/settings/password',
+        href: route('admin.password.edit'),
     },
 ];
 
@@ -28,7 +28,7 @@ const form = useForm({
 });
 
 const updatePassword = () => {
-    form.put(route('password.update'), {
+    form.put(route('admin.password.update'), {
         preserveScroll: true,
         onSuccess: () => form.reset(),
         onError: (errors: any) => {

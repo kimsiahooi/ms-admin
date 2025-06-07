@@ -20,8 +20,8 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
 Route::middleware([
     'web',
     InitializeTenancyByPath::class
-])->prefix('{tenant}')->name('tenant.')->group(function () {
+])->prefix('{tenant}')->group(function () {
     Route::get('/', function () {
         return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
-    })->name('home');
+    })->name('tenant.home');
 });
