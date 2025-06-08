@@ -8,7 +8,7 @@ import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Admin/AppLayout.vue';
 import AppMainLayout from '@/layouts/Admin/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import type { Tenant } from '@/types/tenants';
+import type { Tenant } from '@/types/Admin/tenants';
 import { Head, Link, router } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { computed, h, reactive } from 'vue';

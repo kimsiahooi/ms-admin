@@ -194,6 +194,6 @@ return [
      */
     'seeder_parameters' => [
         '--class' => 'Database\Seeders\Tenant\DatabaseSeeder', // root seeder class
-        // '--force' => true, // This needs to be true to seed tenant databases in production
+        '--force' => true, // This needs to be true to seed tenant databases in production
     ],
 ];

@@ -17,8 +17,9 @@ class TenantController extends Controller
 
         $tenants = Tenant::when($request->search, function ($query, $search) {
             $query->where('name', 'like', "%{$search}%");
-        })
-            ->paginate($entries);
+        })->latest()
+            ->paginate($entries)
+            ->withQueryString();
 
         return inertia('Admin/Tenants/Index', [
             'tenants' => $tenants,

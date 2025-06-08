@@ -1,6 +1,8 @@
-export interface DeleteDialogType<T = null> {
+export type DialogMethodType = 'post' | 'put' | 'delete';
+
+export interface DialogType<T = null> {
+    method: DialogMethodType | null;
     isOpen: boolean;
-    isDeleting: boolean;
     title: string;
     data: T | null;
 }

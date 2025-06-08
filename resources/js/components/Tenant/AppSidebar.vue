@@ -19,6 +19,11 @@ const mainNavItems: NavItem[] = [
         href: route('dashboard', { tenant: tenant.value }),
         icon: LayoutGrid,
     },
+    {
+        title: 'Machines',
+        href: route('machines.index', { tenant: tenant.value }),
+        icon: LayoutGrid,
+    },
 ];
 
 const footerNavItems: NavItem[] = [

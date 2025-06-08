@@ -21,5 +21,9 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin',
             'password' => 'password',
         ]);
+
+        $this->call([
+            MachineSeeder::class,
+        ]);
     }
 }

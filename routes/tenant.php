@@ -10,6 +10,7 @@ use App\Http\Controllers\Tenant\Auth\NewPasswordController;
 use App\Http\Controllers\Tenant\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Tenant\Auth\RegisteredUserController;
 use App\Http\Controllers\Tenant\Auth\VerifyEmailController;
+use App\Http\Controllers\Tenant\MachineController;
 use App\Http\Controllers\Tenant\Settings\PasswordController;
 use App\Http\Controllers\Tenant\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -94,5 +95,7 @@ Route::middleware([
         Route::get('settings/appearance', function () {
             return Inertia::render('Tenant/settings/Appearance');
         })->name('appearance');
+
+        Route::resource('machines', MachineController::class);
     });
 });
