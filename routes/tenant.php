@@ -96,6 +96,6 @@ Route::middleware([
             return Inertia::render('Tenant/settings/Appearance');
         })->name('appearance');
 
-        Route::resource('machines', MachineController::class);
+        Route::resource('machines', MachineController::class)->except(['create', 'show', 'edit']);
     });
 });
