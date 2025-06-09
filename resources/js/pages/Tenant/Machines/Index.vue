@@ -17,6 +17,7 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { AppPageProps, BreadcrumbItem } from '@/types';
 import type { Machine } from '@/types/Tenant/machines';
+import type { Method } from '@inertiajs/core';
 import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
@@ -75,12 +76,12 @@ const columns: ColumnDef<Machine>[] = [
             const machine = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', onClick: () => dialogHandler('put', machine) }, () =>
+                h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', onClick: () => dialogHandler('update', machine) }, () =>
                     h(Pencil, { class: 'size-3' }),
                 ),
                 h(
                     Button,
-                    { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive', onClick: () => dialogHandler('delete', machine) },
+                    { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive', onClick: () => dialogHandler('destroy', machine) },
                     () => h(Trash2, { class: 'size-3' }),
                 ),
             ]);
@@ -147,7 +148,7 @@ const columns: ColumnDef<Machine>[] = [
 ];
 
 const dialog = reactive<DialogType<Machine>>({
-    method: null,
+    type: null,
     title: '',
     isOpen: false,
     data: null,
@@ -158,7 +159,7 @@ const form = useForm<{
     code: string;
     description: string;
     is_active: boolean;
-}>(dialog.method || '', {
+}>(dialog.type || '', {
     name: '',
     code: '',
     description: '',
@@ -167,15 +168,15 @@ const form = useForm<{
 
 const statusDisplay = computed(() => props.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
 
-const dialogButtonLabel = computed(() => (dialog.method === 'post' ? 'Create' : dialog.method === 'put' ? 'Update' : 'Delete'));
-const dialogButtonVariant = computed<ButtonVariants['variant']>(() => (dialog.method === 'delete' ? 'destructive' : 'default'));
+const dialogButtonLabel = computed(() => (dialog.type === 'store' ? 'Create' : dialog.type === 'update' ? 'Update' : 'Delete'));
+const dialogButtonVariant = computed<ButtonVariants['variant']>(() => (dialog.type === 'destroy' ? 'destructive' : 'default'));
 
-const dialogHandler = (method: DialogMethodType, machine?: Machine) => {
-    switch (method) {
-        case 'post':
+const dialogHandler = (type: DialogMethodType, machine?: Machine) => {
+    switch (type) {
+        case 'store':
             dialog.title = 'Create Machine';
             break;
-        case 'put':
+        case 'update':
             if (machine) {
                 dialog.data = machine;
                 form.name = machine.name;
@@ -185,25 +186,28 @@ const dialogHandler = (method: DialogMethodType, machine?: Machine) => {
             }
             dialog.title = `Edit ${dialog.data?.name || 'Machine'}`;
             break;
-        case 'delete':
+        case 'destroy':
             if (machine) {
                 dialog.data = machine;
             }
             dialog.title = `Delete ${dialog.data?.name || 'Machine'}`;
     }
-    dialog.method = method;
+    dialog.type = type;
     dialog.isOpen = true;
 };
 
 const submit = () => {
-    if (dialog.method) {
+    if (dialog.type) {
         const fetchLink =
-            dialog.method === 'post'
+            dialog.type === 'store'
                 ? route('machines.store', { tenant: tenant.value })
-                : dialog.method === 'put'
+                : dialog.type === 'update'
                   ? route('machines.update', { tenant: tenant.value, machine: dialog.data?.id || '' })
                   : route('machines.destroy', { tenant: tenant.value, machine: dialog.data?.id || '' });
-        form.transform((data) => (dialog.method !== 'delete' ? data : {})).submit(dialog.method, fetchLink, {
+
+        const method: Method = dialog.type === 'store' ? 'post' : dialog.type === 'update' ? 'put' : 'delete';
+
+        form.transform((data) => (dialog.type !== 'destroy' ? data : {})).submit(method, fetchLink, {
             onSuccess: () => {
                 form.reset();
                 dialog.isOpen = false;
@@ -223,8 +227,8 @@ watch(
     },
 );
 
-watch([() => form.name, () => dialog.method], ([newName, newMethod]) => {
-    if (newMethod === 'post') {
+watch([() => form.name, () => dialog.type], ([newName, newType]) => {
+    if (newType === 'store') {
         form.code = slug(newName);
     }
 });
@@ -239,7 +243,7 @@ watch([() => form.name, () => dialog.method], ([newName, newMethod]) => {
                 <div class="flex flex-wrap items-center justify-end gap-2">
                     <Dialog v-model:open="dialog.isOpen" :dialog="dialog" @submit="submit">
                         <template #button>
-                            <Button class="cursor-pointer" @click="dialogHandler('post')">Create</Button>
+                            <Button class="cursor-pointer" @click="dialogHandler('store')">Create</Button>
                         </template>
                         <div class="grid w-full max-w-sm items-center gap-1.5">
                             <Label>Name</Label>

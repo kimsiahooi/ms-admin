@@ -14,7 +14,7 @@ const emits = defineEmits<{
     submit: [value: undefined];
 }>();
 
-const dialogDescription = computed(() => (props.dialog.method === 'delete' ? 'Are you sure you want to delete this data?' : ''));
+const dialogDescription = computed(() => (props.dialog.type === 'destroy' ? 'Are you sure you want to delete this data?' : ''));
 
 const submitHandler = () => {
     emits('submit', undefined);
@@ -30,7 +30,7 @@ const submitHandler = () => {
                     <DialogTitle>{{ dialog.title }}</DialogTitle>
                     <DialogDescription>{{ dialogDescription }}</DialogDescription>
                 </DialogHeader>
-                <div v-if="props.dialog.method !== 'delete'" class="grid gap-4">
+                <div v-if="props.dialog.type !== 'destroy'" class="grid gap-4">
                     <slot />
                 </div>
                 <DialogFooter>
