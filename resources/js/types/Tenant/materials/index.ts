@@ -1,4 +1,4 @@
-export interface Machine {
+export interface Material {
     readonly id: number;
     name: string;
     code: string;

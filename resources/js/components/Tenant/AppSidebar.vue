@@ -24,6 +24,11 @@ const mainNavItems: NavItem[] = [
         href: route('machines.index', { tenant: tenant.value }),
         icon: LayoutGrid,
     },
+    {
+        title: 'Materials',
+        href: route('materials.index', { tenant: tenant.value }),
+        icon: LayoutGrid,
+    },
 ];
 
 const footerNavItems: NavItem[] = [

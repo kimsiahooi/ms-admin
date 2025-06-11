@@ -11,6 +11,7 @@ use App\Http\Controllers\Tenant\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Tenant\Auth\RegisteredUserController;
 use App\Http\Controllers\Tenant\Auth\VerifyEmailController;
 use App\Http\Controllers\Tenant\MachineController;
+use App\Http\Controllers\Tenant\MaterialController;
 use App\Http\Controllers\Tenant\Settings\PasswordController;
 use App\Http\Controllers\Tenant\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -97,5 +98,6 @@ Route::middleware([
         })->name('appearance');
 
         Route::resource('machines', MachineController::class)->except(['create', 'show', 'edit']);
+        Route::resource('materials', MaterialController::class)->except(['create', 'show', 'edit']);
     });
 });
