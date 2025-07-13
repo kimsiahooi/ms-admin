@@ -122,6 +122,11 @@ const columns: ColumnDef<ProductWithMaterials>[] = [
         cell: ({ row }) => h('div', null, row.getValue('unit_price')),
     },
     {
+        accessorKey: 'shelf_life_days',
+        header: () => h('div', null, 'Shelf Life Days'),
+        cell: ({ row }) => h('div', null, row.getValue('shelf_life_days')),
+    },
+    {
         accessorKey: 'is_active',
         header: () => h('div', null, 'Active'),
         cell: ({ row }) => {
@@ -170,6 +175,7 @@ const form = useForm<{
     code: string;
     description: string;
     unit_price: number | '';
+    shelf_life_days: number | '';
     is_active: boolean;
     materials: number[];
 }>(dialog.type || '', {
@@ -177,6 +183,7 @@ const form = useForm<{
     code: '',
     description: '',
     unit_price: '',
+    shelf_life_days: '',
     is_active: true,
     materials: [],
 });
@@ -198,6 +205,7 @@ const dialogHandler = (type: DialogMethodType, product?: ProductWithMaterials) =
                 form.code = product.code;
                 form.description = product.description || '';
                 form.unit_price = +product.unit_price;
+                form.shelf_life_days = product.shelf_life_days || '';
                 form.is_active = product.is_active;
                 form.materials = product.materials.map((material) => material.id);
             }
@@ -279,8 +287,13 @@ watch([() => form.name, () => dialog.type], ([newName, newType]) => {
                         </div>
                         <div class="grid w-full max-w-sm items-center gap-1.5">
                             <Label>Unit Price</Label>
-                            <Input type="number" placeholder="Enter Code" v-model:model-value.number="form.unit_price" step=".01" min="0" />
+                            <Input type="number" placeholder="Enter Unit Price" v-model:model-value.number="form.unit_price" step=".01" min="0" />
                             <p v-if="form.errors.unit_price" class="text-destructive">{{ form.errors.unit_price }}</p>
+                        </div>
+                        <div class="grid w-full max-w-sm items-center gap-1.5">
+                            <Label>Shelf Life Day(s)</Label>
+                            <Input type="number" placeholder="Enter Shelf Life Day(s)" v-model:model-value.number="form.shelf_life_days" min="1" />
+                            <p v-if="form.errors.shelf_life_days" class="text-destructive">{{ form.errors.shelf_life_days }}</p>
                         </div>
                         <div class="grid w-full max-w-sm items-center gap-1.5">
                             <Label>Materials</Label>

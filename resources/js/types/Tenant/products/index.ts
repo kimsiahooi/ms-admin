@@ -8,7 +8,7 @@ export interface Product {
     unit_price: string;
     is_active: boolean;
     is_active_display?: string | null;
-    material_id: number;
+    shelf_life_days: number | null;
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;

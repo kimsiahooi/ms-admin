@@ -55,8 +55,9 @@ class ProductController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255', 'unique:products,code'],
             'description' => ['nullable', 'string'],
-            'is_active' => ['required', 'boolean'],
             'unit_price' => ['required', 'numeric', 'min:0'],
+            'shelf_life_days' => ['nullable', 'integer', 'min:1'],
+            'is_active' => ['required', 'boolean'],
             'materials' => ['required', 'array'],
             'materials.*' => Rule::exists('materials', 'id')->where('is_active', true),
         ]);
@@ -95,6 +96,7 @@ class ProductController extends Controller
             'description' => ['nullable', 'string'],
             'is_active' => ['required', 'boolean'],
             'unit_price' => ['required', 'numeric', 'min:0'],
+            'shelf_life_days' => ['nullable', 'integer', 'min:1'],
             'materials' => ['required', 'array'],
             'materials.*' => Rule::exists('materials', 'id')->where('is_active', true),
         ]);
