@@ -1,4 +1,4 @@
-import type { Material } from '@/types/Tenant/materials';
+import type { Material } from '../materials';
 
 export interface Product {
     readonly id: number;
@@ -14,6 +14,6 @@ export interface Product {
     deleted_at: Date | null;
 }
 
-export interface ProductWithMaterial extends Product {
-    material?: Material;
+export interface ProductWithMaterials extends Product {
+    materials: Material[];
 }

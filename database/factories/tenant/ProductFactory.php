@@ -3,6 +3,7 @@
 namespace Database\Factories\Tenant;
 
 use App\Models\Tenant\Material;
+use App\Models\Tenant\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -26,7 +27,19 @@ class ProductFactory extends Factory
             'description' => fake()->sentence(),
             'unit_price' => fake()->numberBetween(0.01, 9.99),
             'is_active' => fake()->boolean(),
-            'material_id' => Material::inRandomOrder()?->first(),
         ];
+    }
+
+    public function withMaterials(int $count = 3): static
+    {
+        return $this->afterCreating(function (Product $product) use ($count) {
+            $materials = Material::active()->inRandomOrder()->limit($count)->get();
+
+            if ($materials->isEmpty()) {
+                $materials = Material::factory()->count($count)->create();
+            }
+
+            $product->materials()->sync($materials);
+        });
     }
 }

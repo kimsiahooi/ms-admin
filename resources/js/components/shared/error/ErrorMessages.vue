@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SharedData } from '@/types';
+import type { AppPageProps } from '@/types';
 import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -7,7 +7,7 @@ const props = defineProps<{
     errorKey: string;
 }>();
 
-const page = usePage<SharedData>();
+const page = usePage<AppPageProps>();
 
 const formErrors = computed(() =>
     Object.entries(page.props.errors)

@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Tenant;
 
 use App\enums\tenant\Product\Status;
 use App\Http\Controllers\Controller;
+use App\Models\Tenant\Material;
 use App\Models\Tenant\Product;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
@@ -16,7 +18,7 @@ class ProductController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $products = Product::with('material')->when($request->search, function ($query, $search) {
+        $products = Product::with('materials')->when($request->search, function ($query, $search) {
             $query->where('name', 'like', "%{$search}%");
         })->latest()
             ->paginate($entries)
@@ -30,6 +32,9 @@ class ProductController extends Controller
                     'value' => $status->value,
                 ];
             }),
+            'options' => [
+                'materials' => Material::active()->get()->map(fn(Material $material) => ['name' => $material->name, 'value' => $material->id]),
+            ],
         ]);
     }
 
@@ -44,7 +49,24 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request) {}
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255', 'unique:products,code'],
+            'description' => ['nullable', 'string'],
+            'is_active' => ['required', 'boolean'],
+            'unit_price' => ['required', 'numeric', 'min:0'],
+            'materials' => ['required', 'array'],
+            'materials.*' => Rule::exists('materials', 'id')->where('is_active', true),
+        ]);
+
+        $product = Product::create($validated);
+
+        $product->materials()->sync($validated['materials']);
+
+        return back()->with('success', 'Product created successfully.');
+    }
 
     /**
      * Display the specified resource.
@@ -67,7 +89,21 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255', Rule::unique('products', 'code')->ignore($product->id, 'id')],
+            'description' => ['nullable', 'string'],
+            'is_active' => ['required', 'boolean'],
+            'unit_price' => ['required', 'numeric', 'min:0'],
+            'materials' => ['required', 'array'],
+            'materials.*' => Rule::exists('materials', 'id')->where('is_active', true),
+        ]);
+
+        $product->update($validated);
+
+        $product->materials()->sync($validated['materials']);
+
+        return back()->with('success', 'Product updated successfully.');
     }
 
     /**
@@ -75,6 +111,8 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        $product->delete();
+
+        return back()->with('success', 'Product deleted successfully.');
     }
 }

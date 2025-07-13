@@ -12,7 +12,7 @@ class Product extends Model
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name', 'code', 'description', 'unit_price', 'is_active', 'material_id'];
+    protected $fillable = ['name', 'code', 'description', 'unit_price', 'is_active'];
 
     protected $appends = ['is_active_display'];
 
@@ -23,13 +23,13 @@ class Product extends Model
         ];
     }
 
+    public function materials()
+    {
+        return $this->belongsToMany(Material::class)->withTimestamps();
+    }
+
     protected function getIsActiveDisplayAttribute(): string
     {
         return Status::tryFrom($this->is_active)?->dislay();
-    }
-
-    public function material()
-    {
-        return $this->belongsTo(Material::class);
     }
 }

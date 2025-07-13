@@ -3,6 +3,7 @@
 namespace Database\Seeders\Tenant;
 
 use App\Models\User;
+use Database\Seeders\tenant\MaterialProductSeeder;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 

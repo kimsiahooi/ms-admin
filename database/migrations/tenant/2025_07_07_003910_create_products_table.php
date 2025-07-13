@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Tenant\Material;
+use App\Models\Tenant\Product;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,9 +20,15 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->decimal('unit_price');
             $table->boolean('is_active')->default(true);
-            $table->foreignIdFor(Material::class)->constrained();
             $table->timestamps();
             $table->softDeletes();
+        });
+
+        Schema::create('material_product', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(Material::class)->constrained();
+            $table->foreignIdFor(Product::class)->constrained();
+            $table->timestamps();
         });
     }
 
@@ -30,6 +37,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('material_product');
         Schema::dropIfExists('products');
     }
 };

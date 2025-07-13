@@ -10,10 +10,10 @@ defineProps<{
     triggerClass?: HTMLAttributes['class'];
 }>();
 
-const model = defineModel<AcceptableValue | undefined>();
+const model = defineModel<AcceptableValue[] | undefined>();
 
 const emit = defineEmits<{
-    change: [value: AcceptableValue];
+    change: [value: AcceptableValue[]];
 }>();
 
 watch(model, (newModel) => {
@@ -24,7 +24,7 @@ watch(model, (newModel) => {
 </script>
 
 <template>
-    <Select v-model="model">
+    <Select v-model="model" multiple>
         <SelectTrigger class="min-w-40" :class="triggerClass">
             <SelectValue :placeholder="placeholder" />
         </SelectTrigger>
