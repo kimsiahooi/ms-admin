@@ -5,7 +5,6 @@ export interface Product {
     name: string;
     code: string;
     description: string | null;
-    unit_price: string;
     is_active: boolean;
     is_active_display?: string | null;
     shelf_life_days: number | null;

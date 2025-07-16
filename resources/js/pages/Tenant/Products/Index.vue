@@ -117,11 +117,6 @@ const columns: ColumnDef<ProductWithMaterials>[] = [
         cell: ({ row }) => h('div', null, row.getValue('description')),
     },
     {
-        accessorKey: 'unit_price',
-        header: () => h('div', null, 'Unit Price'),
-        cell: ({ row }) => h('div', null, row.getValue('unit_price')),
-    },
-    {
         accessorKey: 'shelf_life_days',
         header: () => h('div', null, 'Shelf Life Days'),
         cell: ({ row }) => h('div', null, row.getValue('shelf_life_days')),
@@ -204,7 +199,6 @@ const dialogHandler = (type: DialogMethodType, product?: ProductWithMaterials) =
                 form.name = product.name;
                 form.code = product.code;
                 form.description = product.description || '';
-                form.unit_price = +product.unit_price;
                 form.shelf_life_days = product.shelf_life_days || '';
                 form.is_active = product.is_active;
                 form.materials = product.materials.map((material) => material.id);
@@ -284,11 +278,6 @@ watch([() => form.name, () => dialog.type], ([newName, newType]) => {
                             <Label>Description</Label>
                             <Textarea placeholder="Enter Description" v-model:model-value="form.description" />
                             <p v-if="form.errors.description" class="text-destructive">{{ form.errors.description }}</p>
-                        </div>
-                        <div class="grid w-full max-w-sm items-center gap-1.5">
-                            <Label>Unit Price</Label>
-                            <Input type="number" placeholder="Enter Unit Price" v-model:model-value.number="form.unit_price" step=".01" min="0" />
-                            <p v-if="form.errors.unit_price" class="text-destructive">{{ form.errors.unit_price }}</p>
                         </div>
                         <div class="grid w-full max-w-sm items-center gap-1.5">
                             <Label>Shelf Life Day(s)</Label>

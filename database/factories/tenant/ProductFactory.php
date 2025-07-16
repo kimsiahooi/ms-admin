@@ -25,7 +25,6 @@ class ProductFactory extends Factory
             'name' => $name,
             'code' => Str::slug($name),
             'description' => fake()->sentence(),
-            'unit_price' => fake()->randomFloat(2, 0.01, 9.99),
             'shelf_life_days' => fake()->optional(0.5)->numberBetween(30, 60),
             'is_active' => fake()->boolean(),
         ];

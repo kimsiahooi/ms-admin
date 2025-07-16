@@ -12,7 +12,7 @@ class Product extends Model
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name', 'code', 'description', 'unit_price', 'shelf_life_days', 'is_active'];
+    protected $fillable = ['name', 'code', 'description', 'shelf_life_days', 'is_active'];
 
     protected $appends = ['is_active_display'];
 
