@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Factories\Tenant;
+namespace Database\Factories\tenant;
 
 use App\enums\tenant\Product\Currency;
 use App\Models\Tenant\Material;

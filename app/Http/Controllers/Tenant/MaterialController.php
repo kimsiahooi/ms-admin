@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Tenant;
 
 use App\enums\tenant\Material\Status;
 use App\Http\Controllers\Controller;
-use App\Models\Tenant\Material;
+use App\Models\tenant\Material;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
