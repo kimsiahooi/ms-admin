@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
-use App\Models\tenant\ProductPrize;
+use App\Models\Tenant\ProductPrize;
 use Illuminate\Http\Request;
 
 class ProductPrizeController extends Controller

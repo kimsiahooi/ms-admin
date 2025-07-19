@@ -1,6 +1,6 @@
 <?php
 
-namespace App\enums\tenant\Material;
+namespace App\enums\Tenant\Material;
 
 enum Status: int
 {

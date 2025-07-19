@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Factories\tenant;
+namespace Database\Factories\Tenant;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;

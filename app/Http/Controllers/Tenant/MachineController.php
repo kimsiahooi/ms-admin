@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Tenant;
 
-use App\enums\tenant\Machine\Status;
+use App\enums\Tenant\Machine\Status;
 use App\Http\Controllers\Controller;
-use App\Models\tenant\Machine;
+use App\Models\Tenant\Machine;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 

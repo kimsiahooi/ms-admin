@@ -1,8 +1,8 @@
 <?php
 
-namespace Database\Factories\tenant;
+namespace Database\Factories\Tenant;
 
-use App\enums\tenant\Product\Currency;
+use App\enums\Tenant\Product\Currency;
 use App\Models\Tenant\Material;
 use App\Models\Tenant\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;

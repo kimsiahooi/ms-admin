@@ -1,6 +1,6 @@
 <?php
 
-namespace App\enums\tenant\Machine;
+namespace App\enums\Tenant\Machine;
 
 enum Status: int
 {

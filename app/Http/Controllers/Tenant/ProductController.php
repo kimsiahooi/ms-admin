@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Tenant;
 
-use App\enums\tenant\Product\Currency;
-use App\enums\tenant\Product\Status;
+use App\enums\Tenant\Product\Currency;
+use App\enums\Tenant\Product\Status;
 use App\Http\Controllers\Controller;
-use App\Models\tenant\Material;
-use App\Models\tenant\Product;
+use App\Models\Tenant\Material;
+use App\Models\Tenant\Product;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 

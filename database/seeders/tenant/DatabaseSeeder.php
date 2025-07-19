@@ -1,9 +1,9 @@
 <?php
 
-namespace Database\Seeders\tenant;
+namespace Database\Seeders\Tenant;
 
 use App\Models\User;
-use Database\Seeders\tenant\MaterialProductSeeder;
+use Database\Seeders\Tenant\MaterialProductSeeder;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 

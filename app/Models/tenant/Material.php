@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\tenant;
+namespace App\Models\Tenant;
 
-use App\enums\tenant\Material\Status;
+use App\enums\Tenant\Material\Status;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

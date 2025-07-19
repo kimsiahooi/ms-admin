@@ -1,6 +1,6 @@
 <?php
 
-namespace App\enums\tenant\Product;
+namespace App\enums\Tenant\Product;
 
 enum Currency: string
 {

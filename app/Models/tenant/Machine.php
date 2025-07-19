@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\tenant;
+namespace App\Models\Tenant;
 
-use App\enums\tenant\Machine\Status;
+use App\enums\Tenant\Machine\Status;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;

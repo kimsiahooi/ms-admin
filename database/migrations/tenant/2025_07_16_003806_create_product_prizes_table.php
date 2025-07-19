@@ -1,7 +1,7 @@
 <?php
 
-use App\enums\tenant\Product\Currency;
-use App\Models\tenant\Product;
+use App\enums\Tenant\Product\Currency;
+use App\Models\Tenant\Product;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
