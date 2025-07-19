@@ -49,7 +49,7 @@ class MachineController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255', Rule::unique('machines', 'code')->where(function ($query) {
+            'code' => ['required', 'string', 'alpha_dash', 'max:255', Rule::unique('machines', 'code')->where(function ($query) {
                 return $query->where('tenant_id', tenant('id'));
             })],
             'description' => ['nullable', 'string'],
@@ -84,7 +84,7 @@ class MachineController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255', Rule::unique('machines', 'code')->ignore($machine->id)->where(function ($query) {
+            'code' => ['required', 'string', 'alpha_dash', 'max:255', Rule::unique('machines', 'code')->ignore($machine->id)->where(function ($query) {
                 return $query->where('tenant_id', tenant('id'));
             })],
             'description' => ['nullable', 'string'],
