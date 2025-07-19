@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Tenant\Material;
+use App\Models\tenant\Material;
 use App\Models\Tenant\Product;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;

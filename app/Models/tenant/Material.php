@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Tenant;
+namespace App\Models\tenant;
 
 use App\enums\tenant\Material\Status;
 use Illuminate\Database\Eloquent\Builder;
