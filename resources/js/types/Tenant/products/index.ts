@@ -13,7 +13,7 @@ export interface Product {
     deleted_at: Date | null;
 }
 
-export interface ProductPrize {
+export interface ProductPrice {
     readonly id: number;
     currency:
         | 'AED'
@@ -177,7 +177,7 @@ export interface ProductPrize {
         | 'ZAR'
         | 'ZMW'
         | 'ZWL';
-    prize: string;
+    price: string;
     product_id: number;
     created_at: Date | null;
     updated_at: Date | null;
@@ -188,11 +188,11 @@ export interface ProductWithMaterials extends Product {
     materials: Material[];
 }
 
-export interface ProductWithPrizes extends Product {
-    prizes: ProductPrize[];
+export interface ProductWithprices extends Product {
+    prices: ProductPrice[];
 }
 
-export interface ProductWithMaterialsAndPrizes extends Product {
+export interface ProductWithMaterialsAndprices extends Product {
     materials: Material[];
-    prizes: ProductPrize[];
+    prices: ProductPrice[];
 }

@@ -13,7 +13,7 @@ class Product extends Model
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory, SoftDeletes, BelongsToTenant;
 
-    protected $fillable = ['name', 'code', 'description', 'shelf_life_days', 'is_active'];
+    protected $fillable = ['name', 'code', 'description', 'shelf_life_days', 'is_active', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
@@ -31,9 +31,9 @@ class Product extends Model
         return $this->belongsToMany(Material::class)->withTimestamps();
     }
 
-    public function prizes()
+    public function prices()
     {
-        return $this->hasMany(ProductPrize::class);
+        return $this->hasMany(ProductPrice::class);
     }
 
     protected function getIsActiveDisplayAttribute(): string

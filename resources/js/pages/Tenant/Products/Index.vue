@@ -19,7 +19,7 @@ import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { AppPageProps, BreadcrumbItem } from '@/types';
-import type { ProductPrize, ProductWithMaterialsAndPrizes } from '@/types/Tenant/products';
+import type { ProductPrice, ProductWithMaterialsAndprices } from '@/types/Tenant/products';
 import type { Method } from '@inertiajs/core';
 import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
@@ -33,11 +33,11 @@ defineOptions({
 });
 
 const props = defineProps<{
-    products: PaginateData<ProductWithMaterialsAndPrizes[]>;
+    products: PaginateData<ProductWithMaterialsAndprices[]>;
     statuses: SwitchOption<number>[];
     options: {
         materials: SelectOption<number>[];
-        currencies: SelectOption<ProductPrize['currency']>[];
+        currencies: SelectOption<ProductPrice['currency']>[];
     };
 }>();
 
@@ -71,11 +71,11 @@ const filterChangeHandler = (filter: Filter) => {
     router.visit(route('products.index', { ...pickBy(filter), tenant: tenant.value }));
 };
 
-const columnVisibility = <VisibilityState<Partial<ProductWithMaterialsAndPrizes>>>{
+const columnVisibility = <VisibilityState<Partial<ProductWithMaterialsAndprices>>>{
     description: false,
 };
 
-const columns: ColumnDef<ProductWithMaterialsAndPrizes>[] = [
+const columns: ColumnDef<ProductWithMaterialsAndprices>[] = [
     {
         accessorKey: 'actions',
         header: () => h('div', null, 'Actions'),
@@ -151,7 +151,7 @@ const columns: ColumnDef<ProductWithMaterialsAndPrizes>[] = [
     },
 ];
 
-const dialog = reactive<DialogType<ProductWithMaterialsAndPrizes>>({
+const dialog = reactive<DialogType<ProductWithMaterialsAndprices>>({
     type: null,
     title: '',
     isOpen: false,
@@ -163,9 +163,9 @@ const form = useForm<{
     code: string;
     description: string;
     shelf_life_days: number | '';
-    prizes: {
+    prices: {
         id: number | '';
-        currency: ProductPrize['currency'] | '';
+        currency: ProductPrice['currency'] | '';
         value: number | '';
     }[];
     is_active: boolean;
@@ -175,7 +175,7 @@ const form = useForm<{
     code: '',
     description: '',
     shelf_life_days: '',
-    prizes: [{ id: '', currency: '', value: '' }],
+    prices: [{ id: '', currency: '', value: '' }],
     is_active: true,
     materials: [],
 });
@@ -185,7 +185,7 @@ const statusDisplay = computed(() => props.statuses.find((status) => (form.is_ac
 const dialogButtonLabel = computed(() => (dialog.type === 'store' ? 'Create' : dialog.type === 'update' ? 'Update' : 'Delete'));
 const dialogButtonVariant = computed<ButtonVariants['variant']>(() => (dialog.type === 'destroy' ? 'destructive' : 'default'));
 
-const dialogHandler = (type: DialogMethodType, product?: ProductWithMaterialsAndPrizes) => {
+const dialogHandler = (type: DialogMethodType, product?: ProductWithMaterialsAndprices) => {
     switch (type) {
         case 'store':
             dialog.title = 'Create Product';
@@ -197,9 +197,9 @@ const dialogHandler = (type: DialogMethodType, product?: ProductWithMaterialsAnd
                 form.code = product.code;
                 form.description = product.description || '';
                 form.shelf_life_days = product.shelf_life_days || '';
-                form.prizes = product.prizes.map((prize) => ({ id: prize.id, currency: prize.currency, value: +prize.prize }));
+                form.prices = product.prices.map((price) => ({ id: price.id, currency: price.currency, value: +price.price }));
                 form.is_active = product.is_active;
-                form.materials = product.materials.map((material) => material.id);
+                form.materials = product.materials.filter((material) => material.is_active).map((material) => material.id);
             }
             dialog.title = `Edit ${dialog.data?.name || 'Product'}`;
             break;
@@ -283,25 +283,25 @@ watch([() => form.name, () => dialog.type], ([newName, newType]) => {
                             <p v-if="form.errors.shelf_life_days" class="text-destructive">{{ form.errors.shelf_life_days }}</p>
                         </div>
                         <div class="grid w-full max-w-sm items-center gap-1.5">
-                            <Label>Unit Prize</Label>
-                            <div v-for="(prize, index) in form.prizes" :key="index">
+                            <Label>Unit price</Label>
+                            <div v-for="(price, index) in form.prices" :key="index">
                                 <div class="grid grid-cols-2 gap-2">
                                     <Select
                                         :options="options.currencies"
                                         placeholder="Select Currency"
-                                        v-model:model-value="prize.currency"
+                                        v-model:model-value="price.currency"
                                         trigger-class="w-full"
                                     />
                                     <Input
                                         type="number"
                                         step=".01"
                                         min="0"
-                                        placeholder="Enter Unit Prize"
-                                        v-model:model-value.number="prize.value"
+                                        placeholder="Enter Unit price"
+                                        v-model:model-value.number="price.value"
                                         class="w-full"
                                     />
                                 </div>
-                                <ErrorMessages :error-key="`prizes.${index}`" />
+                                <ErrorMessages :error-key="`prices.${index}`" />
                             </div>
                         </div>
                         <div class="grid w-full max-w-sm items-center gap-1.5">

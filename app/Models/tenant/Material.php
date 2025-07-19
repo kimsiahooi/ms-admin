@@ -14,7 +14,7 @@ class Material extends Model
     /** @use HasFactory<\Database\Factories\Tenant\MaterialFactory> */
     use HasFactory, SoftDeletes, BelongsToTenant;
 
-    protected $fillable = ['name', 'code', 'description', 'is_active'];
+    protected $fillable = ['name', 'code', 'description', 'is_active', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 

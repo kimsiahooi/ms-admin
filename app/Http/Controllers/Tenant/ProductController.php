@@ -19,7 +19,7 @@ class ProductController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $products = Product::with(['materials', 'prizes'])->when($request->search, function ($query, $search) {
+        $products = Product::with(['materials', 'prices'])->when($request->search, function ($query, $search) {
             $query->where('name', 'like', "%{$search}%");
         })->latest()
             ->paginate($entries)
@@ -60,13 +60,13 @@ class ProductController extends Controller
             })],
             'description' => ['nullable', 'string'],
             'shelf_life_days' => ['nullable', 'integer', 'min:1'],
-            'prizes' => ['required', 'array'],
-            'prizes.*.id' => ['nullable'],
-            'prizes.*.currency' => ['required', Rule::in(array_column(Currency::cases(), 'value'))],
-            'prizes.*.value' => ['required', 'numeric', 'min:0'],
+            'prices' => ['required', 'array'],
+            'prices.*.id' => ['nullable'],
+            'prices.*.currency' => ['required', Rule::in(array_column(Currency::cases(), 'value'))],
+            'prices.*.value' => ['required', 'numeric', 'min:0'],
             'is_active' => ['required', 'boolean'],
             'materials' => ['required', 'array'],
-            'materials.*' => [Rule::exists('materials', 'id')->where(function ($query) {
+            'materials.*' => ['distinct', Rule::exists('materials', 'id')->where(function ($query) {
                 return $query->where('is_active', true)
                     ->where('tenant_id', tenant('id'));
             })],
@@ -74,10 +74,10 @@ class ProductController extends Controller
 
         $product = Product::create($validated);
 
-        foreach ($validated['prizes'] as $prize) {
-            $product->prizes()->create([
-                'currency' => $prize['currency'],
-                'prize' => $prize['value'],
+        foreach ($validated['prices'] as $price) {
+            $product->prices()->create([
+                'currency' => $price['currency'],
+                'price' => $price['value'],
             ]);
         }
 
@@ -115,12 +115,12 @@ class ProductController extends Controller
             'description' => ['nullable', 'string'],
             'is_active' => ['required', 'boolean'],
             'shelf_life_days' => ['nullable', 'integer', 'min:1'],
-            'prizes' => ['required', 'array'],
-            'prizes.*.id' => ['nullable', 'exists:product_prizes,id'],
-            'prizes.*.currency' => ['required', Rule::in(array_column(Currency::cases(), 'value'))],
-            'prizes.*.value' => ['required', 'numeric', 'min:0'],
+            'prices' => ['required', 'array'],
+            'prices.*.id' => ['nullable', 'exists:product_prices,id'],
+            'prices.*.currency' => ['required', Rule::in(array_column(Currency::cases(), 'value'))],
+            'prices.*.value' => ['required', 'numeric', 'min:0'],
             'materials' => ['required', 'array'],
-            'materials.*' => [Rule::exists('materials', 'id')->where(function ($query) {
+            'materials.*' => ['distinct', Rule::exists('materials', 'id')->where(function ($query) {
                 return $query->where('is_active', true)
                     ->where('tenant_id', tenant('id'));
             })],
@@ -128,19 +128,19 @@ class ProductController extends Controller
 
         $product->update($validated);
 
-        foreach ($validated['prizes'] as $prize) {
-            if ($prize['id']) {
-                $existingPrize = $product->prizes()->where('id', $prize['id'])->first();
-                if ($existingPrize) {
-                    $existingPrize->update([
-                        'currency' => $prize['currency'],
-                        'prize' => $prize['value'],
+        foreach ($validated['prices'] as $price) {
+            if ($price['id']) {
+                $existingprice = $product->prices()->where('id', $price['id'])->first();
+                if ($existingprice) {
+                    $existingprice->update([
+                        'currency' => $price['currency'],
+                        'price' => $price['value'],
                     ]);
                 }
             } else {
-                $product->prizes()->create([
-                    'currency' => $prize['currency'],
-                    'prize' => $prize['value'],
+                $product->prices()->create([
+                    'currency' => $price['currency'],
+                    'price' => $price['value'],
                 ]);
             }
         }
