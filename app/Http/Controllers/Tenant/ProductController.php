@@ -34,7 +34,7 @@ class ProductController extends Controller
                 ];
             }),
             'options' => [
-                'materials' => Material::active()->get()->map(fn(Material $material) => ['name' => $material->name, 'value' => $material->id]),
+                'materials' => Material::active()->get()->map(fn(Material $material) => ['name' => "{$material->name} ({$material->code})", 'value' => $material->id]),
                 'currencies' => collect(Currency::cases())->map(fn($currency) => ['name' => $currency->value, 'value' => $currency->value]),
             ],
         ]);
