@@ -15,12 +15,14 @@ return new class extends Migration
         Schema::create('materials', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('code')->unique();
+            $table->string('code');
             $table->text('description')->nullable();
             $table->boolean('is_active')->default(true);
             $table->foreignIdFor(Tenant::class)->constrained();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->unique(['code', 'tenant_id']);
         });
     }
 

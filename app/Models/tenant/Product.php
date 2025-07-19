@@ -6,13 +6,16 @@ use App\enums\Tenant\Product\Status;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class Product extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToTenant;
 
     protected $fillable = ['name', 'code', 'description', 'shelf_life_days', 'is_active'];
+
+    protected $hidden = ['tenant_id'];
 
     protected $appends = ['is_active_display'];
 

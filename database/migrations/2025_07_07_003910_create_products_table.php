@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Tenant;
+use App\Models\Tenant\Material;
+use App\Models\Tenant\Product;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,15 +14,25 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('materials', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('code')->unique();
+            $table->string('code');
             $table->text('description')->nullable();
+            $table->integer('shelf_life_days')->nullable();
             $table->boolean('is_active')->default(true);
             $table->foreignIdFor(Tenant::class)->constrained();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->unique(['code', 'tenant_id']);
+        });
+
+        Schema::create('material_product', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(Material::class)->constrained();
+            $table->foreignIdFor(Product::class)->constrained();
+            $table->timestamps();
         });
     }
 
@@ -29,6 +41,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('materials');
+        Schema::dropIfExists('material_product');
+        Schema::dropIfExists('products');
     }
 };

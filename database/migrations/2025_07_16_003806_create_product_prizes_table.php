@@ -1,6 +1,8 @@
 <?php
 
+use App\enums\Tenant\Product\Currency;
 use App\Models\Tenant;
+use App\Models\Tenant\Product;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,15 +14,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('materials', function (Blueprint $table) {
+        Schema::create('product_prizes', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('code')->unique();
-            $table->text('description')->nullable();
-            $table->boolean('is_active')->default(true);
+            $table->enum('currency', array_column(Currency::cases(), 'value'));
+            $table->decimal('prize')->min(0);
+            $table->foreignIdFor(Product::class)->constrained();
             $table->foreignIdFor(Tenant::class)->constrained();
             $table->timestamps();
             $table->softDeletes();
+
+
+            $table->unique(['currency', 'product_id', 'tenant_id']);
         });
     }
 
@@ -29,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('materials');
+        Schema::dropIfExists('product_prizes');
     }
 };

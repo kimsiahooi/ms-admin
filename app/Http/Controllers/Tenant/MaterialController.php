@@ -49,7 +49,9 @@ class MaterialController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255', 'unique:materials,code'],
+            'code' => ['required', 'string', 'max:255', Rule::unique('materials', 'code')->where(function ($query) {
+                return $query->where('tenant_id', tenant('id'));
+            })],
             'description' => ['nullable', 'string'],
             'is_active' => ['required', 'boolean'],
         ]);
@@ -82,7 +84,9 @@ class MaterialController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255', Rule::unique('materials', 'code')->ignore($material->id)],
+            'code' => ['required', 'string', 'max:255', Rule::unique('materials', 'code')->ignore($material->id)->where(function ($query) {
+                return $query->where('tenant_id', tenant('id'));
+            })],
             'description' => ['nullable', 'string'],
             'is_active' => ['required', 'boolean'],
         ]);

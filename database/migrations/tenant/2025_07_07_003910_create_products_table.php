@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Tenant;
 use App\Models\Tenant\Material;
 use App\Models\Tenant\Product;
 use Illuminate\Database\Migrations\Migration;
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->integer('shelf_life_days')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->foreignIdFor(Tenant::class)->constrained();
             $table->timestamps();
             $table->softDeletes();
         });

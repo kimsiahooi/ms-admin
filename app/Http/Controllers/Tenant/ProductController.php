@@ -55,7 +55,9 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255', 'unique:products,code'],
+            'code' => ['required', 'string', 'max:255', Rule::unique('products', 'code')->where(function ($query) {
+                return $query->where('tenant_id', tenant('id'));
+            })],
             'description' => ['nullable', 'string'],
             'shelf_life_days' => ['nullable', 'integer', 'min:1'],
             'prizes' => ['required', 'array'],
@@ -64,7 +66,10 @@ class ProductController extends Controller
             'prizes.*.value' => ['required', 'numeric', 'min:0'],
             'is_active' => ['required', 'boolean'],
             'materials' => ['required', 'array'],
-            'materials.*' => [Rule::exists('materials', 'id')->where('is_active', true)],
+            'materials.*' => [Rule::exists('materials', 'id')->where(function ($query) {
+                return $query->where('is_active', true)
+                    ->where('tenant_id', tenant('id'));
+            })],
         ]);
 
         $product = Product::create($validated);
@@ -104,7 +109,9 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255', Rule::unique('products', 'code')->ignore($product->id, 'id')],
+            'code' => ['required', 'string', 'max:255', Rule::unique('products', 'code')->ignore($product->id, 'id')->where(function ($query) {
+                return $query->where('tenant_id', tenant('id'));
+            })],
             'description' => ['nullable', 'string'],
             'is_active' => ['required', 'boolean'],
             'shelf_life_days' => ['nullable', 'integer', 'min:1'],
@@ -113,7 +120,10 @@ class ProductController extends Controller
             'prizes.*.currency' => ['required', Rule::in(array_column(Currency::cases(), 'value'))],
             'prizes.*.value' => ['required', 'numeric', 'min:0'],
             'materials' => ['required', 'array'],
-            'materials.*' => [Rule::exists('materials', 'id')->where('is_active', true)],
+            'materials.*' => [Rule::exists('materials', 'id')->where(function ($query) {
+                return $query->where('is_active', true)
+                    ->where('tenant_id', tenant('id'));
+            })],
         ]);
 
         $product->update($validated);

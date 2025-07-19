@@ -12,15 +12,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('materials', function (Blueprint $table) {
+        Schema::create('tenant_users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('code')->unique();
-            $table->text('description')->nullable();
-            $table->boolean('is_active')->default(true);
+            $table->string('email');
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
             $table->foreignIdFor(Tenant::class)->constrained();
+            $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->unique(['email', 'tenant_id']);
         });
     }
 
@@ -29,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('materials');
+        Schema::dropIfExists('tenant_users');
     }
 };
