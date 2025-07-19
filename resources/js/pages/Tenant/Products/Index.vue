@@ -164,7 +164,6 @@ const form = useForm<{
     description: string;
     shelf_life_days: number | '';
     prices: {
-        id: number | '';
         currency: ProductPrice['currency'] | '';
         value: number | '';
     }[];
@@ -175,7 +174,7 @@ const form = useForm<{
     code: '',
     description: '',
     shelf_life_days: '',
-    prices: [{ id: '', currency: '', value: '' }],
+    prices: [{ currency: '', value: '' }],
     is_active: true,
     materials: [],
 });
@@ -235,7 +234,7 @@ const submit = () => {
 
 const priceHandler = (index: number) => {
     if (!index) {
-        form.prices = [...form.prices, { id: '', currency: '', value: '' }];
+        form.prices = [...form.prices, { currency: '', value: '' }];
     } else {
         form.prices = form.prices.filter((_, i) => index !== i);
     }

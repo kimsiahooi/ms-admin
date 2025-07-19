@@ -61,7 +61,6 @@ class ProductController extends Controller
             'description' => ['nullable', 'string'],
             'shelf_life_days' => ['nullable', 'integer', 'min:1'],
             'prices' => ['required', 'array'],
-            'prices.*.id' => ['nullable'],
             'prices.*.currency' => ['required', 'distinct', Rule::in(array_column(Currency::cases(), 'value'))],
             'prices.*.value' => ['required', 'numeric', 'min:0'],
             'is_active' => ['required', 'boolean'],
@@ -139,9 +138,6 @@ class ProductController extends Controller
             'is_active' => ['required', 'boolean'],
             'shelf_life_days' => ['nullable', 'integer', 'min:1'],
             'prices' => ['required', 'array'],
-            'prices.*.id' => ['nullable', Rule::exists('product_prices', 'id')->where(function ($query) {
-                return $query->where('tenant_id', tenant('id'))->whereNull('deleted_at');
-            })],
             'prices.*.currency' => ['required', 'distinct', Rule::in(array_column(Currency::cases(), 'value'))],
             'prices.*.value' => ['required', 'numeric', 'min:0'],
             'materials' => ['required', 'array'],
@@ -154,26 +150,24 @@ class ProductController extends Controller
 
         $priceIds = [];
         foreach ($validated['prices'] as $price) {
-            if ($price['id']) {
-                $existingPrice = $product->prices()->where('id', $price['id'])->first();
-                if ($existingPrice) {
-                    $existingPrice->update([
-                        'currency' => $price['currency'],
-                        'price' => $price['value'],
-                    ]);
-                }
+            $existingPrice = $product->prices()->onlyTrashed()->where('currency', $price['currency'])->first();
+
+            if ($existingPrice) {
+                $existingPrice->restore();
+                $existingPrice->update([
+                    'currency' => $price['currency'],
+                    'price' => $price['value'],
+                ]);
 
                 $priceIds[] = $existingPrice->id;
             } else {
-                $existingPrice = $product->prices()->onlyTrashed()->where('currency', $price['currency'])->first();
+                $existingPrice = $product->prices()->where('currency', $price['currency'])->first();
 
                 if ($existingPrice) {
-                    $existingPrice->restore();
                     $existingPrice->update([
                         'currency' => $price['currency'],
                         'price' => $price['value'],
                     ]);
-
 
                     $priceIds[] = $existingPrice->id;
                 } else {
