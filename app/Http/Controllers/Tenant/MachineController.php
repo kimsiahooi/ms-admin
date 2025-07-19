@@ -50,13 +50,20 @@ class MachineController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'alpha_dash', 'max:255', Rule::unique('machines', 'code')->where(function ($query) {
-                return $query->where('tenant_id', tenant('id'));
+                return $query->where('tenant_id', tenant('id'))->whereNull('deleted_at');
             })],
             'description' => ['nullable', 'string'],
             'is_active' => ['required', 'boolean'],
         ]);
 
-        Machine::create($validated);
+        $machine = Machine::onlyTrashed()->where('code', $validated['code'])->first();
+
+        if ($machine) {
+            $machine->restore();
+            $machine->update($validated);
+        } else {
+            Machine::create($validated);
+        }
 
         return back()->with('success', 'Machine created successfully.');
     }

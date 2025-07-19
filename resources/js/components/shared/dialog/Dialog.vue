@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="T">
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogScrollContent, DialogTitle } from '@/components/ui/dialog';
 import { computed } from 'vue';
 import type { DialogType } from './types';
 
@@ -24,7 +24,7 @@ const submitHandler = () => {
 <template>
     <Dialog v-model:open="model">
         <slot name="button" />
-        <DialogContent class="sm:max-w-[425px]">
+        <DialogScrollContent class="sm:max-w-[425px]">
             <form @submit.prevent="submitHandler" class="space-y-4">
                 <DialogHeader>
                     <DialogTitle>{{ dialog.title }}</DialogTitle>
@@ -40,6 +40,6 @@ const submitHandler = () => {
                     <slot name="submit-button" />
                 </DialogFooter>
             </form>
-        </DialogContent>
+        </DialogScrollContent>
     </Dialog>
 </template>

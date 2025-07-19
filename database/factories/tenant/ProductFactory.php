@@ -59,6 +59,7 @@ class ProductFactory extends Factory
                 $product->prices()->create([
                     'currency' => $currency->value,
                     'price' => fake()->randomFloat(2, 10, 100),
+                    'tenant_id' => $product->tenant_id,
                 ]);
             }
         });

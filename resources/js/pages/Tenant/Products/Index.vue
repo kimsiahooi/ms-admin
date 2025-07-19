@@ -24,7 +24,7 @@ import type { Method } from '@inertiajs/core';
 import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { Pencil, Trash2 } from 'lucide-vue-next';
+import { Minus, Pencil, Plus, Trash2 } from 'lucide-vue-next';
 import slug from 'slug';
 import { computed, h, reactive, watch } from 'vue';
 
@@ -233,6 +233,14 @@ const submit = () => {
     }
 };
 
+const priceHandler = (index: number) => {
+    if (!index) {
+        form.prices = [...form.prices, { id: '', currency: '', value: '' }];
+    } else {
+        form.prices = form.prices.filter((_, i) => index !== i);
+    }
+};
+
 watch(
     () => dialog.isOpen,
     (newValue) => {
@@ -285,21 +293,37 @@ watch([() => form.name, () => dialog.type], ([newName, newType]) => {
                         <div class="grid w-full max-w-sm items-center gap-1.5">
                             <Label>Unit price</Label>
                             <div v-for="(price, index) in form.prices" :key="index">
-                                <div class="grid grid-cols-2 gap-2">
-                                    <Select
-                                        :options="options.currencies"
-                                        placeholder="Select Currency"
-                                        v-model:model-value="price.currency"
-                                        trigger-class="w-full"
-                                    />
-                                    <Input
-                                        type="number"
-                                        step=".01"
-                                        min="0"
-                                        placeholder="Enter Unit price"
-                                        v-model:model-value.number="price.value"
-                                        class="w-full"
-                                    />
+                                <div class="flex items-center gap-2">
+                                    <div class="flex-1">
+                                        <Select
+                                            :options="options.currencies"
+                                            placeholder="Select Currency"
+                                            v-model:model-value="price.currency"
+                                            trigger-class="w-full"
+                                        />
+                                    </div>
+                                    <div class="flex-1">
+                                        <Input
+                                            type="number"
+                                            step=".01"
+                                            min="0"
+                                            placeholder="Enter Unit Price"
+                                            v-model:model-value.number="price.value"
+                                            class="w-full"
+                                        />
+                                    </div>
+                                    <div>
+                                        <Button
+                                            type="button"
+                                            size="icon"
+                                            class="cursor-pointer"
+                                            :variant="!index ? 'default' : 'destructive'"
+                                            @click="priceHandler(index)"
+                                        >
+                                            <Plus v-if="!index" />
+                                            <Minus v-else />
+                                        </Button>
+                                    </div>
                                 </div>
                                 <ErrorMessages :error-key="`prices.${index}`" />
                             </div>

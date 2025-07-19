@@ -50,13 +50,20 @@ class MaterialController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'alpha_dash', 'max:255', Rule::unique('materials', 'code')->where(function ($query) {
-                return $query->where('tenant_id', tenant('id'));
+                return $query->where('tenant_id', tenant('id'))->whereNull('deleted_at');
             })],
             'description' => ['nullable', 'string'],
             'is_active' => ['required', 'boolean'],
         ]);
 
-        Material::create($validated);
+        $material = Material::onlyTrashed()->where('code', $validated['code'])->first();
+
+        if ($material) {
+            $material->restore();
+            $material->update($validated);
+        } else {
+            Material::create($validated);
+        }
 
         return back()->with('success', 'Material created successfully.');
     }

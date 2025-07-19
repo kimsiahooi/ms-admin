@@ -56,30 +56,53 @@ class ProductController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'alpha_dash', 'max:255', Rule::unique('products', 'code')->where(function ($query) {
-                return $query->where('tenant_id', tenant('id'));
+                return $query->where('tenant_id', tenant('id'))->whereNull('deleted_at');
             })],
             'description' => ['nullable', 'string'],
             'shelf_life_days' => ['nullable', 'integer', 'min:1'],
             'prices' => ['required', 'array'],
             'prices.*.id' => ['nullable'],
-            'prices.*.currency' => ['required', Rule::in(array_column(Currency::cases(), 'value'))],
+            'prices.*.currency' => ['required', 'distinct', Rule::in(array_column(Currency::cases(), 'value'))],
             'prices.*.value' => ['required', 'numeric', 'min:0'],
             'is_active' => ['required', 'boolean'],
             'materials' => ['required', 'array'],
             'materials.*' => ['distinct', Rule::exists('materials', 'id')->where(function ($query) {
-                return $query->where('is_active', true)
-                    ->where('tenant_id', tenant('id'));
+                return $query->where('is_active', true)->where('tenant_id', tenant('id'))->whereNull('deleted_at');
             })],
         ]);
 
-        $product = Product::create($validated);
+        $product = Product::onlyTrashed()->where('code', $validated['code'])->first();
 
-        foreach ($validated['prices'] as $price) {
-            $product->prices()->create([
-                'currency' => $price['currency'],
-                'price' => $price['value'],
-            ]);
+        if ($product) {
+            $product->restore();
+            $product->update($validated);
+        } else {
+            $product = Product::create($validated);
         }
+
+        $priceIds = [];
+        foreach ($validated['prices'] as $price) {
+            $existingPrice = $product->prices()->onlyTrashed()->where('currency', $price['currency'])->first();
+
+            if ($existingPrice) {
+                $existingPrice->restore();
+                $existingPrice->update([
+                    'currency' => $price['currency'],
+                    'price' => $price['value'],
+                ]);
+
+                $priceIds[] = $existingPrice->id;
+            } else {
+                $newPrice = $product->prices()->create([
+                    'currency' => $price['currency'],
+                    'price' => $price['value'],
+                ]);
+
+                $priceIds[] = $newPrice->id;
+            }
+        }
+
+        $product->prices()->whereNotIn('id', $priceIds)->delete();
 
         $product->materials()->sync($validated['materials']);
 
@@ -116,34 +139,55 @@ class ProductController extends Controller
             'is_active' => ['required', 'boolean'],
             'shelf_life_days' => ['nullable', 'integer', 'min:1'],
             'prices' => ['required', 'array'],
-            'prices.*.id' => ['nullable', 'exists:product_prices,id'],
-            'prices.*.currency' => ['required', Rule::in(array_column(Currency::cases(), 'value'))],
+            'prices.*.id' => ['nullable', Rule::exists('product_prices', 'id')->where(function ($query) {
+                return $query->where('tenant_id', tenant('id'))->whereNull('deleted_at');
+            })],
+            'prices.*.currency' => ['required', 'distinct', Rule::in(array_column(Currency::cases(), 'value'))],
             'prices.*.value' => ['required', 'numeric', 'min:0'],
             'materials' => ['required', 'array'],
             'materials.*' => ['distinct', Rule::exists('materials', 'id')->where(function ($query) {
-                return $query->where('is_active', true)
-                    ->where('tenant_id', tenant('id'));
+                return $query->where('is_active', true)->where('tenant_id', tenant('id'))->whereNull('deleted_at');
             })],
         ]);
 
         $product->update($validated);
 
+        $priceIds = [];
         foreach ($validated['prices'] as $price) {
             if ($price['id']) {
-                $existingprice = $product->prices()->where('id', $price['id'])->first();
-                if ($existingprice) {
-                    $existingprice->update([
+                $existingPrice = $product->prices()->where('id', $price['id'])->first();
+                if ($existingPrice) {
+                    $existingPrice->update([
                         'currency' => $price['currency'],
                         'price' => $price['value'],
                     ]);
                 }
+
+                $priceIds[] = $existingPrice->id;
             } else {
-                $product->prices()->create([
-                    'currency' => $price['currency'],
-                    'price' => $price['value'],
-                ]);
+                $existingPrice = $product->prices()->onlyTrashed()->where('currency', $price['currency'])->first();
+
+                if ($existingPrice) {
+                    $existingPrice->restore();
+                    $existingPrice->update([
+                        'currency' => $price['currency'],
+                        'price' => $price['value'],
+                    ]);
+
+
+                    $priceIds[] = $existingPrice->id;
+                } else {
+                    $newPrice = $product->prices()->create([
+                        'currency' => $price['currency'],
+                        'price' => $price['value'],
+                    ]);
+
+                    $priceIds[] = $newPrice->id;
+                }
             }
         }
+
+        $product->prices()->whereNotIn('id', $priceIds)->delete();
 
         $product->materials()->sync($validated['materials']);
 
