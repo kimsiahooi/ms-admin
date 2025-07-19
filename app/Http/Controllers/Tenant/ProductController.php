@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Tenant;
 
+use App\enums\tenant\Product\Currency;
 use App\enums\tenant\Product\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Material;
@@ -18,7 +19,7 @@ class ProductController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $products = Product::with('materials')->when($request->search, function ($query, $search) {
+        $products = Product::with(['materials', 'prizes'])->when($request->search, function ($query, $search) {
             $query->where('name', 'like', "%{$search}%");
         })->latest()
             ->paginate($entries)
@@ -34,6 +35,7 @@ class ProductController extends Controller
             }),
             'options' => [
                 'materials' => Material::active()->get()->map(fn(Material $material) => ['name' => $material->name, 'value' => $material->id]),
+                'currencies' => collect(Currency::cases())->map(fn($currency) => ['name' => $currency->value, 'value' => $currency->value]),
             ],
         ]);
     }
@@ -56,12 +58,23 @@ class ProductController extends Controller
             'code' => ['required', 'string', 'max:255', 'unique:products,code'],
             'description' => ['nullable', 'string'],
             'shelf_life_days' => ['nullable', 'integer', 'min:1'],
+            'prizes' => ['required', 'array'],
+            'prizes.*.id' => ['nullable'],
+            'prizes.*.currency' => ['required', Rule::in(array_column(Currency::cases(), 'value'))],
+            'prizes.*.value' => ['required', 'numeric', 'min:0'],
             'is_active' => ['required', 'boolean'],
             'materials' => ['required', 'array'],
-            'materials.*' => Rule::exists('materials', 'id')->where('is_active', true),
+            'materials.*' => [Rule::exists('materials', 'id')->where('is_active', true)],
         ]);
 
         $product = Product::create($validated);
+
+        foreach ($validated['prizes'] as $prize) {
+            $product->prizes()->create([
+                'currency' => $prize['currency'],
+                'prize' => $prize['value'],
+            ]);
+        }
 
         $product->materials()->sync($validated['materials']);
 
@@ -95,11 +108,32 @@ class ProductController extends Controller
             'description' => ['nullable', 'string'],
             'is_active' => ['required', 'boolean'],
             'shelf_life_days' => ['nullable', 'integer', 'min:1'],
+            'prizes' => ['required', 'array'],
+            'prizes.*.id' => ['nullable', 'exists:product_prizes,id'],
+            'prizes.*.currency' => ['required', Rule::in(array_column(Currency::cases(), 'value'))],
+            'prizes.*.value' => ['required', 'numeric', 'min:0'],
             'materials' => ['required', 'array'],
-            'materials.*' => Rule::exists('materials', 'id')->where('is_active', true),
+            'materials.*' => [Rule::exists('materials', 'id')->where('is_active', true)],
         ]);
 
         $product->update($validated);
+
+        foreach ($validated['prizes'] as $prize) {
+            if ($prize['id']) {
+                $existingPrize = $product->prizes()->where('id', $prize['id'])->first();
+                if ($existingPrize) {
+                    $existingPrize->update([
+                        'currency' => $prize['currency'],
+                        'prize' => $prize['value'],
+                    ]);
+                }
+            } else {
+                $product->prizes()->create([
+                    'currency' => $prize['currency'],
+                    'prize' => $prize['value'],
+                ]);
+            }
+        }
 
         $product->materials()->sync($validated['materials']);
 

@@ -28,6 +28,11 @@ class Product extends Model
         return $this->belongsToMany(Material::class)->withTimestamps();
     }
 
+    public function prizes()
+    {
+        return $this->hasMany(ProductPrize::class);
+    }
+
     protected function getIsActiveDisplayAttribute(): string
     {
         return Status::tryFrom($this->is_active)?->dislay();

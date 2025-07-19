@@ -2,6 +2,7 @@
 
 namespace Database\Factories\Tenant;
 
+use App\enums\tenant\Product\Currency;
 use App\Models\Tenant\Material;
 use App\Models\Tenant\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -40,6 +41,24 @@ class ProductFactory extends Factory
             }
 
             $product->materials()->sync($materials);
+        });
+    }
+
+    public function withCurrencies(int $count = 3): static
+    {
+        return $this->afterCreating(function (Product $product) use ($count) {
+
+            $currencies = Currency::cases();
+            shuffle($currencies);
+
+            $selectedCurrencies = array_slice($currencies, 0, $count);
+
+            foreach ($selectedCurrencies as $currency) {
+                $product->prizes()->create([
+                    'currency' => $currency->value,
+                    'prize' => fake()->randomFloat(2, 10, 100),
+                ]);
+            }
         });
     }
 }

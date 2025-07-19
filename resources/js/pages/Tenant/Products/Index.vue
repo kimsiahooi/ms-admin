@@ -3,7 +3,7 @@ import { Dialog } from '@/components/shared/dialog';
 import type { DialogMethodType, DialogType } from '@/components/shared/dialog/types';
 import { ErrorMessages } from '@/components/shared/error';
 import type { PaginateData } from '@/components/shared/pagination/types';
-import { MultiSelect } from '@/components/shared/select';
+import { MultiSelect, Select } from '@/components/shared/select';
 import type { SelectOption } from '@/components/shared/select/types';
 import type { SwitchOption } from '@/components/shared/switch/types';
 import { DataTable } from '@/components/shared/table';
@@ -19,7 +19,7 @@ import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { AppPageProps, BreadcrumbItem } from '@/types';
-import type { ProductWithMaterials } from '@/types/Tenant/products';
+import type { ProductPrize, ProductWithMaterialsAndPrizes } from '@/types/Tenant/products';
 import type { Method } from '@inertiajs/core';
 import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
@@ -33,10 +33,11 @@ defineOptions({
 });
 
 const props = defineProps<{
-    products: PaginateData<ProductWithMaterials[]>;
+    products: PaginateData<ProductWithMaterialsAndPrizes[]>;
     statuses: SwitchOption<number>[];
     options: {
         materials: SelectOption<number>[];
+        currencies: SelectOption<ProductPrize['currency']>[];
     };
 }>();
 
@@ -70,11 +71,11 @@ const filterChangeHandler = (filter: Filter) => {
     router.visit(route('products.index', { ...pickBy(filter), tenant: tenant.value }));
 };
 
-const columnVisibility = <VisibilityState<Partial<ProductWithMaterials>>>{
+const columnVisibility = <VisibilityState<Partial<ProductWithMaterialsAndPrizes>>>{
     description: false,
 };
 
-const columns: ColumnDef<ProductWithMaterials>[] = [
+const columns: ColumnDef<ProductWithMaterialsAndPrizes>[] = [
     {
         accessorKey: 'actions',
         header: () => h('div', null, 'Actions'),
@@ -158,7 +159,7 @@ const columns: ColumnDef<ProductWithMaterials>[] = [
     },
 ];
 
-const dialog = reactive<DialogType<ProductWithMaterials>>({
+const dialog = reactive<DialogType<ProductWithMaterialsAndPrizes>>({
     type: null,
     title: '',
     isOpen: false,
@@ -169,16 +170,20 @@ const form = useForm<{
     name: string;
     code: string;
     description: string;
-    unit_price: number | '';
     shelf_life_days: number | '';
+    prizes: {
+        id: number | '';
+        currency: ProductPrize['currency'] | '';
+        value: number | '';
+    }[];
     is_active: boolean;
     materials: number[];
 }>(dialog.type || '', {
     name: '',
     code: '',
     description: '',
-    unit_price: '',
     shelf_life_days: '',
+    prizes: [{ id: '', currency: '', value: '' }],
     is_active: true,
     materials: [],
 });
@@ -188,7 +193,7 @@ const statusDisplay = computed(() => props.statuses.find((status) => (form.is_ac
 const dialogButtonLabel = computed(() => (dialog.type === 'store' ? 'Create' : dialog.type === 'update' ? 'Update' : 'Delete'));
 const dialogButtonVariant = computed<ButtonVariants['variant']>(() => (dialog.type === 'destroy' ? 'destructive' : 'default'));
 
-const dialogHandler = (type: DialogMethodType, product?: ProductWithMaterials) => {
+const dialogHandler = (type: DialogMethodType, product?: ProductWithMaterialsAndPrizes) => {
     switch (type) {
         case 'store':
             dialog.title = 'Create Product';
@@ -200,6 +205,7 @@ const dialogHandler = (type: DialogMethodType, product?: ProductWithMaterials) =
                 form.code = product.code;
                 form.description = product.description || '';
                 form.shelf_life_days = product.shelf_life_days || '';
+                form.prizes = product.prizes.map((prize) => ({ id: prize.id, currency: prize.currency, value: +prize.prize }));
                 form.is_active = product.is_active;
                 form.materials = product.materials.map((material) => material.id);
             }
@@ -283,6 +289,28 @@ watch([() => form.name, () => dialog.type], ([newName, newType]) => {
                             <Label>Shelf Life Day(s)</Label>
                             <Input type="number" placeholder="Enter Shelf Life Day(s)" v-model:model-value.number="form.shelf_life_days" min="1" />
                             <p v-if="form.errors.shelf_life_days" class="text-destructive">{{ form.errors.shelf_life_days }}</p>
+                        </div>
+                        <div class="grid w-full max-w-sm items-center gap-1.5">
+                            <Label>Unit Prize</Label>
+                            <div v-for="(prize, index) in form.prizes" :key="index">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <Select
+                                        :options="options.currencies"
+                                        placeholder="Select Currency"
+                                        v-model:model-value="prize.currency"
+                                        trigger-class="w-full"
+                                    />
+                                    <Input
+                                        type="number"
+                                        step=".01"
+                                        min="0"
+                                        placeholder="Enter Unit Prize"
+                                        v-model:model-value.number="prize.value"
+                                        class="w-full"
+                                    />
+                                </div>
+                                <ErrorMessages :error-key="`prizes.${index}`" />
+                            </div>
                         </div>
                         <div class="grid w-full max-w-sm items-center gap-1.5">
                             <Label>Materials</Label>

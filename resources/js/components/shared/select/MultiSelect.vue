@@ -24,7 +24,7 @@ watch(model, (newModel) => {
 </script>
 
 <template>
-    <Select v-model="model" multiple>
+    <Select v-model="model" multiple :disabled="!options.length">
         <SelectTrigger class="min-w-40" :class="triggerClass">
             <SelectValue :placeholder="placeholder" />
         </SelectTrigger>
