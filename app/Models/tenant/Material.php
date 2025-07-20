@@ -32,9 +32,9 @@ class Material extends Model
         return $this->belongsToMany(Product::class)->withTimestamps();
     }
 
-    protected function getIsActiveDisplayAttribute(): string
+    protected function getIsActiveDisplayAttribute(): string | null
     {
-        return Status::tryFrom($this->is_active)?->dislay();
+        return Status::tryFrom($this->is_active)?->display();
     }
 
     public function scopeActive(Builder $query): void

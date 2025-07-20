@@ -27,7 +27,7 @@ class MachineController extends Controller
             'machines' => $machines,
             'statuses' => collect(Status::cases())->map(function ($status) {
                 return [
-                    'name' => $status->dislay(),
+                    'name' => $status->display(),
                     'value' => $status->value,
                 ];
             }),

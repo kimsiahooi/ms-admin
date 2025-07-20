@@ -38,6 +38,7 @@ const props = defineProps<{
     options: {
         materials: SelectOption<number>[];
         currencies: SelectOption<ProductPrice['currency']>[];
+        shelf_life_types: SelectOption<string>[];
     };
 }>();
 
@@ -110,9 +111,17 @@ const columns: ColumnDef<ProductWithMaterialsAndprices>[] = [
         cell: ({ row }) => h('div', null, row.getValue('description')),
     },
     {
-        accessorKey: 'shelf_life_days',
-        header: () => h('div', null, 'Shelf Life Days'),
-        cell: ({ row }) => h('div', null, row.getValue('shelf_life_days')),
+        accessorKey: 'shelf_life_duration',
+        header: () => h('div', null, 'Shelf Life Duration'),
+        cell: ({ row }) => h('div', null, row.getValue('shelf_life_duration')),
+    },
+    {
+        accessorKey: 'shelf_life_type',
+        header: () => h('div', null, 'Shelf Life type'),
+        cell: ({ row }) => {
+            const shelf_life_type = row.original.shelf_life_type_display || '';
+            return h('div', null, shelf_life_type);
+        },
     },
     {
         accessorKey: 'is_active',
@@ -162,7 +171,8 @@ const form = useForm<{
     name: string;
     code: string;
     description: string;
-    shelf_life_days: number | '';
+    shelf_life_duration: number | '';
+    shelf_life_type: string;
     prices: {
         currency: ProductPrice['currency'] | '';
         value: number | '';
@@ -173,7 +183,8 @@ const form = useForm<{
     name: '',
     code: '',
     description: '',
-    shelf_life_days: '',
+    shelf_life_duration: '',
+    shelf_life_type: '',
     prices: [{ currency: '', value: '' }],
     is_active: true,
     materials: [],
@@ -195,8 +206,9 @@ const dialogHandler = (type: DialogMethodType, product?: ProductWithMaterialsAnd
                 form.name = product.name;
                 form.code = product.code;
                 form.description = product.description || '';
-                form.shelf_life_days = product.shelf_life_days || '';
-                form.prices = product.prices.map((price) => ({ id: price.id, currency: price.currency, value: +price.price }));
+                form.shelf_life_duration = product.shelf_life_duration ? +product.shelf_life_duration : '';
+                form.shelf_life_type = product.shelf_life_type || '';
+                form.prices = product.prices.map((price) => ({ currency: price.currency, value: +price.price }));
                 form.is_active = product.is_active;
                 form.materials = product.materials.filter((material) => material.is_active).map((material) => material.id);
             }
@@ -285,9 +297,30 @@ watch([() => form.name, () => dialog.type], ([newName, newType]) => {
                             <p v-if="form.errors.description" class="text-destructive">{{ form.errors.description }}</p>
                         </div>
                         <div class="grid w-full max-w-sm items-center gap-1.5">
-                            <Label>Shelf Life Day(s)</Label>
-                            <Input type="number" placeholder="Enter Shelf Life Day(s)" v-model:model-value.number="form.shelf_life_days" min="1" />
-                            <p v-if="form.errors.shelf_life_days" class="text-destructive">{{ form.errors.shelf_life_days }}</p>
+                            <div class="grid gap-1.5 md:grid-cols-2">
+                                <div class="grid gap-1.5">
+                                    <Label>Shelf Life Duration</Label>
+                                    <Input
+                                        type="number"
+                                        placeholder="Enter Shelf Life Day(s)"
+                                        v-model:model-value.number="form.shelf_life_duration"
+                                        min="0"
+                                        step=".01"
+                                        class="w-full"
+                                    />
+                                </div>
+                                <div class="grid gap-1.5">
+                                    <Label>Shelf Life Type</Label>
+                                    <Select
+                                        :options="options.shelf_life_types"
+                                        placeholder="Select Shelf Life Type"
+                                        v-model:model-value="form.shelf_life_type"
+                                        trigger-class="w-full"
+                                    />
+                                </div>
+                            </div>
+                            <p v-if="form.errors.shelf_life_duration" class="text-destructive">{{ form.errors.shelf_life_duration }}</p>
+                            <p v-if="form.errors.shelf_life_type" class="text-destructive">{{ form.errors.shelf_life_type }}</p>
                         </div>
                         <div class="grid w-full max-w-sm items-center gap-1.5">
                             <Label>Unit price</Label>

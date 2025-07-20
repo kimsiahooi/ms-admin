@@ -7,7 +7,9 @@ export interface Product {
     description: string | null;
     is_active: boolean;
     is_active_display?: string | null;
-    shelf_life_days: number | null;
+    shelf_life_duration: string | null;
+    shelf_life_type: 'SECOND' | 'MINUTE' | 'HOUR' | 'DAY' | 'MONTH' | 'YEAR' | null;
+    shelf_life_type_display?: string | null;
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;

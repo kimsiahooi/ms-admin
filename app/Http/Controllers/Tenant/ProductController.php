@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\enums\Tenant\Product\Currency;
+use App\enums\Tenant\Product\ShelfLifeType;
 use App\enums\Tenant\Product\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Material;
@@ -29,13 +30,14 @@ class ProductController extends Controller
             'products' => $products,
             'statuses' => collect(Status::cases())->map(function ($status) {
                 return [
-                    'name' => $status->dislay(),
+                    'name' => $status->display(),
                     'value' => $status->value,
                 ];
             }),
             'options' => [
                 'materials' => Material::active()->get()->map(fn(Material $material) => ['name' => "{$material->name} ({$material->code})", 'value' => $material->id]),
-                'currencies' => collect(Currency::cases())->map(fn($currency) => ['name' => $currency->value, 'value' => $currency->value]),
+                'currencies' => collect(Currency::cases())->map(fn(Currency $currency) => ['name' => $currency->value, 'value' => $currency->value]),
+                'shelf_life_types' => collect(ShelfLifeType::cases())->map(fn(ShelfLifeType $shelfLifeType) => ['name' => $shelfLifeType->display(), 'value' => $shelfLifeType->value]),
             ],
         ]);
     }
@@ -59,7 +61,8 @@ class ProductController extends Controller
                 return $query->where('tenant_id', tenant('id'))->whereNull('deleted_at');
             })],
             'description' => ['nullable', 'string'],
-            'shelf_life_days' => ['nullable', 'integer', 'min:1'],
+            'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type', 'numeric', 'min:0'],
+            'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::in(array_column(ShelfLifeType::cases(), 'value'))],
             'prices' => ['required', 'array'],
             'prices.*.currency' => ['required', 'distinct', Rule::in(array_column(Currency::cases(), 'value'))],
             'prices.*.value' => ['required', 'numeric', 'min:0'],
@@ -136,7 +139,8 @@ class ProductController extends Controller
             })],
             'description' => ['nullable', 'string'],
             'is_active' => ['required', 'boolean'],
-            'shelf_life_days' => ['nullable', 'integer', 'min:1'],
+            'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type', 'numeric', 'min:0'],
+            'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::in(array_column(ShelfLifeType::cases(), 'value'))],
             'prices' => ['required', 'array'],
             'prices.*.currency' => ['required', 'distinct', Rule::in(array_column(Currency::cases(), 'value'))],
             'prices.*.value' => ['required', 'numeric', 'min:0'],

@@ -3,6 +3,7 @@
 namespace Database\Factories\Tenant;
 
 use App\enums\Tenant\Product\Currency;
+use App\enums\Tenant\Product\ShelfLifeType;
 use App\Models\Tenant;
 use App\Models\Tenant\Material;
 use App\Models\Tenant\Product;
@@ -22,12 +23,14 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         $name = fake()->unique()->sentence(2);
+        $shelfLifeDuration = fake()->optional(0.5)->randomFloat(2, 10, 100);
 
         return [
             'name' => $name,
             'code' => Str::slug($name),
             'description' => fake()->sentence(),
-            'shelf_life_days' => fake()->optional(0.5)->numberBetween(30, 60),
+            'shelf_life_duration' => $shelfLifeDuration,
+            'shelf_life_type' => $shelfLifeDuration ? fake()->randomElement(ShelfLifeType::cases()) : null,
             'is_active' => fake()->boolean(),
             'tenant_id' => Tenant::inRandomOrder()->first(),
         ];

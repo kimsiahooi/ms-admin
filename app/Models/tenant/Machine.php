@@ -26,8 +26,8 @@ class Machine extends Model
         ];
     }
 
-    protected function getIsActiveDisplayAttribute(): string
+    protected function getIsActiveDisplayAttribute(): string | null
     {
-        return Status::tryFrom($this->is_active)?->dislay();
+        return Status::tryFrom($this->is_active)?->display();
     }
 }

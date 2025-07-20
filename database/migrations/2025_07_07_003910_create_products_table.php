@@ -1,5 +1,6 @@
 <?php
 
+use App\enums\Tenant\Product\ShelfLifeType;
 use App\Models\Tenant;
 use App\Models\Tenant\Material;
 use App\Models\Tenant\Product;
@@ -19,7 +20,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('code');
             $table->text('description')->nullable();
-            $table->integer('shelf_life_days')->nullable();
+            $table->decimal('shelf_life_duration')->min(0)->nullable();
+            $table->enum('shelf_life_type', array_column(ShelfLifeType::cases(), 'value'))->nullable();
             $table->boolean('is_active')->default(true);
             $table->foreignIdFor(Tenant::class)->constrained();
             $table->timestamps();
