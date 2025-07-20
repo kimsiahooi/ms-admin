@@ -28,9 +28,9 @@ class Material extends Model
         ];
     }
 
-    public function products()
+    public function boms()
     {
-        return $this->belongsToMany(Product::class)->withTimestamps();
+        return $this->belongsToMany(Bom::class)->withTimestamps()->using(BomMaterial::class);
     }
 
     protected function getUnitTypeDisplayAttribute(): string | null
@@ -42,7 +42,6 @@ class Material extends Model
     {
         return Status::tryFrom($this->is_active)?->display();
     }
-
 
     public function scopeActive(Builder $query): void
     {

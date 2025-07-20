@@ -74,8 +74,10 @@ class BomController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Bom $bom)
+    public function destroy(Product $product, Bom $bom)
     {
-        //
+        $bom->delete();
+
+        return back()->with('success', 'Bom deleted successfully.');
     }
 }

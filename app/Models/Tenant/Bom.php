@@ -31,6 +31,11 @@ class Bom extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function materials()
+    {
+        return $this->belongsToMany(Material::class)->withPivot(['quantity'])->withTimestamps()->using(BomMaterial::class);
+    }
+
     protected function getIsActiveDisplayAttribute(): string | null
     {
         return Status::tryFrom($this->is_active)?->display();
