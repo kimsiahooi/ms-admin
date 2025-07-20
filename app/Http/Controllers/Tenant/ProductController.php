@@ -61,8 +61,8 @@ class ProductController extends Controller
                 return $query->where('tenant_id', tenant('id'))->whereNull('deleted_at');
             })],
             'description' => ['nullable', 'string'],
-            'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type', 'numeric', 'min:0.01'],
-            'shelf_life_type' => ['nullable', Rule::in(ShelfLifeType::cases())],
+            'shelf_life_duration' => ['nullable', 'numeric', 'min:0.01'],
+            'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::in(ShelfLifeType::cases())],
             'prices' => ['required', 'array'],
             'prices.*.currency' => ['required', 'distinct', Rule::in(Currency::cases())],
             'prices.*.value' => ['required', 'numeric', 'min:0'],

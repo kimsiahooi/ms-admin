@@ -14,12 +14,12 @@ enum ShelfLifeType: string
     public function display(): string
     {
         return match ($this) {
-            self::SECOND => 'Second',
-            self::MINUTE => 'Minute',
-            self::HOUR => 'Hour',
-            self::DAY => 'Day',
-            self::MONTH => 'Month',
-            self::YEAR => 'Year',
+            self::SECOND => 'Second(s)',
+            self::MINUTE => 'Minute(s)',
+            self::HOUR => 'Hour(s)',
+            self::DAY => 'Day(s)',
+            self::MONTH => 'Month(s)',
+            self::YEAR => 'Year(s)',
         };
     }
 }
