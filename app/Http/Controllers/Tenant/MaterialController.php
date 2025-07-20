@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\enums\Tenant\Material\Status;
+use App\enums\Tenant\Material\UnitType;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Material;
 use Illuminate\Http\Request;
@@ -25,12 +26,10 @@ class MaterialController extends Controller
 
         return inertia('Tenant/Materials/Index', [
             'materials' => $materials,
-            'statuses' => collect(Status::cases())->map(function ($status) {
-                return [
-                    'name' => $status->display(),
-                    'value' => $status->value,
-                ];
-            }),
+            'options' => [
+                'statuses' => collect(Status::cases())->map(fn(Status $status) => ['name' => $status->display(), 'value' => $status->value]),
+                'unit_types' => collect(UnitType::cases())->map(fn(UnitType $unitType) => ['name' => $unitType->display(), 'value' => $unitType->value]),
+            ]
         ]);
     }
 
@@ -53,6 +52,7 @@ class MaterialController extends Controller
                 return $query->where('tenant_id', tenant('id'))->whereNull('deleted_at');
             })],
             'description' => ['nullable', 'string'],
+            'unit_type' => ['required', Rule::in(UnitType::cases())],
             'is_active' => ['required', 'boolean'],
         ]);
 
@@ -95,6 +95,7 @@ class MaterialController extends Controller
                 return $query->where('tenant_id', tenant('id'));
             })],
             'description' => ['nullable', 'string'],
+            'unit_type' => ['required', Rule::in(UnitType::cases())],
             'is_active' => ['required', 'boolean'],
         ]);
 

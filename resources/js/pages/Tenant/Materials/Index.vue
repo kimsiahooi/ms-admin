@@ -2,6 +2,8 @@
 import { Dialog } from '@/components/shared/dialog';
 import type { DialogMethodType, DialogType } from '@/components/shared/dialog/types';
 import type { PaginateData } from '@/components/shared/pagination/types';
+import { Select } from '@/components/shared/select';
+import type { SelectOption } from '@/components/shared/select/types';
 import type { SwitchOption } from '@/components/shared/switch/types';
 import { DataTable } from '@/components/shared/table';
 import type { Filter, SearchConfig, VisibilityState } from '@/components/shared/table/types';
@@ -31,7 +33,10 @@ defineOptions({
 
 const props = defineProps<{
     materials: PaginateData<Material[]>;
-    statuses: SwitchOption<number>[];
+    options: {
+        statuses: SwitchOption<number>[];
+        unit_types: SelectOption<Material['unit_type']>[];
+    };
 }>();
 
 const { formatDateTime } = useFormatDateTime();
@@ -103,6 +108,14 @@ const columns: ColumnDef<Material>[] = [
         cell: ({ row }) => h('div', null, row.getValue('description')),
     },
     {
+        accessorKey: 'unit_type',
+        header: () => h('div', null, 'Unit Type'),
+        cell: ({ row }) => {
+            const unitTypeDisplay = row.original.unit_type_display || '';
+            return h('div', null, unitTypeDisplay);
+        },
+    },
+    {
         accessorKey: 'is_active',
         header: () => h('div', null, 'Active'),
         cell: ({ row }) => {
@@ -150,15 +163,17 @@ const form = useForm<{
     name: string;
     code: string;
     description: string;
+    unit_type: Material['unit_type'] | '';
     is_active: boolean;
 }>(dialog.type || '', {
     name: '',
     code: '',
     description: '',
+    unit_type: '',
     is_active: true,
 });
 
-const statusDisplay = computed(() => props.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
+const statusDisplay = computed(() => props.options.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
 
 const dialogButtonLabel = computed(() => (dialog.type === 'store' ? 'Create' : dialog.type === 'update' ? 'Update' : 'Delete'));
 const dialogButtonVariant = computed<ButtonVariants['variant']>(() => (dialog.type === 'destroy' ? 'destructive' : 'default'));
@@ -174,6 +189,7 @@ const dialogHandler = (type: DialogMethodType, material?: Material) => {
                 form.name = material.name;
                 form.code = material.code;
                 form.description = material.description || '';
+                form.unit_type = material.unit_type;
                 form.is_active = material.is_active;
             }
             dialog.title = `Edit ${dialog.data?.name || 'Material'}`;
@@ -251,6 +267,16 @@ watch([() => form.name, () => dialog.type], ([newName, newType]) => {
                             <Label>Description</Label>
                             <Textarea placeholder="Enter Description" v-model:model-value="form.description" />
                             <p v-if="form.errors.description" class="text-destructive">{{ form.errors.description }}</p>
+                        </div>
+                        <div class="grid w-full max-w-sm items-center gap-1.5">
+                            <Label>Unit Type</Label>
+                            <Select
+                                :options="options.unit_types"
+                                placeholder="Select Unit Type"
+                                v-model:model-value="form.unit_type"
+                                trigger-class="w-full"
+                            />
+                            <p v-if="form.errors.unit_type" class="text-destructive">{{ form.errors.unit_type }}</p>
                         </div>
                         <div class="grid w-full max-w-sm items-center gap-1.5">
                             <Label class="mb-1">Status</Label>

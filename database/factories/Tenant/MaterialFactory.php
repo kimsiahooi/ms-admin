@@ -2,6 +2,7 @@
 
 namespace Database\Factories\Tenant;
 
+use App\enums\Tenant\Material\UnitType;
 use App\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -24,6 +25,7 @@ class MaterialFactory extends Factory
             'name' => $name,
             'code' => Str::slug($name),
             'description' => fake()->sentence(),
+            'unit_type' => fake()->randomElement(UnitType::cases()),
             'is_active' => fake()->boolean(),
             'tenant_id' => Tenant::inRandomOrder()->first(),
         ];

@@ -117,7 +117,7 @@ const columns: ColumnDef<ProductWithMaterialsAndprices>[] = [
     },
     {
         accessorKey: 'shelf_life_type',
-        header: () => h('div', null, 'Shelf Life type'),
+        header: () => h('div', null, 'Shelf Life Type'),
         cell: ({ row }) => {
             const shelf_life_type = row.original.shelf_life_type_display || '';
             return h('div', null, shelf_life_type);
@@ -128,7 +128,6 @@ const columns: ColumnDef<ProductWithMaterialsAndprices>[] = [
         header: () => h('div', null, 'Active'),
         cell: ({ row }) => {
             const { is_active, is_active_display } = row.original;
-
             return h(Badge, { variant: is_active ? 'default' : 'destructive' }, () => is_active_display);
         },
     },
