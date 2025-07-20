@@ -27,11 +27,6 @@ class Product extends Model
         ];
     }
 
-    public function materials()
-    {
-        return $this->belongsToMany(Material::class)->withTimestamps();
-    }
-
     public function prices()
     {
         return $this->hasMany(ProductPrice::class);

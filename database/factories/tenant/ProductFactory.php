@@ -36,19 +36,6 @@ class ProductFactory extends Factory
         ];
     }
 
-    public function withMaterials(int $count = 3): static
-    {
-        return $this->afterCreating(function (Product $product) use ($count) {
-            $materials = Material::active()->inRandomOrder()->limit($count)->get();
-
-            if ($materials->isEmpty()) {
-                $materials = Material::factory()->count($count)->create();
-            }
-
-            $product->materials()->sync($materials);
-        });
-    }
-
     public function withCurrencies(int $count = 3): static
     {
         return $this->afterCreating(function (Product $product) use ($count) {

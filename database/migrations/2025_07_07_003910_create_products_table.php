@@ -29,13 +29,6 @@ return new class extends Migration
 
             $table->unique(['code', 'tenant_id']);
         });
-
-        Schema::create('material_product', function (Blueprint $table) {
-            $table->id();
-            $table->foreignIdFor(Material::class)->constrained();
-            $table->foreignIdFor(Product::class)->constrained();
-            $table->timestamps();
-        });
     }
 
     /**
@@ -43,7 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('material_product');
         Schema::dropIfExists('products');
     }
 };

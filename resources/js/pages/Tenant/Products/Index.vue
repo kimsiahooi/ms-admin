@@ -3,7 +3,7 @@ import { Dialog } from '@/components/shared/dialog';
 import type { DialogMethodType, DialogType } from '@/components/shared/dialog/types';
 import { ErrorMessages } from '@/components/shared/error';
 import type { PaginateData } from '@/components/shared/pagination/types';
-import { MultiSelect, Select } from '@/components/shared/select';
+import { Select } from '@/components/shared/select';
 import type { SelectOption } from '@/components/shared/select/types';
 import type { SwitchOption } from '@/components/shared/switch/types';
 import { DataTable } from '@/components/shared/table';
@@ -19,7 +19,7 @@ import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { AppPageProps, BreadcrumbItem } from '@/types';
-import type { ProductPrice, ProductWithMaterialsAndprices } from '@/types/Tenant/products';
+import type { ProductPrice, ProductWithPrice } from '@/types/Tenant/products';
 import type { Method } from '@inertiajs/core';
 import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
@@ -33,7 +33,7 @@ defineOptions({
 });
 
 const props = defineProps<{
-    products: PaginateData<ProductWithMaterialsAndprices[]>;
+    products: PaginateData<ProductWithPrice[]>;
     statuses: SwitchOption<number>[];
     options: {
         materials: SelectOption<number>[];
@@ -72,11 +72,11 @@ const filterChangeHandler = (filter: Filter) => {
     router.visit(route('products.index', { ...pickBy(filter), tenant: tenant.value }));
 };
 
-const columnVisibility = <VisibilityState<Partial<ProductWithMaterialsAndprices>>>{
+const columnVisibility = <VisibilityState<Partial<ProductWithPrice>>>{
     description: false,
 };
 
-const columns: ColumnDef<ProductWithMaterialsAndprices>[] = [
+const columns: ColumnDef<ProductWithPrice>[] = [
     {
         accessorKey: 'actions',
         header: () => h('div', null, 'Actions'),
@@ -159,7 +159,7 @@ const columns: ColumnDef<ProductWithMaterialsAndprices>[] = [
     },
 ];
 
-const dialog = reactive<DialogType<ProductWithMaterialsAndprices>>({
+const dialog = reactive<DialogType<ProductWithPrice>>({
     type: null,
     title: '',
     isOpen: false,
@@ -177,7 +177,6 @@ const form = useForm<{
         value: number | '';
     }[];
     is_active: boolean;
-    materials: number[];
 }>(dialog.type || '', {
     name: '',
     code: '',
@@ -186,7 +185,6 @@ const form = useForm<{
     shelf_life_type: '',
     prices: [{ currency: '', value: '' }],
     is_active: true,
-    materials: [],
 });
 
 const statusDisplay = computed(() => props.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
@@ -194,7 +192,7 @@ const statusDisplay = computed(() => props.statuses.find((status) => (form.is_ac
 const dialogButtonLabel = computed(() => (dialog.type === 'store' ? 'Create' : dialog.type === 'update' ? 'Update' : 'Delete'));
 const dialogButtonVariant = computed<ButtonVariants['variant']>(() => (dialog.type === 'destroy' ? 'destructive' : 'default'));
 
-const dialogHandler = (type: DialogMethodType, product?: ProductWithMaterialsAndprices) => {
+const dialogHandler = (type: DialogMethodType, product?: ProductWithPrice) => {
     switch (type) {
         case 'store':
             dialog.title = 'Create Product';
@@ -209,7 +207,6 @@ const dialogHandler = (type: DialogMethodType, product?: ProductWithMaterialsAnd
                 form.shelf_life_type = product.shelf_life_type || '';
                 form.prices = product.prices.map((price) => ({ currency: price.currency, value: +price.price }));
                 form.is_active = product.is_active;
-                form.materials = product.materials.filter((material) => material.is_active).map((material) => material.id);
             }
             dialog.title = `Edit ${dialog.data?.name || 'Product'}`;
             break;
@@ -358,16 +355,6 @@ watch([() => form.name, () => dialog.type], ([newName, newType]) => {
                                 </div>
                                 <ErrorMessages :error-key="`prices.${index}`" />
                             </div>
-                        </div>
-                        <div class="grid w-full max-w-sm items-center gap-1.5">
-                            <Label>Materials</Label>
-                            <MultiSelect
-                                :options="options.materials"
-                                placeholder="Select Materials"
-                                v-model:model-value="form.materials"
-                                trigger-class="w-full"
-                            />
-                            <ErrorMessages error-key="materials" />
                         </div>
                         <div class="grid w-full max-w-sm items-center gap-1.5">
                             <Label class="mb-1">Status</Label>

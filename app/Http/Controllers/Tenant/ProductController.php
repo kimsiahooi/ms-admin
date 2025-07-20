@@ -20,7 +20,7 @@ class ProductController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $products = Product::with(['materials', 'prices'])->when($request->search, function ($query, $search) {
+        $products = Product::with(['prices'])->when($request->search, function ($query, $search) {
             $query->where('name', 'like', "%{$search}%");
         })->latest()
             ->paginate($entries)
@@ -67,10 +67,6 @@ class ProductController extends Controller
             'prices.*.currency' => ['required', 'distinct', Rule::in(Currency::cases())],
             'prices.*.value' => ['required', 'numeric', 'min:0'],
             'is_active' => ['required', 'boolean'],
-            'materials' => ['required', 'array'],
-            'materials.*' => ['distinct', Rule::exists('materials', 'id')->where(function ($query) {
-                return $query->where('is_active', true)->where('tenant_id', tenant('id'))->whereNull('deleted_at');
-            })],
         ]);
 
         $validated['shelf_life_type'] = $validated['shelf_life_duration'] ? $validated['shelf_life_type'] : null;
@@ -108,8 +104,6 @@ class ProductController extends Controller
 
         $product->prices()->whereNotIn('id', $priceIds)->delete();
 
-        $product->materials()->sync($validated['materials']);
-
         return back()->with('success', 'Product created successfully.');
     }
 
@@ -146,10 +140,6 @@ class ProductController extends Controller
             'prices' => ['required', 'array'],
             'prices.*.currency' => ['required', 'distinct', Rule::in(Currency::cases())],
             'prices.*.value' => ['required', 'numeric', 'min:0'],
-            'materials' => ['required', 'array'],
-            'materials.*' => ['distinct', Rule::exists('materials', 'id')->where(function ($query) {
-                return $query->where('is_active', true)->where('tenant_id', tenant('id'))->whereNull('deleted_at');
-            })],
         ]);
 
         $validated['shelf_life_type'] = $validated['shelf_life_duration'] ? $validated['shelf_life_type'] : null;
@@ -190,8 +180,6 @@ class ProductController extends Controller
         }
 
         $product->prices()->whereNotIn('id', $priceIds)->delete();
-
-        $product->materials()->sync($validated['materials']);
 
         return back()->with('success', 'Product updated successfully.');
     }

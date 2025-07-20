@@ -1,5 +1,3 @@
-import type { Material } from '../materials';
-
 export interface Product {
     readonly id: number;
     name: string;
@@ -186,15 +184,6 @@ export interface ProductPrice {
     deleted_at: Date | null;
 }
 
-export interface ProductWithMaterials extends Product {
-    materials: Material[];
-}
-
-export interface ProductWithprices extends Product {
-    prices: ProductPrice[];
-}
-
-export interface ProductWithMaterialsAndprices extends Product {
-    materials: Material[];
+export interface ProductWithPrice extends Product {
     prices: ProductPrice[];
 }
