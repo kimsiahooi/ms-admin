@@ -302,9 +302,9 @@ watch([() => form.name, () => dialog.type], ([newName, newType]) => {
                                     <Label>Shelf Life Duration</Label>
                                     <Input
                                         type="number"
-                                        placeholder="Enter Shelf Life Day(s)"
+                                        placeholder="Enter Shelf Life Duration"
                                         v-model:model-value.number="form.shelf_life_duration"
-                                        min="0"
+                                        min="0.01"
                                         step=".01"
                                         class="w-full"
                                     />

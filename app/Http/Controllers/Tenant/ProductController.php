@@ -61,8 +61,8 @@ class ProductController extends Controller
                 return $query->where('tenant_id', tenant('id'))->whereNull('deleted_at');
             })],
             'description' => ['nullable', 'string'],
-            'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type', 'numeric', 'min:0'],
-            'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::in(array_column(ShelfLifeType::cases(), 'value'))],
+            'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type', 'numeric', 'min:0.01'],
+            'shelf_life_type' => ['nullable', Rule::in(array_column(ShelfLifeType::cases(), 'value'))],
             'prices' => ['required', 'array'],
             'prices.*.currency' => ['required', 'distinct', Rule::in(array_column(Currency::cases(), 'value'))],
             'prices.*.value' => ['required', 'numeric', 'min:0'],
@@ -72,6 +72,8 @@ class ProductController extends Controller
                 return $query->where('is_active', true)->where('tenant_id', tenant('id'))->whereNull('deleted_at');
             })],
         ]);
+
+        $validated['shelf_life_type'] = $validated['shelf_life_duration'] ? $validated['shelf_life_type'] : null;
 
         $product = Product::onlyTrashed()->where('code', $validated['code'])->first();
 
@@ -139,7 +141,7 @@ class ProductController extends Controller
             })],
             'description' => ['nullable', 'string'],
             'is_active' => ['required', 'boolean'],
-            'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type', 'numeric', 'min:0'],
+            'shelf_life_duration' => ['nullable', 'numeric', 'min:0.01'],
             'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::in(array_column(ShelfLifeType::cases(), 'value'))],
             'prices' => ['required', 'array'],
             'prices.*.currency' => ['required', 'distinct', Rule::in(array_column(Currency::cases(), 'value'))],
@@ -149,6 +151,8 @@ class ProductController extends Controller
                 return $query->where('is_active', true)->where('tenant_id', tenant('id'))->whereNull('deleted_at');
             })],
         ]);
+
+        $validated['shelf_life_type'] = $validated['shelf_life_duration'] ? $validated['shelf_life_type'] : null;
 
         $product->update($validated);
 
