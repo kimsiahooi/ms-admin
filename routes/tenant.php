@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\BomController;
 use App\Http\Controllers\Tenant\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Tenant\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Tenant\Auth\EmailVerificationNotificationController;
@@ -101,5 +102,6 @@ Route::middleware([
         Route::resource('machines', MachineController::class)->except(['create', 'show', 'edit']);
         Route::resource('materials', MaterialController::class)->except(['create', 'show', 'edit']);
         Route::resource('products', ProductController::class)->except(['create', 'show', 'edit']);
+        Route::resource('products.boms', BomController::class)->except(['create', 'show', 'edit']);
     });
 });

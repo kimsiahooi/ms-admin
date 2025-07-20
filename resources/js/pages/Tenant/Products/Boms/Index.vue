@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { Dialog } from '@/components/shared/dialog';
 import type { DialogMethodType, DialogType } from '@/components/shared/dialog/types';
-import { ErrorMessages } from '@/components/shared/error';
 import type { PaginateData } from '@/components/shared/pagination/types';
-import { Select } from '@/components/shared/select';
-import type { SelectOption } from '@/components/shared/select/types';
 import type { SwitchOption } from '@/components/shared/switch/types';
 import { DataTable } from '@/components/shared/table';
 import type { Filter, SearchConfig, VisibilityState } from '@/components/shared/table/types';
@@ -19,12 +16,13 @@ import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { AppPageProps, BreadcrumbItem } from '@/types';
-import type { ProductPrice, ProductWithPrice } from '@/types/Tenant/products';
+import type { Product } from '@/types/Tenant/products';
+import type { Bom } from '@/types/Tenant/products/boms';
 import type { Method } from '@inertiajs/core';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
+import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { Anvil, Minus, Pencil, Plus, Trash2 } from 'lucide-vue-next';
+import { Pencil, Trash2 } from 'lucide-vue-next';
 import slug from 'slug';
 import { computed, h, reactive, watch } from 'vue';
 
@@ -33,12 +31,10 @@ defineOptions({
 });
 
 const props = defineProps<{
-    products: PaginateData<ProductWithPrice[]>;
-    statuses: SwitchOption<number>[];
+    product: Product;
+    boms: PaginateData<Bom[]>;
     options: {
-        materials: SelectOption<number>[];
-        currencies: SelectOption<ProductPrice['currency']>[];
-        shelf_life_types: SelectOption<string>[];
+        statuses: SwitchOption<number>[];
     };
 }>();
 
@@ -66,39 +62,38 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Products',
         href: route('products.index', { tenant: tenant.value }),
     },
+    {
+        title: props.product.name,
+        href: '#',
+    },
+    {
+        title: 'Bom',
+        href: route('products.boms.index', { tenant: tenant.value, product: props.product.id }),
+    },
 ];
 
 const filterChangeHandler = (filter: Filter) => {
-    router.visit(route('products.index', { ...pickBy(filter), tenant: tenant.value }));
+    router.visit(route('products.boms.index', { ...pickBy(filter), tenant: tenant.value, product: props.product.id }));
 };
 
-const columnVisibility = <VisibilityState<Partial<ProductWithPrice>>>{
+const columnVisibility = <VisibilityState<Partial<Bom>>>{
     description: false,
 };
 
-const columns: ColumnDef<ProductWithPrice>[] = [
+const columns: ColumnDef<Bom>[] = [
     {
         accessorKey: 'actions',
         header: () => h('div', null, 'Actions'),
         cell: ({ row }) => {
-            const product = row.original;
+            const bom = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(Link, { asChild: true, href: route('products.boms.index', { tenant: tenant.value, product: product.id }) }, () =>
-                    h(
-                        Button,
-                        {
-                            class: 'h-auto size-6 cursor-pointer rounded-full',
-                        },
-                        () => h(Anvil, { class: 'size-3' }),
-                    ),
-                ),
-                h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', onClick: () => dialogHandler('update', product) }, () =>
+                h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', onClick: () => dialogHandler('update', bom) }, () =>
                     h(Pencil, { class: 'size-3' }),
                 ),
                 h(
                     Button,
-                    { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive', onClick: () => dialogHandler('destroy', product) },
+                    { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive', onClick: () => dialogHandler('destroy', bom) },
                     () => h(Trash2, { class: 'size-3' }),
                 ),
             ]);
@@ -118,19 +113,6 @@ const columns: ColumnDef<ProductWithPrice>[] = [
         accessorKey: 'description',
         header: () => h('div', null, 'Description'),
         cell: ({ row }) => h('div', null, row.getValue('description')),
-    },
-    {
-        accessorKey: 'shelf_life_duration',
-        header: () => h('div', null, 'Shelf Life Duration'),
-        cell: ({ row }) => h('div', null, row.getValue('shelf_life_duration')),
-    },
-    {
-        accessorKey: 'shelf_life_type',
-        header: () => h('div', null, 'Shelf Life Type'),
-        cell: ({ row }) => {
-            const shelf_life_type = row.original.shelf_life_type_display || '';
-            return h('div', null, shelf_life_type);
-        },
     },
     {
         accessorKey: 'is_active',
@@ -168,7 +150,7 @@ const columns: ColumnDef<ProductWithPrice>[] = [
     },
 ];
 
-const dialog = reactive<DialogType<ProductWithPrice>>({
+const dialog = reactive<DialogType<Bom>>({
     type: null,
     title: '',
     isOpen: false,
@@ -179,51 +161,39 @@ const form = useForm<{
     name: string;
     code: string;
     description: string;
-    shelf_life_duration: number | '';
-    shelf_life_type: string;
-    prices: {
-        currency: ProductPrice['currency'] | '';
-        value: number | '';
-    }[];
     is_active: boolean;
 }>(dialog.type || '', {
     name: '',
     code: '',
     description: '',
-    shelf_life_duration: '',
-    shelf_life_type: '',
-    prices: [{ currency: '', value: '' }],
     is_active: true,
 });
 
-const statusDisplay = computed(() => props.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
+const statusDisplay = computed(() => props.options.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
 
 const dialogButtonLabel = computed(() => (dialog.type === 'store' ? 'Create' : dialog.type === 'update' ? 'Update' : 'Delete'));
 const dialogButtonVariant = computed<ButtonVariants['variant']>(() => (dialog.type === 'destroy' ? 'destructive' : 'default'));
 
-const dialogHandler = (type: DialogMethodType, product?: ProductWithPrice) => {
+const dialogHandler = (type: DialogMethodType, bom?: Bom) => {
     switch (type) {
         case 'store':
-            dialog.title = 'Create Product';
+            dialog.title = 'Create Bom';
             break;
         case 'update':
-            if (product) {
-                dialog.data = product;
-                form.name = product.name;
-                form.code = product.code;
-                form.description = product.description || '';
-                form.shelf_life_duration = product.shelf_life_duration ? +product.shelf_life_duration : '';
-                form.shelf_life_type = product.shelf_life_type || '';
-                form.prices = product.prices.map((price) => ({ currency: price.currency, value: +price.price }));
-                form.is_active = product.is_active;
+            if (bom) {
+                dialog.data = bom;
+                form.name = bom.name;
+                form.code = bom.code;
+                form.description = bom.description || '';
+                form.is_active = bom.is_active;
             }
-            dialog.title = `Edit ${dialog.data?.name || 'Product'}`;
+            dialog.title = `Edit ${dialog.data?.name || 'Bom'}`;
             break;
         case 'destroy':
-            if (product) {
-                dialog.data = product;
+            if (bom) {
+                dialog.data = bom;
             }
-            dialog.title = `Delete ${dialog.data?.name || 'Product'}`;
+            dialog.title = `Delete ${dialog.data?.name || 'Bom'}`;
     }
     dialog.type = type;
     dialog.isOpen = true;
@@ -233,10 +203,10 @@ const submit = () => {
     if (dialog.type) {
         const fetchLink =
             dialog.type === 'store'
-                ? route('products.store', { tenant: tenant.value })
+                ? route('products.boms.store', { tenant: tenant.value, product: props.product.id })
                 : dialog.type === 'update'
-                  ? route('products.update', { tenant: tenant.value, product: dialog.data?.id || '' })
-                  : route('products.destroy', { tenant: tenant.value, product: dialog.data?.id || '' });
+                  ? route('products.boms.update', { tenant: tenant.value, product: props.product.id, bom: dialog.data?.id || '' })
+                  : route('products.boms.destroy', { tenant: tenant.value, product: props.product.id, bom: dialog.data?.id || '' });
 
         const method: Method = dialog.type === 'store' ? 'post' : dialog.type === 'update' ? 'put' : 'delete';
 
@@ -246,14 +216,6 @@ const submit = () => {
                 dialog.isOpen = false;
             },
         });
-    }
-};
-
-const priceHandler = (index: number) => {
-    if (!index) {
-        form.prices = [...form.prices, { currency: '', value: '' }];
-    } else {
-        form.prices = form.prices.filter((_, i) => index !== i);
     }
 };
 
@@ -276,7 +238,7 @@ watch([() => form.name, () => dialog.type], ([newName, newType]) => {
 </script>
 
 <template>
-    <Head title="Products" />
+    <Head title="Boms" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
@@ -302,70 +264,6 @@ watch([() => form.name, () => dialog.type], ([newName, newType]) => {
                             <p v-if="form.errors.description" class="text-destructive">{{ form.errors.description }}</p>
                         </div>
                         <div class="grid w-full max-w-sm items-center gap-1.5">
-                            <div class="grid gap-1.5 md:grid-cols-2">
-                                <div class="grid gap-1.5">
-                                    <Label>Shelf Life Duration</Label>
-                                    <Input
-                                        type="number"
-                                        placeholder="Enter Shelf Life Duration"
-                                        v-model:model-value.number="form.shelf_life_duration"
-                                        min="0.01"
-                                        step=".01"
-                                        class="w-full"
-                                    />
-                                </div>
-                                <div class="grid gap-1.5">
-                                    <Label>Shelf Life Type</Label>
-                                    <Select
-                                        :options="options.shelf_life_types"
-                                        placeholder="Select Shelf Life Type"
-                                        v-model:model-value="form.shelf_life_type"
-                                        trigger-class="w-full"
-                                    />
-                                </div>
-                            </div>
-                            <p v-if="form.errors.shelf_life_duration" class="text-destructive">{{ form.errors.shelf_life_duration }}</p>
-                            <p v-if="form.errors.shelf_life_type" class="text-destructive">{{ form.errors.shelf_life_type }}</p>
-                        </div>
-                        <div class="grid w-full max-w-sm items-center gap-1.5">
-                            <Label>Unit price</Label>
-                            <div v-for="(price, index) in form.prices" :key="index">
-                                <div class="flex items-center gap-2">
-                                    <div class="flex-1">
-                                        <Select
-                                            :options="options.currencies"
-                                            placeholder="Select Currency"
-                                            v-model:model-value="price.currency"
-                                            trigger-class="w-full"
-                                        />
-                                    </div>
-                                    <div class="flex-1">
-                                        <Input
-                                            type="number"
-                                            step=".01"
-                                            min="0"
-                                            placeholder="Enter Unit Price"
-                                            v-model:model-value.number="price.value"
-                                            class="w-full"
-                                        />
-                                    </div>
-                                    <div>
-                                        <Button
-                                            type="button"
-                                            size="icon"
-                                            class="cursor-pointer"
-                                            :variant="!index ? 'default' : 'destructive'"
-                                            @click="priceHandler(index)"
-                                        >
-                                            <Plus v-if="!index" />
-                                            <Minus v-else />
-                                        </Button>
-                                    </div>
-                                </div>
-                                <ErrorMessages :error-key="`prices.${index}`" />
-                            </div>
-                        </div>
-                        <div class="grid w-full max-w-sm items-center gap-1.5">
                             <Label class="mb-1">Status</Label>
                             <div class="flex items-center space-x-2">
                                 <Switch class="cursor-pointer" v-model:model-value="form.is_active" />
@@ -383,7 +281,7 @@ watch([() => form.name, () => dialog.type], ([newName, newType]) => {
                 <div>
                     <DataTable
                         :columns="columns"
-                        :paginate-data="products"
+                        :paginate-data="boms"
                         :column-visibility="columnVisibility"
                         :filter="filter"
                         :entry-options="entryOptions"

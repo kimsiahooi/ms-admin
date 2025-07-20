@@ -32,6 +32,11 @@ class Product extends Model
         return $this->hasMany(ProductPrice::class);
     }
 
+    public function boms()
+    {
+        return $this->hasMany(Bom::class);
+    }
+
     protected function getIsActiveDisplayAttribute(): string | null
     {
         return Status::tryFrom($this->is_active)?->display();
