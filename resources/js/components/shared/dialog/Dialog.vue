@@ -1,45 +1,30 @@
-<script setup lang="ts" generic="T">
+<script setup lang="ts">
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogScrollContent, DialogTitle } from '@/components/ui/dialog';
-import { computed } from 'vue';
-import type { DialogType } from './types';
+import { Dialog, DialogDescription, DialogHeader, DialogScrollContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
-const props = defineProps<{
-    dialog: DialogType<T>;
+defineProps<{
+    title: string;
+    description?: string;
 }>();
 
 const model = defineModel<boolean | undefined>('open');
-
-const emits = defineEmits<{
-    submit: [value: undefined];
-}>();
-
-const dialogDescription = computed(() => (props.dialog.type === 'destroy' ? 'Are you sure you want to delete this data?' : ''));
-
-const submitHandler = () => {
-    emits('submit', undefined);
-};
 </script>
 
 <template>
     <Dialog v-model:open="model">
-        <slot name="button" />
+        <DialogTrigger as-child>
+            <slot name="trigger">
+                <Button class="cursor-pointer">Create</Button>
+            </slot>
+        </DialogTrigger>
         <DialogScrollContent class="sm:max-w-[425px]">
-            <form @submit.prevent="submitHandler" class="space-y-4">
-                <DialogHeader>
-                    <DialogTitle>{{ dialog.title }}</DialogTitle>
-                    <DialogDescription>{{ dialogDescription }}</DialogDescription>
-                </DialogHeader>
-                <div v-if="props.dialog.type !== 'destroy'" class="grid gap-4">
-                    <slot />
-                </div>
-                <DialogFooter>
-                    <DialogClose as-child>
-                        <Button type="button" variant="secondary" class="cursor-pointer"> Close </Button>
-                    </DialogClose>
-                    <slot name="submit-button" />
-                </DialogFooter>
-            </form>
+            <DialogHeader>
+                <DialogTitle>{{ title }}</DialogTitle>
+                <DialogDescription> </DialogDescription>
+            </DialogHeader>
+            <div>
+                <slot />
+            </div>
         </DialogScrollContent>
     </Dialog>
 </template>

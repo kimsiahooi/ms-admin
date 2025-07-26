@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { Dialog } from '@/components/shared/dialog';
-import type { DialogMethodType, DialogType } from '@/components/shared/dialog/types';
 import type { PaginateData } from '@/components/shared/pagination/types';
 import type { SwitchOption } from '@/components/shared/switch/types';
 import { DataTable } from '@/components/shared/table';
 import type { Filter, SearchConfig, VisibilityState } from '@/components/shared/table/types';
 import { Badge } from '@/components/ui/badge';
-import { Button, type ButtonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -17,11 +16,10 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { AppPageProps, BreadcrumbItem } from '@/types';
 import type { Machine } from '@/types/Tenant/machines';
-import type { Method } from '@inertiajs/core';
-import { Head, router, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { Pencil, Trash2 } from 'lucide-vue-next';
+import { Loader, Pencil } from 'lucide-vue-next';
 import slug from 'slug';
 import { computed, h, reactive, watch } from 'vue';
 
@@ -76,13 +74,8 @@ const columns: ColumnDef<Machine>[] = [
             const machine = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', onClick: () => dialogHandler('update', machine) }, () =>
-                    h(Pencil, { class: 'size-3' }),
-                ),
-                h(
-                    Button,
-                    { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive', onClick: () => dialogHandler('destroy', machine) },
-                    () => h(Trash2, { class: 'size-3' }),
+                h(Link, { href: route('machines.edit', { tenant: tenant.value, machine: machine.id }), asChild: true }, () =>
+                    h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
                 ),
             ]);
         },
@@ -139,91 +132,33 @@ const columns: ColumnDef<Machine>[] = [
     },
 ];
 
-const dialog = reactive<DialogType<Machine>>({
-    type: null,
-    title: '',
-    isOpen: false,
-    data: null,
+const statusDisplay = computed(() => props.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
+
+const setting = reactive({
+    dialogIsOpen: false,
 });
 
-const form = useForm<{
-    name: string;
-    code: string;
-    description: string;
-    is_active: boolean;
-}>(dialog.type || '', {
+const form = useForm({
     name: '',
     code: '',
     description: '',
     is_active: true,
 });
 
-const statusDisplay = computed(() => props.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
-
-const dialogButtonLabel = computed(() => (dialog.type === 'store' ? 'Create' : dialog.type === 'update' ? 'Update' : 'Delete'));
-const dialogButtonVariant = computed<ButtonVariants['variant']>(() => (dialog.type === 'destroy' ? 'destructive' : 'default'));
-
-const dialogHandler = (type: DialogMethodType, machine?: Machine) => {
-    switch (type) {
-        case 'store':
-            dialog.title = 'Create Machine';
-            break;
-        case 'update':
-            if (machine) {
-                dialog.data = machine;
-                form.name = machine.name;
-                form.code = machine.code;
-                form.description = machine.description || '';
-                form.is_active = machine.is_active;
-            }
-            dialog.title = `Edit ${dialog.data?.name || 'Machine'}`;
-            break;
-        case 'destroy':
-            if (machine) {
-                dialog.data = machine;
-            }
-            dialog.title = `Delete ${dialog.data?.name || 'Machine'}`;
-    }
-    dialog.type = type;
-    dialog.isOpen = true;
-};
-
-const submit = () => {
-    if (dialog.type) {
-        const fetchLink =
-            dialog.type === 'store'
-                ? route('machines.store', { tenant: tenant.value })
-                : dialog.type === 'update'
-                  ? route('machines.update', { tenant: tenant.value, machine: dialog.data?.id || '' })
-                  : route('machines.destroy', { tenant: tenant.value, machine: dialog.data?.id || '' });
-
-        const method: Method = dialog.type === 'store' ? 'post' : dialog.type === 'update' ? 'put' : 'delete';
-
-        form.transform((data) => (dialog.type !== 'destroy' ? data : {})).submit(method, fetchLink, {
-            onSuccess: () => {
-                form.reset();
-                dialog.isOpen = false;
-            },
-        });
-    }
-};
+const submit = () =>
+    form.post(route('machines.store', { tenant: tenant.value }), {
+        onSuccess: () => {
+            form.reset();
+            setting.dialogIsOpen = false;
+        },
+    });
 
 watch(
-    () => dialog.isOpen,
-    (newValue) => {
-        if (!newValue) {
-            dialog.data = null;
-            form.clearErrors();
-            form.reset();
-        }
+    () => form.name,
+    (newName) => {
+        form.code = slug(newName);
     },
 );
-
-watch([() => form.name, () => dialog.type], ([newName, newType]) => {
-    if (newType === 'store') {
-        form.code = slug(newName);
-    }
-});
 </script>
 
 <template>
@@ -233,38 +168,40 @@ watch([() => form.name, () => dialog.type], ([newName, newType]) => {
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="space-y-3">
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Dialog v-model:open="dialog.isOpen" :dialog="dialog" @submit="submit">
-                        <template #button>
-                            <Button class="cursor-pointer" @click="dialogHandler('store')">Create</Button>
+                    <Dialog title="Create Machine" v-model:open="setting.dialogIsOpen">
+                        <template #trigger>
+                            <Button class="cursor-pointer">Create</Button>
                         </template>
-                        <div class="grid w-full max-w-sm items-center gap-1.5">
-                            <Label>Name</Label>
-                            <Input type="text" placeholder="Enter Name" v-model:model-value="form.name" />
-                            <p v-if="form.errors.name" class="text-destructive">{{ form.errors.name }}</p>
-                        </div>
-                        <div class="grid w-full max-w-sm items-center gap-1.5">
-                            <Label>Code</Label>
-                            <Input type="text" placeholder="Enter Code" v-model:model-value="form.code" />
-                            <p v-if="form.errors.code" class="text-destructive">{{ form.errors.code }}</p>
-                        </div>
-                        <div class="grid w-full max-w-sm items-center gap-1.5">
-                            <Label>Description</Label>
-                            <Textarea placeholder="Enter Description" v-model:model-value="form.description" />
-                            <p v-if="form.errors.description" class="text-destructive">{{ form.errors.description }}</p>
-                        </div>
-                        <div class="grid w-full max-w-sm items-center gap-1.5">
-                            <Label class="mb-1">Status</Label>
-                            <div class="flex items-center space-x-2">
-                                <Switch class="cursor-pointer" v-model:model-value="form.is_active" />
-                                <Label>{{ statusDisplay }}</Label>
+                        <form @submit.prevent="submit" class="space-y-4">
+                            <div class="grid w-full max-w-sm items-center gap-1.5">
+                                <Label>Name</Label>
+                                <Input type="text" placeholder="Enter Name" v-model:model-value="form.name" />
+                                <p v-if="form.errors.name" class="text-destructive">{{ form.errors.name }}</p>
                             </div>
-                            <p v-if="form.errors.is_active" class="text-destructive">{{ form.errors.is_active }}</p>
-                        </div>
-                        <template #submit-button>
-                            <Button type="submit" class="cursor-pointer" :variant="dialogButtonVariant" :disabled="form.processing">
-                                {{ dialogButtonLabel }}
-                            </Button>
-                        </template>
+                            <div class="grid w-full max-w-sm items-center gap-1.5">
+                                <Label>Code</Label>
+                                <Input type="text" placeholder="Enter Code" v-model:model-value="form.code" />
+                                <p v-if="form.errors.code" class="text-destructive">{{ form.errors.code }}</p>
+                            </div>
+                            <div class="grid w-full max-w-sm items-center gap-1.5">
+                                <Label>Description</Label>
+                                <Textarea placeholder="Enter Description" v-model:model-value="form.description" />
+                                <p v-if="form.errors.description" class="text-destructive">{{ form.errors.description }}</p>
+                            </div>
+                            <div class="grid w-full max-w-sm items-center gap-1.5">
+                                <Label class="mb-1">Status</Label>
+                                <div class="flex items-center space-x-2">
+                                    <Switch class="cursor-pointer" v-model:model-value="form.is_active" />
+                                    <Label>{{ statusDisplay }}</Label>
+                                </div>
+                                <p v-if="form.errors.is_active" class="text-destructive">{{ form.errors.is_active }}</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <Button type="submit" class="cursor-pointer" :disabled="form.processing">
+                                    <Loader v-if="form.processing" class="animate-spin" /> Create
+                                </Button>
+                            </div>
+                        </form>
                     </Dialog>
                 </div>
                 <div>

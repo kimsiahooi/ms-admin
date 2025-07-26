@@ -81,7 +81,15 @@ class MachineController extends Controller
      */
     public function edit(Machine $machine)
     {
-        //
+        return inertia('Tenant/Machines/Edit', [
+            'machine' => $machine,
+            'statuses' => collect(Status::cases())->map(function ($status) {
+                return [
+                    'name' => $status->display(),
+                    'value' => $status->value,
+                ];
+            }),
+        ]);
     }
 
     /**
@@ -100,7 +108,7 @@ class MachineController extends Controller
 
         $machine->update($validated);
 
-        return back()->with('success', 'Machine updated successfully.');
+        return to_route('machines.index', ['tenant' => tenant('id')])->with('success', 'Machine updated successfully.');
     }
 
     /**

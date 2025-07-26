@@ -99,7 +99,7 @@ Route::middleware([
             return Inertia::render('Tenant/settings/Appearance');
         })->name('appearance');
 
-        Route::resource('machines', MachineController::class)->except(['create', 'show', 'edit']);
+        Route::resource('machines', MachineController::class)->except(['create', 'show']);
         Route::resource('materials', MaterialController::class)->except(['create', 'show', 'edit']);
         Route::resource('products', ProductController::class)->except(['create', 'show', 'edit']);
         Route::resource('products.boms', BomController::class)->except(['create', 'show', 'edit']);
