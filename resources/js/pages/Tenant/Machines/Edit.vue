@@ -5,11 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { useTenant } from '@/composables/useTenant';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
-import type { AppPageProps, BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import type { Machine } from '@/types/Tenant/machines';
-import { Head, useForm, usePage } from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
 import { Loader } from 'lucide-vue-next';
 import slug from 'slug';
 import { computed, watch } from 'vue';
@@ -23,17 +24,16 @@ const props = defineProps<{
     statuses: SwitchOption<number>[];
 }>();
 
-const page = usePage<AppPageProps>();
-const tenant = computed(() => page.props.tenant?.id || '');
+const { tenant } = useTenant();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: route('dashboard', { tenant: tenant.value }),
+        href: route('dashboard', { tenant: tenant?.id || '' }),
     },
     {
         title: 'Machines',
-        href: route('machines.index', { tenant: tenant.value }),
+        href: route('machines.index', { tenant: tenant?.id || '' }),
     },
     {
         title: props.machine.name,
@@ -50,7 +50,7 @@ const form = useForm({
     is_active: props.machine.is_active,
 });
 
-const submit = () => form.put(route('machines.update', { tenant: tenant.value, machine: props.machine.id }));
+const submit = () => form.put(route('machines.update', { tenant: tenant?.id || '', machine: props.machine.id }));
 
 watch(
     () => form.name,

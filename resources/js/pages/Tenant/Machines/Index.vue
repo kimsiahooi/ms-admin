@@ -11,12 +11,13 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
+import { useTenant } from '@/composables/useTenant';
 import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
-import type { AppPageProps, BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import type { Machine } from '@/types/Tenant/machines';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
 import { Loader, Pencil } from 'lucide-vue-next';
@@ -33,9 +34,8 @@ const props = defineProps<{
 }>();
 
 const { formatDateTime } = useFormatDateTime();
+const { tenant } = useTenant();
 
-const page = usePage<AppPageProps>();
-const tenant = computed(() => page.props.tenant?.id || '');
 const routeParams = computed(() => route().params);
 
 const filter = reactive<Filter>({
@@ -50,16 +50,16 @@ const searchConfig: SearchConfig = {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: route('dashboard', { tenant: tenant.value }),
+        href: route('dashboard', { tenant: tenant?.id || '' }),
     },
     {
         title: 'Machines',
-        href: route('machines.index', { tenant: tenant.value }),
+        href: route('machines.index', { tenant: tenant?.id || '' }),
     },
 ];
 
 const filterChangeHandler = (filter: Filter) => {
-    router.visit(route('machines.index', { ...pickBy(filter), tenant: tenant.value }));
+    router.visit(route('machines.index', { ...pickBy(filter), tenant: tenant?.id || '' }));
 };
 
 const columnVisibility = <VisibilityState<Partial<Machine>>>{
@@ -74,7 +74,7 @@ const columns: ColumnDef<Machine>[] = [
             const machine = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(Link, { href: route('machines.edit', { tenant: tenant.value, machine: machine.id }), asChild: true }, () =>
+                h(Link, { href: route('machines.edit', { tenant: tenant?.id || '', machine: machine.id }), asChild: true }, () =>
                     h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
                 ),
             ]);
@@ -146,7 +146,7 @@ const form = useForm({
 });
 
 const submit = () =>
-    form.post(route('machines.store', { tenant: tenant.value }), {
+    form.post(route('machines.store', { tenant: tenant?.id || '' }), {
         onSuccess: () => {
             form.reset();
             setting.dialogIsOpen = false;
