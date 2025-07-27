@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Select } from '@/components/shared/select';
+import type { SelectOption } from '@/components/shared/select/types';
 import type { SwitchOption } from '@/components/shared/switch/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,19 +11,21 @@ import { useTenant } from '@/composables/useTenant';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import type { Machine } from '@/types/Tenant/machines';
+import type { Material } from '@/types/Tenant/materials';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Loader } from 'lucide-vue-next';
-import slug from 'slug';
-import { computed, watch } from 'vue';
+import { computed } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
 });
 
 const props = defineProps<{
-    machine: Machine;
-    statuses: SwitchOption<number>[];
+    material: Material;
+    options: {
+        statuses: SwitchOption<number>[];
+        unit_types: SelectOption<Material['unit_type']>[];
+    };
 }>();
 
 const { tenant } = useTenant();
@@ -32,36 +36,36 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: route('dashboard', { tenant: tenant?.id || '' }),
     },
     {
-        title: 'Machines',
-        href: route('machines.index', { tenant: tenant?.id || '' }),
+        title: 'Materials',
+        href: route('materials.index', { tenant: tenant?.id || '' }),
     },
     {
-        title: props.machine.name,
+        title: props.material.name,
         href: '#',
     },
 ];
 
-const statusDisplay = computed(() => props.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
+const statusDisplay = computed(() => props.options.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
 
-const form = useForm({
-    name: props.machine.name,
-    code: props.machine.code,
-    description: props.machine.description || '',
-    is_active: props.machine.is_active,
+const form = useForm<{
+    name: string;
+    code: string;
+    description: string;
+    unit_type: Material['unit_type'];
+    is_active: boolean;
+}>({
+    name: props.material.name,
+    code: props.material.code,
+    description: props.material.description || '',
+    unit_type: props.material.unit_type,
+    is_active: props.material.is_active,
 });
 
-const submit = () => form.put(route('machines.update', { tenant: tenant?.id || '', machine: props.machine.id }));
-
-watch(
-    () => form.name,
-    (newName) => {
-        form.code = slug(newName);
-    },
-);
+const submit = () => form.put(route('materials.update', { tenant: tenant?.id || '', material: props.material.id }));
 </script>
 
 <template>
-    <Head :title="machine.name" />
+    <Head :title="material.name" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
@@ -81,6 +85,16 @@ watch(
                         <Label>Description</Label>
                         <Textarea placeholder="Enter Description" v-model:model-value="form.description" />
                         <p v-if="form.errors.description" class="text-destructive">{{ form.errors.description }}</p>
+                    </div>
+                    <div class="grid w-full items-center gap-1.5">
+                        <Label>Unit Type</Label>
+                        <Select
+                            :options="options.unit_types"
+                            placeholder="Select Unit Type"
+                            v-model:model-value="form.unit_type"
+                            trigger-class="w-full"
+                        />
+                        <p v-if="form.errors.unit_type" class="text-destructive">{{ form.errors.unit_type }}</p>
                     </div>
                     <div class="grid w-full items-center gap-1.5">
                         <Label class="mb-1">Status</Label>

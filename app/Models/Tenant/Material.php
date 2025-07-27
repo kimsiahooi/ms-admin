@@ -5,6 +5,7 @@ namespace App\Models\Tenant;
 use App\enums\Tenant\Material\Status;
 use App\enums\Tenant\Material\UnitType;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -13,7 +14,7 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class Material extends Model
 {
     /** @use HasFactory<\Database\Factories\Tenant\MaterialFactory> */
-    use HasFactory, SoftDeletes, BelongsToTenant;
+    use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
     protected $fillable = ['name', 'code', 'description', 'unit_type', 'is_active', 'tenant_id'];
 

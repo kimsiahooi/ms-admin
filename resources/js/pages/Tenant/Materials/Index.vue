@@ -48,6 +48,12 @@ const filter = reactive<Filter>({
     entries: routeParams.value.entries || '10',
 });
 
+const setting = reactive({
+    create: {
+        dialogIsOpen: false,
+    },
+});
+
 const searchConfig: SearchConfig = {
     placeholder: 'Search name...',
 };
@@ -85,22 +91,15 @@ const columns: ColumnDef<Material>[] = [
                 ),
                 h(
                     DeleteDialog,
-                    { title: `Delete ${material.name}` },
                     {
-                        trigger: h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
-                            h(Trash2, { class: 'size-3' }),
-                        ),
-                        deleteButton: h(
-                            Link,
-                            {
-                                href: route('materials.destroy', { tenant: tenant?.id || '', material: material.id }),
-                                asChild: true,
-                                method: 'delete',
-                                preserveState: false,
-                                preserveScroll: false,
-                            },
-                            () => h(Button, { variant: 'destructive', class: 'cursor-pointer' }, 'Delete'),
-                        ),
+                        title: `Delete ${material.name}`,
+                        route: route('materials.destroy', { tenant: tenant?.id || '', material: material.id }),
+                    },
+                    {
+                        default: () =>
+                            h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
+                                h(Trash2, { class: 'size-3' }),
+                            ),
                     },
                 ),
             ]);
@@ -129,11 +128,7 @@ const columns: ColumnDef<Material>[] = [
     {
         accessorKey: 'unit_type',
         header: () => h('div', null, 'Unit Type'),
-        cell: ({ row }) => {
-            const { unit_type_display } = row.original;
-
-            return h('div', null, unit_type_display || '');
-        },
+        cell: ({ row }) => h('div', null, row.original.unit_type_display || ''),
     },
     {
         accessorKey: 'is_active',
@@ -174,8 +169,10 @@ const form = useForm<{
 
 const create = () =>
     form.post(route('materials.store', { tenant: tenant?.id || '' }), {
-        preserveState: false,
-        preserveScroll: false,
+        onSuccess: () => {
+            form.reset();
+            setting.create.dialogIsOpen = false;
+        },
     });
 
 watch(
@@ -193,7 +190,7 @@ watch(
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="space-y-3">
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Dialog title="Create Machine">
+                    <Dialog title="Create Material" v-model:open="setting.create.dialogIsOpen">
                         <template #trigger>
                             <Button class="cursor-pointer">Create</Button>
                         </template>

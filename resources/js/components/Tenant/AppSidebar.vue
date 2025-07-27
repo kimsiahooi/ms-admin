@@ -6,7 +6,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { useTenant } from '@/composables/useTenant';
 import type { NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Computer, Folder, LayoutGrid } from 'lucide-vue-next';
+import { BookOpen, Computer, Folder, LayoutGrid, Recycle } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const { tenant } = useTenant();
@@ -26,7 +26,8 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Materials',
         href: route('materials.index', { tenant: tenant?.id || '' }),
-        icon: LayoutGrid,
+        icon: Recycle,
+        isActive: route().current('materials.*', { tenant: tenant?.id || '' }),
     },
     {
         title: 'Products',

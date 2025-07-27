@@ -12,8 +12,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { Machine } from '@/types/Tenant/machines';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Loader } from 'lucide-vue-next';
-import slug from 'slug';
-import { computed, watch } from 'vue';
+import { computed } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -53,13 +52,6 @@ const form = useForm({
 });
 
 const submit = () => form.put(route('machines.update', { tenant: tenant?.id || '', machine: props.machine.id }));
-
-watch(
-    () => form.name,
-    (newName) => {
-        form.code = slug(newName);
-    },
-);
 </script>
 
 <template>
