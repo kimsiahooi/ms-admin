@@ -10,6 +10,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { Tenant } from '@/types/Admin/tenants';
 import { Head, Link, router } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
+import { SquareArrowOutUpRight } from 'lucide-vue-next';
 import { computed, h, reactive } from 'vue';
 
 defineOptions({
@@ -50,12 +51,22 @@ const columnVisibility = <VisibilityState<Partial<Tenant>>>{};
 
 const columns: ColumnDef<Tenant>[] = [
     {
+        accessorKey: 'actions',
+        header: () => h('div', null, 'Actions'),
+        cell: ({ row }) => {
+            const tenant = row.original;
+
+            return h('div', { class: 'flex items-center gap-2' }, [
+                h(Link, { href: route('dashboard', { tenant: tenant.id }), asChild: true }, () =>
+                    h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(SquareArrowOutUpRight, { class: 'size-3' })),
+                ),
+            ]);
+        },
+    },
+    {
         accessorKey: 'id',
         header: () => h('div', null, 'ID'),
-        cell: ({ row }) => {
-            const id = row.original.id;
-            return h('div', null, id);
-        },
+        cell: ({ row }) => h('div', null, row.getValue('id')),
     },
     {
         accessorKey: 'name',

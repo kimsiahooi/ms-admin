@@ -14,9 +14,9 @@ use App\Http\Controllers\TenantController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return to_route('admin.dashboard');
-})->name('home');
+// Route::get('/', function () {
+//     return to_route('admin.dashboard');
+// })->name('home');
 
 Route::prefix('admin')
     ->name('admin.')->group(function () {

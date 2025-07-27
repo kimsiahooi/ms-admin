@@ -88,12 +88,10 @@ const columns: ColumnDef<Machine>[] = [
                         title: `Delete ${machine.name}`,
                         route: route('machines.destroy', { tenant: tenant?.id || '', machine: machine.id }),
                     },
-                    {
-                        default: () =>
-                            h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
-                                h(Trash2, { class: 'size-3' }),
-                            ),
-                    },
+                    () =>
+                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
+                            h(Trash2, { class: 'size-3' }),
+                        ),
                 ),
             ]);
         },

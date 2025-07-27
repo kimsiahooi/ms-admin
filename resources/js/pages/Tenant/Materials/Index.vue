@@ -93,12 +93,10 @@ const columns: ColumnDef<Material>[] = [
                         title: `Delete ${material.name}`,
                         route: route('materials.destroy', { tenant: tenant?.id || '', material: material.id }),
                     },
-                    {
-                        default: () =>
-                            h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
-                                h(Trash2, { class: 'size-3' }),
-                            ),
-                    },
+                    () =>
+                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
+                            h(Trash2, { class: 'size-3' }),
+                        ),
                 ),
             ]);
         },

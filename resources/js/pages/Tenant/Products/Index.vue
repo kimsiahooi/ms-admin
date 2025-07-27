@@ -98,12 +98,10 @@ const columns: ColumnDef<ProductWithPrices>[] = [
                         title: `Delete ${product.name}`,
                         route: route('products.destroy', { tenant: tenant?.id || '', product: product.id }),
                     },
-                    {
-                        default: () =>
-                            h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
-                                h(Trash2, { class: 'size-3' }),
-                            ),
-                    },
+                    () =>
+                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
+                            h(Trash2, { class: 'size-3' }),
+                        ),
                 ),
             ]);
         },
