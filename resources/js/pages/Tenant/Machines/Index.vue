@@ -45,6 +45,12 @@ const filter = reactive<Filter>({
     entries: routeParams.value.entries || '10',
 });
 
+const setting = reactive({
+    create: {
+        dialogIsOpen: false,
+    },
+});
+
 const searchConfig: SearchConfig = {
     placeholder: 'Search name...',
 };
@@ -82,21 +88,12 @@ const columns: ColumnDef<Machine>[] = [
                     DeleteDialog,
                     {
                         title: `Delete ${machine.name}`,
+                        route: route('machines.destroy', { tenant: tenant?.id || '', machine: machine.id }),
                     },
                     {
-                        trigger: () =>
+                        default: () =>
                             h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
                                 h(Trash2, { class: 'size-3' }),
-                            ),
-                        default: () =>
-                            h(
-                                Link,
-                                {
-                                    href: route('machines.destroy', { tenant: tenant?.id || '', machine: machine.id }),
-                                    asChild: true,
-                                    method: 'delete',
-                                },
-                                () => h(Button, { variant: 'destructive', class: 'cursor-pointer' }, () => 'Delete'),
                             ),
                     },
                 ),
@@ -153,7 +150,13 @@ const form = useForm({
     is_active: true,
 });
 
-const create = () => form.post(route('machines.store', { tenant: tenant?.id || '' }));
+const create = () =>
+    form.post(route('machines.store', { tenant: tenant?.id || '' }), {
+        onSuccess: () => {
+            form.reset();
+            setting.create.dialogIsOpen = false;
+        },
+    });
 
 watch(
     () => form.name,
@@ -170,7 +173,7 @@ watch(
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="space-y-3">
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Dialog title="Create Machine">
+                    <Dialog title="Create Machine" v-model:open="setting.create.dialogIsOpen">
                         <template #trigger>
                             <Button class="cursor-pointer">Create</Button>
                         </template>

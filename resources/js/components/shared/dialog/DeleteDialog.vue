@@ -10,11 +10,13 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { router } from '@inertiajs/vue3';
 
-withDefaults(
+const props = withDefaults(
     defineProps<{
         title: string;
         description?: string;
+        route: string;
     }>(),
     {
         description: () => 'Are you sure you want to delete?',
@@ -22,12 +24,19 @@ withDefaults(
 );
 
 const model = defineModel<boolean | undefined>('open');
+
+const deleteHandler = () =>
+    router.delete(props.route, {
+        onSuccess: () => {
+            model.value = false;
+        },
+    });
 </script>
 
 <template>
     <Dialog v-model:open="model">
         <DialogTrigger as-child>
-            <slot name="trigger">
+            <slot>
                 <Button class="cursor-pointer" variant="destructive">Delete</Button>
             </slot>
         </DialogTrigger>
@@ -40,9 +49,7 @@ const model = defineModel<boolean | undefined>('open');
                 <DialogClose as-child>
                     <Button type="button" variant="secondary"> Close </Button>
                 </DialogClose>
-                <slot>
-                    <Button variant="destructive" class="cursor-pointer">Delete</Button>
-                </slot>
+                <Button variant="destructive" class="cursor-pointer" @click="deleteHandler">Delete</Button>
             </DialogFooter>
         </DialogScrollContent>
     </Dialog>
