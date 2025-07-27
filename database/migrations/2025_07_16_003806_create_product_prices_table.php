@@ -15,7 +15,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('product_prices', function (Blueprint $table) {
-            $table->id();
+            $table->ulid('id')->primary();
             $table->enum('currency', array_column(Currency::cases(), 'value'));
             $table->decimal('amount')->min(0);
             $table->foreignIdFor(Product::class)->constrained();
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->softDeletes();
 
 
-            $table->unique(['currency', 'product_id']);
+            $table->unique(['currency', 'product_id', 'tenant_id']);
         });
     }
 

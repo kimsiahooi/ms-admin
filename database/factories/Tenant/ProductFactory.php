@@ -2,11 +2,8 @@
 
 namespace Database\Factories\Tenant;
 
-use App\enums\Tenant\Product\Currency;
 use App\enums\Tenant\Product\ShelfLifeType;
 use App\Models\Tenant;
-use App\Models\Tenant\Material;
-use App\Models\Tenant\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
