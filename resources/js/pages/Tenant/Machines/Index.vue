@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Dialog } from '@/components/shared/dialog';
+import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination/types';
 import type { SwitchOption } from '@/components/shared/switch/types';
 import { DataTable } from '@/components/shared/table';
@@ -20,7 +20,7 @@ import type { Machine } from '@/types/Tenant/machines';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { Loader, Pencil } from 'lucide-vue-next';
+import { Loader, Pencil, Trash2 } from 'lucide-vue-next';
 import slug from 'slug';
 import { computed, h, reactive, watch } from 'vue';
 
@@ -76,6 +76,26 @@ const columns: ColumnDef<Machine>[] = [
             return h('div', { class: 'flex items-center gap-2' }, [
                 h(Link, { href: route('machines.edit', { tenant: tenant?.id || '', machine: machine.id }), asChild: true }, () =>
                     h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
+                ),
+                h(
+                    DeleteDialog,
+                    { title: `Delete ${machine.name}` },
+                    {
+                        trigger: h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
+                            h(Trash2, { class: 'size-3' }),
+                        ),
+                        deleteButton: h(
+                            Link,
+                            {
+                                href: route('machines.destroy', { tenant: tenant?.id || '', machine: machine.id }),
+                                asChild: true,
+                                method: 'delete',
+                                preserveState: false,
+                                preserveScroll: false,
+                            },
+                            () => h(Button, { variant: 'destructive', class: 'cursor-pointer' }, 'Delete'),
+                        ),
+                    },
                 ),
             ]);
         },
@@ -134,10 +154,6 @@ const columns: ColumnDef<Machine>[] = [
 
 const statusDisplay = computed(() => props.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
 
-const setting = reactive({
-    dialogIsOpen: false,
-});
-
 const form = useForm({
     name: '',
     code: '',
@@ -145,12 +161,10 @@ const form = useForm({
     is_active: true,
 });
 
-const submit = () =>
+const create = () =>
     form.post(route('machines.store', { tenant: tenant?.id || '' }), {
-        onSuccess: () => {
-            form.reset();
-            setting.dialogIsOpen = false;
-        },
+        preserveState: false,
+        preserveScroll: false,
     });
 
 watch(
@@ -168,11 +182,11 @@ watch(
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="space-y-3">
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Dialog title="Create Machine" v-model:open="setting.dialogIsOpen">
+                    <Dialog title="Create Machine">
                         <template #trigger>
                             <Button class="cursor-pointer">Create</Button>
                         </template>
-                        <form @submit.prevent="submit" class="space-y-4">
+                        <form @submit.prevent="create" class="space-y-4">
                             <div class="grid w-full max-w-sm items-center gap-1.5">
                                 <Label>Name</Label>
                                 <Input type="text" placeholder="Enter Name" v-model:model-value="form.name" />

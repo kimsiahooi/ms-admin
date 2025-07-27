@@ -20,7 +20,7 @@ const model = defineModel<boolean | undefined>('open');
         <DialogScrollContent class="sm:max-w-[425px]">
             <DialogHeader>
                 <DialogTitle>{{ title }}</DialogTitle>
-                <DialogDescription> </DialogDescription>
+                <DialogDescription>{{ description }}</DialogDescription>
             </DialogHeader>
             <div>
                 <slot />
