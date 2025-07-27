@@ -100,8 +100,8 @@ Route::middleware([
         })->name('appearance');
 
         Route::resource('machines', MachineController::class)->except(['create', 'show']);
-        Route::resource('materials', MaterialController::class)->except(['create', 'show', 'edit']);
-        Route::resource('products', ProductController::class)->except(['create', 'show', 'edit']);
-        Route::resource('products.boms', BomController::class)->except(['create', 'show', 'edit']);
+        Route::resource('materials', MaterialController::class)->except(['create', 'show']);
+        Route::resource('products', ProductController::class)->except(['create', 'show']);
+        Route::resource('products.boms', BomController::class)->except(['create', 'show']);
     });
 });

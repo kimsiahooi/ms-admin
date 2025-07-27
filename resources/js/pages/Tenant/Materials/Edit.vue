@@ -21,9 +21,7 @@ defineOptions({
 
 const props = defineProps<{
     machine: Machine;
-    options: {
-        statuses: SwitchOption<number>[];
-    };
+    statuses: SwitchOption<number>[];
 }>();
 
 const { tenant } = useTenant();
@@ -43,7 +41,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const statusDisplay = computed(() => props.options.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
+const statusDisplay = computed(() => props.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
 
 const form = useForm({
     name: props.machine.name,

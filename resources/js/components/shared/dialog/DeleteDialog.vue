@@ -40,7 +40,7 @@ const model = defineModel<boolean | undefined>('open');
                 <DialogClose as-child>
                     <Button type="button" variant="secondary"> Close </Button>
                 </DialogClose>
-                <slot name="deleteButton">
+                <slot>
                     <Button variant="destructive" class="cursor-pointer">Delete</Button>
                 </slot>
             </DialogFooter>

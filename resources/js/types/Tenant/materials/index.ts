@@ -1,5 +1,5 @@
 export interface Material {
-    readonly id: number;
+    readonly id: string;
     name: string;
     code: string;
     description: string | null;

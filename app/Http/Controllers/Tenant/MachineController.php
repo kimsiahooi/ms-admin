@@ -25,12 +25,14 @@ class MachineController extends Controller
 
         return inertia('Tenant/Machines/Index', [
             'machines' => $machines,
-            'statuses' => collect(Status::cases())->map(function ($status) {
-                return [
-                    'name' => $status->display(),
-                    'value' => $status->value,
-                ];
-            }),
+            'options' => [
+                'statuses' => collect(Status::cases())->map(function ($status) {
+                    return [
+                        'name' => $status->display(),
+                        'value' => $status->value,
+                    ];
+                }),
+            ]
         ]);
     }
 
@@ -83,12 +85,14 @@ class MachineController extends Controller
     {
         return inertia('Tenant/Machines/Edit', [
             'machine' => $machine,
-            'statuses' => collect(Status::cases())->map(function ($status) {
-                return [
-                    'name' => $status->display(),
-                    'value' => $status->value,
-                ];
-            }),
+            'options' => [
+                'statuses' => collect(Status::cases())->map(function ($status) {
+                    return [
+                        'name' => $status->display(),
+                        'value' => $status->value,
+                    ];
+                }),
+            ]
         ]);
     }
 

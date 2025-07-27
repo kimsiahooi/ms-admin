@@ -65,7 +65,7 @@ class MaterialController extends Controller
             Material::create($validated);
         }
 
-        return back()->with('success', 'Material created successfully.');
+        return to_route('materials.index', ['tenant' => tenant('id')])->with('success', 'Material created successfully.');
     }
 
     /**
@@ -81,7 +81,13 @@ class MaterialController extends Controller
      */
     public function edit(Material $material)
     {
-        //
+        return inertia('Tenant/Materials/Edit', [
+            'material' => $material,
+            'options' => [
+                'statuses' => collect(Status::cases())->map(fn(Status $status) => ['name' => $status->display(), 'value' => $status->value]),
+                'unit_types' => collect(UnitType::cases())->map(fn(UnitType $unitType) => ['name' => $unitType->display(), 'value' => $unitType->value]),
+            ]
+        ]);
     }
 
     /**
@@ -101,7 +107,7 @@ class MaterialController extends Controller
 
         $material->update($validated);
 
-        return back()->with('success', 'Material updated successfully.');
+        return to_route('materials.index', ['tenant' => tenant('id')])->with('success', 'Material updated successfully.');
     }
 
     /**

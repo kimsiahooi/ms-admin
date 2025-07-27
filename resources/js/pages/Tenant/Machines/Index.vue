@@ -30,7 +30,9 @@ defineOptions({
 
 const props = defineProps<{
     machines: PaginateData<Machine[]>;
-    statuses: SwitchOption<number>[];
+    options: {
+        statuses: SwitchOption<number>[];
+    };
 }>();
 
 const { formatDateTime } = useFormatDateTime();
@@ -58,9 +60,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const filterChangeHandler = (filter: Filter) => {
-    router.visit(route('machines.index', { ...pickBy(filter), tenant: tenant?.id || '' }));
-};
+const filterChangeHandler = (filter: Filter) => router.visit(route('machines.index', { ...pickBy(filter), tenant: tenant?.id || '' }));
 
 const columnVisibility = <VisibilityState<Partial<Machine>>>{
     id: false,
@@ -80,22 +80,24 @@ const columns: ColumnDef<Machine>[] = [
                 ),
                 h(
                     DeleteDialog,
-                    { title: `Delete ${machine.name}` },
                     {
-                        trigger: h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
-                            h(Trash2, { class: 'size-3' }),
-                        ),
-                        deleteButton: h(
-                            Link,
-                            {
-                                href: route('machines.destroy', { tenant: tenant?.id || '', machine: machine.id }),
-                                asChild: true,
-                                method: 'delete',
-                                preserveState: false,
-                                preserveScroll: false,
-                            },
-                            () => h(Button, { variant: 'destructive', class: 'cursor-pointer' }, 'Delete'),
-                        ),
+                        title: `Delete ${machine.name}`,
+                    },
+                    {
+                        trigger: () =>
+                            h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
+                                h(Trash2, { class: 'size-3' }),
+                            ),
+                        default: () =>
+                            h(
+                                Link,
+                                {
+                                    href: route('machines.destroy', { tenant: tenant?.id || '', machine: machine.id }),
+                                    asChild: true,
+                                    method: 'delete',
+                                },
+                                () => h(Button, { variant: 'destructive', class: 'cursor-pointer' }, () => 'Delete'),
+                            ),
                     },
                 ),
             ]);
@@ -133,32 +135,16 @@ const columns: ColumnDef<Machine>[] = [
     {
         accessorKey: 'created_at',
         header: () => h('div', null, 'Created At'),
-        cell: ({ row }) => {
-            const value = formatDateTime(row.original.created_at);
-
-            if (!value) {
-                return h('div', null);
-            }
-
-            return h('div', null, value);
-        },
+        cell: ({ row }) => h('div', null, formatDateTime(row.original.created_at) || ''),
     },
     {
         accessorKey: 'updated_at',
         header: () => h('div', null, 'Updated At'),
-        cell: ({ row }) => {
-            const value = formatDateTime(row.original.updated_at);
-
-            if (!value) {
-                return h('div', null);
-            }
-
-            return h('div', null, value);
-        },
+        cell: ({ row }) => h('div', null, formatDateTime(row.original.updated_at) || ''),
     },
 ];
 
-const statusDisplay = computed(() => props.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
+const statusDisplay = computed(() => props.options.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
 
 const form = useForm({
     name: '',
@@ -167,11 +153,7 @@ const form = useForm({
     is_active: true,
 });
 
-const create = () =>
-    form.post(route('machines.store', { tenant: tenant?.id || '' }), {
-        preserveState: false,
-        preserveScroll: false,
-    });
+const create = () => form.post(route('machines.store', { tenant: tenant?.id || '' }));
 
 watch(
     () => form.name,
