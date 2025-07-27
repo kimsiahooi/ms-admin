@@ -10,7 +10,7 @@ class ProductPrice extends Model
 {
     use BelongsToTenant, SoftDeletes;
 
-    protected $fillable = ['currency', 'price', 'tenant_id'];
+    protected $fillable = ['currency', 'amount', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 }

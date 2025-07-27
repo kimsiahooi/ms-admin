@@ -49,6 +49,7 @@
         "tailwindcss": "^4.1.1",
         "tw-animate-css": "^1.2.5",
         "typescript": "^5.2.2",
+        "uuid": "^11.1.0",
         "vaul-vue": "^0.4.1",
         "vee-validate": "^4.15.0",
         "vite": "^6.2.0",

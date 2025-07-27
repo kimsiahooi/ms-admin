@@ -28,13 +28,11 @@ class ProductController extends Controller
 
         return inertia('Tenant/Products/Index', [
             'products' => $products,
-            'statuses' => collect(Status::cases())->map(function ($status) {
-                return [
+            'options' => [
+                'statuses' => collect(Status::cases())->map(fn($status) => [
                     'name' => $status->display(),
                     'value' => $status->value,
-                ];
-            }),
-            'options' => [
+                ]),
                 'materials' => Material::active()->get()->map(fn(Material $material) => ['name' => "{$material->name} ({$material->code})", 'value' => $material->id]),
                 'currencies' => collect(Currency::cases())->map(fn(Currency $currency) => ['name' => $currency->value, 'value' => $currency->value]),
                 'shelf_life_types' => collect(ShelfLifeType::cases())->map(fn(ShelfLifeType $shelfLifeType) => ['name' => $shelfLifeType->display(), 'value' => $shelfLifeType->value]),
@@ -61,15 +59,13 @@ class ProductController extends Controller
                 return $query->where('tenant_id', tenant('id'))->whereNull('deleted_at');
             })],
             'description' => ['nullable', 'string'],
-            'shelf_life_duration' => ['nullable', 'numeric', 'min:0.01'],
+            'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type',  'numeric', 'min:0.01'],
             'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::in(ShelfLifeType::cases())],
             'prices' => ['required', 'array'],
             'prices.*.currency' => ['required', 'distinct', Rule::in(Currency::cases())],
-            'prices.*.value' => ['required', 'numeric', 'min:0'],
+            'prices.*.amount' => ['required', 'numeric', 'min:0'],
             'is_active' => ['required', 'boolean'],
         ]);
-
-        $validated['shelf_life_type'] = $validated['shelf_life_duration'] ? $validated['shelf_life_type'] : null;
 
         $product = Product::onlyTrashed()->where('code', $validated['code'])->first();
 
@@ -88,14 +84,14 @@ class ProductController extends Controller
                 $existingPrice->restore();
                 $existingPrice->update([
                     'currency' => $price['currency'],
-                    'price' => $price['value'],
+                    'amount' => $price['amount'],
                 ]);
 
                 $priceIds[] = $existingPrice->id;
             } else {
                 $newPrice = $product->prices()->create([
                     'currency' => $price['currency'],
-                    'price' => $price['value'],
+                    'amount' => $price['amount'],
                 ]);
 
                 $priceIds[] = $newPrice->id;
@@ -120,7 +116,18 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        //
+        return inertia('Tenant/Products/Edit', [
+            'product' => $product->load(['prices']),
+            'options' => [
+                'statuses' => collect(Status::cases())->map(fn($status) => [
+                    'name' => $status->display(),
+                    'value' => $status->value,
+                ]),
+                'materials' => Material::active()->get()->map(fn(Material $material) => ['name' => "{$material->name} ({$material->code})", 'value' => $material->id]),
+                'currencies' => collect(Currency::cases())->map(fn(Currency $currency) => ['name' => $currency->value, 'value' => $currency->value]),
+                'shelf_life_types' => collect(ShelfLifeType::cases())->map(fn(ShelfLifeType $shelfLifeType) => ['name' => $shelfLifeType->display(), 'value' => $shelfLifeType->value]),
+            ],
+        ]);
     }
 
     /**
@@ -135,14 +142,12 @@ class ProductController extends Controller
             })],
             'description' => ['nullable', 'string'],
             'is_active' => ['required', 'boolean'],
-            'shelf_life_duration' => ['nullable', 'numeric', 'min:0.01'],
+            'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type', 'numeric', 'min:0.01'],
             'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::in(ShelfLifeType::cases())],
             'prices' => ['required', 'array'],
             'prices.*.currency' => ['required', 'distinct', Rule::in(Currency::cases())],
-            'prices.*.value' => ['required', 'numeric', 'min:0'],
+            'prices.*.amount' => ['required', 'numeric', 'min:0'],
         ]);
-
-        $validated['shelf_life_type'] = $validated['shelf_life_duration'] ? $validated['shelf_life_type'] : null;
 
         $product->update($validated);
 
@@ -154,7 +159,7 @@ class ProductController extends Controller
                 $existingPrice->restore();
                 $existingPrice->update([
                     'currency' => $price['currency'],
-                    'price' => $price['value'],
+                    'amount' => $price['amount'],
                 ]);
 
                 $priceIds[] = $existingPrice->id;
@@ -164,14 +169,14 @@ class ProductController extends Controller
                 if ($existingPrice) {
                     $existingPrice->update([
                         'currency' => $price['currency'],
-                        'price' => $price['value'],
+                        'amount' => $price['amount'],
                     ]);
 
                     $priceIds[] = $existingPrice->id;
                 } else {
                     $newPrice = $product->prices()->create([
                         'currency' => $price['currency'],
-                        'price' => $price['value'],
+                        'amount' => $price['amount'],
                     ]);
 
                     $priceIds[] = $newPrice->id;
@@ -181,7 +186,7 @@ class ProductController extends Controller
 
         $product->prices()->whereNotIn('id', $priceIds)->delete();
 
-        return back()->with('success', 'Product updated successfully.');
+        return to_route('products.index', ['tenant' => tenant('id')])->with('success', 'Product updated successfully.');
     }
 
     /**
@@ -190,6 +195,7 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
+        $product->prices()->delete();
 
         return back()->with('success', 'Product deleted successfully.');
     }

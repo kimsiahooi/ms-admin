@@ -1,5 +1,5 @@
 export interface Product {
-    readonly id: number;
+    readonly id: string;
     name: string;
     code: string;
     description: string | null;
@@ -14,7 +14,7 @@ export interface Product {
 }
 
 export interface ProductPrice {
-    readonly id: number;
+    readonly id: string;
     currency:
         | 'AED'
         | 'AFN'
@@ -177,13 +177,13 @@ export interface ProductPrice {
         | 'ZAR'
         | 'ZMW'
         | 'ZWL';
-    price: string;
+    amount: string;
     product_id: number;
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;
 }
 
-export interface ProductWithPrice extends Product {
+export interface ProductWithPrices extends Product {
     prices: ProductPrice[];
 }

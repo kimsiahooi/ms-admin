@@ -35,23 +35,4 @@ class ProductFactory extends Factory
             'tenant_id' => Tenant::inRandomOrder()->first(),
         ];
     }
-
-    public function withCurrencies(int $count = 3): static
-    {
-        return $this->afterCreating(function (Product $product) use ($count) {
-
-            $currencies = Currency::cases();
-            shuffle($currencies);
-
-            $selectedCurrencies = array_slice($currencies, 0, $count);
-
-            foreach ($selectedCurrencies as $currency) {
-                $product->prices()->create([
-                    'currency' => $currency->value,
-                    'price' => fake()->randomFloat(2, 10, 100),
-                    'tenant_id' => $product->tenant_id,
-                ]);
-            }
-        });
-    }
 }

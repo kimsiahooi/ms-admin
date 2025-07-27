@@ -65,7 +65,7 @@ class MaterialController extends Controller
             Material::create($validated);
         }
 
-        return to_route('materials.index', ['tenant' => tenant('id')])->with('success', 'Material created successfully.');
+        return back()->with('success', 'Material created successfully.');
     }
 
     /**

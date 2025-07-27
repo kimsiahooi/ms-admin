@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             TenantSeeder::class,
             MachineSeeder::class,
             MaterialSeeder::class,
-            // ProductSeeder::class,
+            ProductSeeder::class,
         ]);
     }
 }
