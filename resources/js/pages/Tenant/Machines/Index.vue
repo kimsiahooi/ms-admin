@@ -63,6 +63,7 @@ const filterChangeHandler = (filter: Filter) => {
 };
 
 const columnVisibility = <VisibilityState<Partial<Machine>>>{
+    id: false,
     description: false,
 };
 
@@ -99,6 +100,11 @@ const columns: ColumnDef<Machine>[] = [
                 ),
             ]);
         },
+    },
+    {
+        accessorKey: 'id',
+        header: () => h('div', null, 'Id'),
+        cell: ({ row }) => h('div', null, row.getValue('id')),
     },
     {
         accessorKey: 'name',
