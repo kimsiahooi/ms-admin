@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\enums\Tenant\Product\Currency;
+use App\Models\Tenant\Product;
 use App\Models\Tenant\ProductPrice;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -13,6 +15,18 @@ class ProductPriceSeeder extends Seeder
      */
     public function run(): void
     {
-        ProductPrice::factory(100)->create();
+        $products = Product::all();
+
+        foreach ($products as $product) {
+            $currencies = fake()->randomElements(Currency::cases(), 20);
+
+            foreach ($currencies as $currency) {
+                ProductPrice::factory()->create([
+                    'product_id' => $product,
+                    'tenant_id' => $product->tenant_id,
+                    'currency' => $currency->value,
+                ]);
+            }
+        }
     }
 }

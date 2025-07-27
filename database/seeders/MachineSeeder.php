@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Tenant;
 use App\Models\Tenant\Machine;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -13,6 +14,12 @@ class MachineSeeder extends Seeder
      */
     public function run(): void
     {
-        Machine::factory(100)->create();
+        $tenants = Tenant::all();
+
+        foreach ($tenants as $tenant) {
+            Machine::factory(20)->create([
+                'tenant_id' => $tenant,
+            ]);
+        }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Tenant;
 use App\Models\Tenant\Bom;
 use App\Models\Tenant\Material;
 use App\Models\Tenant\Product;
@@ -15,6 +16,12 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        Product::factory(100)->create();
+        $tenants = Tenant::all();
+
+        foreach ($tenants as $tenant) {
+            Product::factory(20)->create([
+                'tenant_id' => $tenant,
+            ]);
+        }
     }
 }

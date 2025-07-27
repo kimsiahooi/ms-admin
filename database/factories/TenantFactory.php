@@ -17,7 +17,7 @@ class TenantFactory extends Factory
      */
     public function definition(): array
     {
-        $name = fake()->unique()->sentence(2);
+        $name = fake()->unique()->sentence(1);
 
         return [
             'id' => Str::slug($name),

@@ -22,7 +22,7 @@ class ProductPriceFactory extends Factory
         $product = Product::inRandomOrder()->first();
 
         return [
-            'currency' => fake()->unique()->randomElement(Currency::cases()),
+            'currency' => fake()->randomElement(Currency::cases()),
             'amount' => fake()->randomFloat(2, 10, 99),
             'product_id' => $product,
             'tenant_id' => $product->tenant_id,

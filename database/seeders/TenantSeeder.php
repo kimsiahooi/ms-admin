@@ -13,15 +13,11 @@ class TenantSeeder extends Seeder
      */
     public function run(): void
     {
-        Tenant::factory()->createMany([
-            [
-                'id' => 'ms-admin',
-                'name' => 'Ms Admin'
-            ],
-            [
-                'id' => 'testing',
-                'name' => 'Testing'
-            ],
+        Tenant::factory()->create([
+            'id' => 'ms-admin',
+            'name' => 'Ms Admin'
         ]);
+
+        Tenant::factory(4)->create();
     }
 }
