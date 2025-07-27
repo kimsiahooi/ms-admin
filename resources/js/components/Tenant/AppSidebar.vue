@@ -3,35 +3,34 @@ import NavFooter from '@/components/Tenant/NavFooter.vue';
 import NavMain from '@/components/Tenant/NavMain.vue';
 import NavUser from '@/components/Tenant/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import type { AppPageProps, NavItem } from '@/types';
-import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { useTenant } from '@/composables/useTenant';
+import type { NavItem } from '@/types';
+import { Link } from '@inertiajs/vue3';
+import { BookOpen, Computer, Folder, LayoutGrid } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
-const page = usePage<AppPageProps>();
-
-const tenant = computed(() => page.props.tenant?.id || '');
+const { tenant } = useTenant();
 
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: route('dashboard', { tenant: tenant.value }),
+        href: route('dashboard', { tenant: tenant?.id || '' }),
         icon: LayoutGrid,
     },
     {
         title: 'Machines',
-        href: route('machines.index', { tenant: tenant.value }),
-        icon: LayoutGrid,
+        href: route('machines.index', { tenant: tenant?.id || '' }),
+        icon: Computer,
+        isActive: route().current('machines.*', { tenant: tenant?.id || '' }),
     },
     {
         title: 'Materials',
-        href: route('materials.index', { tenant: tenant.value }),
+        href: route('materials.index', { tenant: tenant?.id || '' }),
         icon: LayoutGrid,
     },
     {
         title: 'Products',
-        href: route('products.index', { tenant: tenant.value }),
+        href: route('products.index', { tenant: tenant?.id || '' }),
         icon: LayoutGrid,
     },
 ];
@@ -56,7 +55,7 @@ const footerNavItems: NavItem[] = [
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
-                        <Link :href="route('dashboard', { tenant })">
+                        <Link :href="route('dashboard', { tenant: tenant?.id || '' })">
                             <AppLogo />
                         </Link>
                     </SidebarMenuButton>
