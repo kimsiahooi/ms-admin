@@ -18,6 +18,7 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->enum('currency', array_column(Currency::cases(), 'value'));
             $table->decimal('amount')->min(0);
+            $table->boolean('is_active')->default(true);
             $table->foreignIdFor(Product::class)->constrained();
             $table->foreignIdFor(Tenant::class)->constrained();
             $table->timestamps();

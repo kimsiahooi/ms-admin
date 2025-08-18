@@ -178,6 +178,8 @@ export interface ProductPrice {
         | 'ZMW'
         | 'ZWL';
     amount: string;
+    is_active: boolean;
+    is_active_display?: string | null;
     product_id: number;
     created_at: Date | null;
     updated_at: Date | null;

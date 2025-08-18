@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
-import { ErrorMessages } from '@/components/shared/error';
 import type { PaginateData } from '@/components/shared/pagination/types';
 import { Select } from '@/components/shared/select';
 import type { SelectOption } from '@/components/shared/select/types';
@@ -19,13 +18,12 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Material } from '@/types/Tenant/materials';
-import type { Product, ProductPrice, ProductWithPrices } from '@/types/Tenant/products';
+import type { Product, ProductPrice } from '@/types/Tenant/products';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { Loader, Minus, Pencil, Plus, Trash2 } from 'lucide-vue-next';
+import { CircleDollarSign, Loader, Pencil, Trash2 } from 'lucide-vue-next';
 import slug from 'slug';
-import { v4 as uuidv4 } from 'uuid';
 import { computed, h, reactive, watch } from 'vue';
 
 defineOptions({
@@ -33,7 +31,7 @@ defineOptions({
 });
 
 const props = defineProps<{
-    products: PaginateData<ProductWithPrices[]>;
+    products: PaginateData<Product[]>;
     options: {
         statuses: SwitchOption<number>[];
         materials: SelectOption<Material['id']>[];
@@ -76,12 +74,12 @@ const filterChangeHandler = (filter: Filter) => {
     router.visit(route('products.index', { ...pickBy(filter), tenant: tenant?.id || '' }));
 };
 
-const columnVisibility = <VisibilityState<Partial<ProductWithPrices>>>{
+const columnVisibility = <VisibilityState<Partial<Product>>>{
     id: false,
     description: false,
 };
 
-const columns: ColumnDef<ProductWithPrices>[] = [
+const columns: ColumnDef<Product>[] = [
     {
         accessorKey: 'actions',
         header: () => h('div', null, 'Actions'),
@@ -89,6 +87,9 @@ const columns: ColumnDef<ProductWithPrices>[] = [
             const product = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
+                h(Link, { href: route('products.prices.index', { tenant: tenant?.id || '', product: product.id }), asChild: true }, () =>
+                    h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(CircleDollarSign, { class: 'size-3' })),
+                ),
                 h(Link, { href: route('products.edit', { tenant: tenant?.id || '', product: product.id }), asChild: true }, () =>
                     h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
                 ),
@@ -155,11 +156,6 @@ const form = useForm<{
     description: string;
     shelf_life_duration: string;
     shelf_life_type: Product['shelf_life_type'] | '';
-    prices: {
-        id: string;
-        currency: ProductPrice['currency'] | '';
-        amount: string;
-    }[];
     is_active: boolean;
 }>({
     name: '',
@@ -167,24 +163,8 @@ const form = useForm<{
     description: '',
     shelf_life_duration: '',
     shelf_life_type: '',
-    prices: [{ id: uuidv4(), currency: '', amount: '' }],
     is_active: true,
 });
-
-const priceHandler = (
-    type: 'add' | 'remove',
-    price: {
-        id: string;
-        currency: ProductPrice['currency'] | '';
-        amount: string;
-    },
-) => {
-    if (type === 'add') {
-        form.prices = [...form.prices, { id: uuidv4(), currency: '', amount: '' }];
-    } else if (type === 'remove') {
-        form.prices = form.prices.filter((p) => p.id !== price.id);
-    }
-};
 
 const create = () =>
     form.post(route('products.store', { tenant: tenant?.id || '' }), {
@@ -254,44 +234,6 @@ watch(
                                 </div>
                                 <p v-if="form.errors.shelf_life_duration" class="text-destructive">{{ form.errors.shelf_life_duration }}</p>
                                 <p v-if="form.errors.shelf_life_type" class="text-destructive">{{ form.errors.shelf_life_type }}</p>
-                            </div>
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label>Unit price</Label>
-                                <div v-for="(price, index) in form.prices" :key="price.id">
-                                    <div class="flex items-center gap-2">
-                                        <div class="flex-1">
-                                            <Select
-                                                :options="options.currencies"
-                                                placeholder="Select Currency"
-                                                v-model:model-value="price.currency"
-                                                trigger-class="w-full"
-                                            />
-                                        </div>
-                                        <div class="flex-1">
-                                            <Input
-                                                type="number"
-                                                step=".01"
-                                                min="0"
-                                                placeholder="Enter Unit Price"
-                                                v-model:model-value="price.amount"
-                                                class="w-full"
-                                            />
-                                        </div>
-                                        <div>
-                                            <Button
-                                                type="button"
-                                                size="icon"
-                                                class="cursor-pointer"
-                                                :variant="!index ? 'default' : 'destructive'"
-                                                @click="priceHandler(!index ? 'add' : 'remove', price)"
-                                            >
-                                                <Plus v-if="!index" />
-                                                <Minus v-else />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                    <ErrorMessages :error-key="`prices.${index}`" />
-                                </div>
                             </div>
                             <div class="grid w-full max-w-sm items-center gap-1.5">
                                 <Label class="mb-1">Status</Label>

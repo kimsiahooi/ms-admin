@@ -34,7 +34,6 @@ class ProductController extends Controller
                     'value' => $status->value,
                 ]),
                 'materials' => Material::active()->get()->map(fn(Material $material) => ['name' => "{$material->name} ({$material->code})", 'value' => $material->id]),
-                'currencies' => collect(Currency::cases())->map(fn(Currency $currency) => ['name' => $currency->value, 'value' => $currency->value]),
                 'shelf_life_types' => collect(ShelfLifeType::cases())->map(fn(ShelfLifeType $shelfLifeType) => ['name' => $shelfLifeType->display(), 'value' => $shelfLifeType->value]),
             ],
         ]);
@@ -61,9 +60,6 @@ class ProductController extends Controller
             'description' => ['nullable', 'string'],
             'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type',  'numeric', 'min:0.01'],
             'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::in(ShelfLifeType::cases())],
-            'prices' => ['required', 'array'],
-            'prices.*.currency' => ['required', 'distinct', Rule::in(Currency::cases())],
-            'prices.*.amount' => ['required', 'numeric', 'min:0'],
             'is_active' => ['required', 'boolean'],
         ]);
 
@@ -75,30 +71,6 @@ class ProductController extends Controller
         } else {
             $product = Product::create($validated);
         }
-
-        $priceIds = [];
-        foreach ($validated['prices'] as $price) {
-            $existingPrice = $product->prices()->onlyTrashed()->where('currency', $price['currency'])->first();
-
-            if ($existingPrice) {
-                $existingPrice->restore();
-                $existingPrice->update([
-                    'currency' => $price['currency'],
-                    'amount' => $price['amount'],
-                ]);
-
-                $priceIds[] = $existingPrice->id;
-            } else {
-                $newPrice = $product->prices()->create([
-                    'currency' => $price['currency'],
-                    'amount' => $price['amount'],
-                ]);
-
-                $priceIds[] = $newPrice->id;
-            }
-        }
-
-        $product->prices()->whereNotIn('id', $priceIds)->delete();
 
         return back()->with('success', 'Product created successfully.');
     }
@@ -117,14 +89,13 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         return inertia('Tenant/Products/Edit', [
-            'product' => $product->load(['prices']),
+            'product' => $product,
             'options' => [
                 'statuses' => collect(Status::cases())->map(fn($status) => [
                     'name' => $status->display(),
                     'value' => $status->value,
                 ]),
                 'materials' => Material::active()->get()->map(fn(Material $material) => ['name' => "{$material->name} ({$material->code})", 'value' => $material->id]),
-                'currencies' => collect(Currency::cases())->map(fn(Currency $currency) => ['name' => $currency->value, 'value' => $currency->value]),
                 'shelf_life_types' => collect(ShelfLifeType::cases())->map(fn(ShelfLifeType $shelfLifeType) => ['name' => $shelfLifeType->display(), 'value' => $shelfLifeType->value]),
             ],
         ]);
@@ -144,47 +115,9 @@ class ProductController extends Controller
             'is_active' => ['required', 'boolean'],
             'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type', 'numeric', 'min:0.01'],
             'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::in(ShelfLifeType::cases())],
-            'prices' => ['required', 'array'],
-            'prices.*.currency' => ['required', 'distinct', Rule::in(Currency::cases())],
-            'prices.*.amount' => ['required', 'numeric', 'min:0'],
         ]);
 
         $product->update($validated);
-
-        $priceIds = [];
-        foreach ($validated['prices'] as $price) {
-            $existingPrice = $product->prices()->onlyTrashed()->where('currency', $price['currency'])->first();
-
-            if ($existingPrice) {
-                $existingPrice->restore();
-                $existingPrice->update([
-                    'currency' => $price['currency'],
-                    'amount' => $price['amount'],
-                ]);
-
-                $priceIds[] = $existingPrice->id;
-            } else {
-                $existingPrice = $product->prices()->where('currency', $price['currency'])->first();
-
-                if ($existingPrice) {
-                    $existingPrice->update([
-                        'currency' => $price['currency'],
-                        'amount' => $price['amount'],
-                    ]);
-
-                    $priceIds[] = $existingPrice->id;
-                } else {
-                    $newPrice = $product->prices()->create([
-                        'currency' => $price['currency'],
-                        'amount' => $price['amount'],
-                    ]);
-
-                    $priceIds[] = $newPrice->id;
-                }
-            }
-        }
-
-        $product->prices()->whereNotIn('id', $priceIds)->delete();
 
         return to_route('products.index', ['tenant' => tenant('id')])->with('success', 'Product updated successfully.');
     }

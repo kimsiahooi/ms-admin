@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ErrorMessages } from '@/components/shared/error';
 import { Select } from '@/components/shared/select';
 import type { SelectOption } from '@/components/shared/select/types';
 import type { SwitchOption } from '@/components/shared/switch/types';
@@ -13,10 +12,9 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Material } from '@/types/Tenant/materials';
-import type { Product, ProductPrice, ProductWithPrices } from '@/types/Tenant/products';
+import type { Product, ProductPrice } from '@/types/Tenant/products';
 import { Head, useForm } from '@inertiajs/vue3';
-import { Loader, Minus, Plus } from 'lucide-vue-next';
-import { v4 as uuidv4 } from 'uuid';
+import { Loader } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 defineOptions({
@@ -24,7 +22,7 @@ defineOptions({
 });
 
 const props = defineProps<{
-    product: ProductWithPrices;
+    product: Product;
     options: {
         statuses: SwitchOption<number>[];
         materials: SelectOption<Material['id']>[];
@@ -58,11 +56,6 @@ const form = useForm<{
     description: string;
     shelf_life_duration: string;
     shelf_life_type: Product['shelf_life_type'] | '';
-    prices: {
-        id: string;
-        currency: ProductPrice['currency'] | '';
-        amount: string;
-    }[];
     is_active: boolean;
 }>({
     name: props.product.name,
@@ -70,26 +63,8 @@ const form = useForm<{
     description: props.product.description || '',
     shelf_life_duration: props.product.shelf_life_duration || '',
     shelf_life_type: props.product.shelf_life_type || '',
-    prices: props.product.prices.length
-        ? props.product.prices.map((price) => ({ id: price.id, currency: price.currency, amount: price.amount }))
-        : [{ id: uuidv4(), currency: '', amount: '' }],
     is_active: true,
 });
-
-const priceHandler = (
-    type: 'add' | 'remove',
-    price: {
-        id: string;
-        currency: ProductPrice['currency'] | '';
-        amount: string;
-    },
-) => {
-    if (type === 'add') {
-        form.prices = [...form.prices, { id: uuidv4(), currency: '', amount: '' }];
-    } else if (type === 'remove') {
-        form.prices = form.prices.filter((p) => p.id !== price.id);
-    }
-};
 
 const submit = () => form.put(route('products.update', { tenant: tenant?.id || '', product: props.product.id }));
 </script>
@@ -141,44 +116,6 @@ const submit = () => form.put(route('products.update', { tenant: tenant?.id || '
                         </div>
                         <p v-if="form.errors.shelf_life_duration" class="text-destructive">{{ form.errors.shelf_life_duration }}</p>
                         <p v-if="form.errors.shelf_life_type" class="text-destructive">{{ form.errors.shelf_life_type }}</p>
-                    </div>
-                    <div class="grid w-full items-center gap-1.5">
-                        <Label>Unit price</Label>
-                        <div v-for="(price, index) in form.prices" :key="price.id">
-                            <div class="flex items-center gap-2">
-                                <div class="flex-1">
-                                    <Select
-                                        :options="options.currencies"
-                                        placeholder="Select Currency"
-                                        v-model:model-value="price.currency"
-                                        trigger-class="w-full"
-                                    />
-                                </div>
-                                <div class="flex-1">
-                                    <Input
-                                        type="number"
-                                        step=".01"
-                                        min="0"
-                                        placeholder="Enter Unit Price"
-                                        v-model:model-value="price.amount"
-                                        class="w-full"
-                                    />
-                                </div>
-                                <div>
-                                    <Button
-                                        type="button"
-                                        size="icon"
-                                        class="cursor-pointer"
-                                        :variant="!index ? 'default' : 'destructive'"
-                                        @click="priceHandler(!index ? 'add' : 'remove', price)"
-                                    >
-                                        <Plus v-if="!index" />
-                                        <Minus v-else />
-                                    </Button>
-                                </div>
-                            </div>
-                            <ErrorMessages :error-key="`prices.${index}`" />
-                        </div>
                     </div>
                     <div class="grid w-full items-center gap-1.5">
                         <Label class="mb-1">Status</Label>

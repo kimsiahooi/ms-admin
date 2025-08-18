@@ -14,6 +14,7 @@ use App\Http\Controllers\Tenant\Auth\VerifyEmailController;
 use App\Http\Controllers\Tenant\MachineController;
 use App\Http\Controllers\Tenant\MaterialController;
 use App\Http\Controllers\Tenant\ProductController;
+use App\Http\Controllers\Tenant\ProductPriceController;
 use App\Http\Controllers\Tenant\Settings\PasswordController;
 use App\Http\Controllers\Tenant\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -102,6 +103,7 @@ Route::middleware([
         Route::resource('machines', MachineController::class)->except(['create', 'show']);
         Route::resource('materials', MaterialController::class)->except(['create', 'show']);
         Route::resource('products', ProductController::class)->except(['create', 'show']);
+        Route::resource('products.prices', ProductPriceController::class)->except(['create', 'show']);
         Route::resource('products.boms', BomController::class)->except(['create', 'show']);
     });
 });
