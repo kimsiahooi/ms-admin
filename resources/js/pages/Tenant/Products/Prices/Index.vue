@@ -8,7 +8,9 @@ import { DataTable } from '@/components/shared/table';
 import type { Filter, SearchConfig, VisibilityState } from '@/components/shared/table/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { useTenant } from '@/composables/useTenant';
 import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
@@ -18,6 +20,7 @@ import type { Product, ProductPrice } from '@/types/Tenant/products';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
+import { Loader } from 'lucide-vue-next';
 import { computed, h, reactive } from 'vue';
 
 defineOptions({
@@ -171,6 +174,19 @@ const create = () =>
                                     trigger-class="w-full"
                                 />
                                 <p v-if="form.errors.currency" class="text-destructive">{{ form.errors.currency }}</p>
+                            </div>
+                            <div class="grid w-full max-w-sm items-center gap-1.5">
+                                <Label>Amount</Label>
+                                <Input type="number" placeholder="Enter Amount" v-model:model-value.number="form.amount" step=".01" min="0" />
+                                <p v-if="form.errors.amount" class="text-destructive">{{ form.errors.amount }}</p>
+                            </div>
+                            <div class="grid w-full max-w-sm items-center gap-1.5">
+                                <Label class="mb-1">Status</Label>
+                                <div class="flex items-center space-x-2">
+                                    <Switch class="cursor-pointer" v-model:model-value="form.is_active" />
+                                    <Label>{{ statusDisplay }}</Label>
+                                </div>
+                                <p v-if="form.errors.is_active" class="text-destructive">{{ form.errors.is_active }}</p>
                             </div>
                             <div class="flex gap-2">
                                 <Button type="submit" class="cursor-pointer" :disabled="form.processing">

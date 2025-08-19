@@ -7,6 +7,7 @@ use App\enums\Tenant\Product\Price\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Product;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ProductPriceController extends Controller
 {
@@ -47,9 +48,26 @@ class ProductPriceController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, Product $product)
     {
-        //
+        $validated = $request->validate([
+            'currency' => [
+                'required',
+                Rule::in(Currency::cases()),
+                Rule::unique('product_prices', 'currency')
+                    ->where(
+                        fn($query) => $query
+                            ->where('tenant_id', tenant('id'))
+                            ->where('product_id', $product->id)
+                    )
+            ],
+            'amount' => ['required', 'min:0', 'numeric'],
+            'is_active' => ['required', 'boolean'],
+        ]);
+
+        $product->prices()->create($validated);
+
+        return back()->with('success', 'Product price created successfully.');
     }
 
     /**
