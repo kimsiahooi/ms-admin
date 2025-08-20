@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Dialog } from '@/components/shared/dialog';
+import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination/types';
 import { Select } from '@/components/shared/select';
 import type { SelectOption } from '@/components/shared/select/types';
@@ -17,10 +17,10 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Product, ProductPrice } from '@/types/Tenant/products';
-import { Head, router, useForm } from '@inertiajs/vue3';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { Loader } from 'lucide-vue-next';
+import { Loader, Pencil, Trash2 } from 'lucide-vue-next';
 import { computed, h, reactive } from 'vue';
 
 defineOptions({
@@ -82,30 +82,32 @@ const columnVisibility = <VisibilityState<Partial<ProductPrice>>>{
 };
 
 const columns: ColumnDef<ProductPrice>[] = [
-    // {
-    //     accessorKey: 'actions',
-    //     header: () => h('div', null, 'Actions'),
-    //     cell: ({ row }) => {
-    //         const machine = row.original;
+    {
+        accessorKey: 'actions',
+        header: () => h('div', null, 'Actions'),
+        cell: ({ row }) => {
+            const price = row.original;
 
-    //         return h('div', { class: 'flex items-center gap-2' }, [
-    //             h(Link, { href: route('machines.edit', { tenant: tenant?.id || '', machine: machine.id }), asChild: true }, () =>
-    //                 h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
-    //             ),
-    //             h(
-    //                 DeleteDialog,
-    //                 {
-    //                     title: `Delete ${machine.name}`,
-    //                     route: route('machines.destroy', { tenant: tenant?.id || '', machine: machine.id }),
-    //                 },
-    //                 () =>
-    //                     h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
-    //                         h(Trash2, { class: 'size-3' }),
-    //                     ),
-    //             ),
-    //         ]);
-    //     },
-    // },
+            return h('div', { class: 'flex items-center gap-2' }, [
+                h(
+                    Link,
+                    { href: route('products.prices.edit', { tenant: tenant?.id || '', product: props.product.id, price: price.id }), asChild: true },
+                    () => h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
+                ),
+                h(
+                    DeleteDialog,
+                    {
+                        title: `Delete ${price.currency}`,
+                        route: route('products.prices.destroy', { tenant: tenant?.id || '', product: props.product.id, price: price.id }),
+                    },
+                    () =>
+                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
+                            h(Trash2, { class: 'size-3' }),
+                        ),
+                ),
+            ]);
+        },
+    },
     {
         accessorKey: 'is_active',
         header: () => h('div', null, 'Active'),

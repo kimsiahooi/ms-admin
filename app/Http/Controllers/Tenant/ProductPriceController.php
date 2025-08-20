@@ -6,6 +6,7 @@ use App\enums\Tenant\Product\Currency;
 use App\enums\Tenant\Product\Price\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Product;
+use App\Models\Tenant\ProductPrice;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -59,13 +60,21 @@ class ProductPriceController extends Controller
                         fn($query) => $query
                             ->where('tenant_id', tenant('id'))
                             ->where('product_id', $product->id)
+                            ->whereNull('deleted_at')
                     )
             ],
             'amount' => ['required', 'min:0', 'numeric'],
             'is_active' => ['required', 'boolean'],
         ]);
 
-        $product->prices()->create($validated);
+        $price = ProductPrice::onlyTrashed()->where('currency', $validated['currency'])->first();
+
+        if ($price) {
+            $price->restore();
+            $price->update($validated);
+        } else {
+            $product->prices()->create($validated);
+        }
 
         return back()->with('success', 'Product price created successfully.');
     }
@@ -97,8 +106,10 @@ class ProductPriceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Product $product, ProductPrice $price)
     {
-        //
+        $price->delete();
+
+        return back()->with('success', 'Price deleted successfully.');
     }
 }
