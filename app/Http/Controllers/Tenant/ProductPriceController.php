@@ -90,17 +90,46 @@ class ProductPriceController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request, Product $product, ProductPrice $price)
     {
-        //
+        return inertia('Tenant/Products/Prices/Edit', [
+            'product' => $product,
+            'price' => $price,
+            'options' => [
+                'statuses' => collect(Status::cases())->map(fn($status) => [
+                    'name' => $status->display(),
+                    'value' => $status->value,
+                ]),
+                'currencies' => collect(Currency::cases())->map(fn(Currency $currency) => ['name' => $currency->value, 'value' => $currency->value]),
+            ],
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Product $product, ProductPrice $price)
     {
-        //
+        $validated = $request->validate([
+            'currency' => [
+                'required',
+                Rule::in(Currency::cases()),
+                Rule::unique('product_prices', 'currency')
+                    ->ignore($price->id, 'id')
+                    ->where(
+                        fn($query) => $query
+                            ->where('tenant_id', tenant('id'))
+                            ->where('product_id', $product->id)
+                            ->whereNull('deleted_at')
+                    )
+            ],
+            'amount' => ['required', 'min:0', 'numeric'],
+            'is_active' => ['required', 'boolean'],
+        ]);
+
+        $price->update($validated);
+
+        return to_route('products.prices.index', ['tenant' => tenant('id'), 'product' => $product->id])->with('success', 'Prices updated successfully.');
     }
 
     /**
