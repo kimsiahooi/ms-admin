@@ -43,6 +43,10 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: props.material.name,
         href: '#',
     },
+    {
+        title: 'Edit',
+        href: route('materials.edit', { tenant: tenant?.id || '', material: props.material.id }),
+    },
 ];
 
 const statusDisplay = computed(() => props.options.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
