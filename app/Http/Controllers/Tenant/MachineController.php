@@ -19,7 +19,7 @@ class MachineController extends Controller
         $entries = $request->input('entries', 10);
 
         $machines = Machine::when($request->search, function (Builder $query, $search) {
-            $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");;
+            $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");
         })->latest()
             ->paginate($entries)
             ->withQueryString();

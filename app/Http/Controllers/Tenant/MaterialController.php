@@ -20,7 +20,7 @@ class MaterialController extends Controller
         $entries = $request->input('entries', 10);
 
         $materials = Material::when($request->search, function (Builder $query, $search) {
-            $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");;
+            $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");
         })->latest()
             ->paginate($entries)
             ->withQueryString();
