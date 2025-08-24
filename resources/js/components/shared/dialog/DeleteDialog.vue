@@ -17,9 +17,11 @@ const props = withDefaults(
         title: string;
         description?: string;
         route: string;
+        asChild?: boolean;
     }>(),
     {
-        description: () => 'Are you sure you want to delete?',
+        description: 'Are you sure you want to delete?',
+        asChild: true,
     },
 );
 
@@ -35,7 +37,7 @@ const deleteHandler = () =>
 
 <template>
     <Dialog v-model:open="model">
-        <DialogTrigger as-child>
+        <DialogTrigger :as-child="asChild">
             <slot>
                 <Button class="cursor-pointer" variant="destructive">Delete</Button>
             </slot>

@@ -4,6 +4,7 @@ import type { PaginateData } from '@/components/shared/pagination/types';
 import type { SwitchOption } from '@/components/shared/switch/types';
 import { DataTable } from '@/components/shared/table';
 import type { Filter, SearchConfig, VisibilityState } from '@/components/shared/table/types';
+import { Tooltip } from '@/components/shared/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -79,18 +80,23 @@ const columns: ColumnDef<Machine>[] = [
             const machine = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(Link, { href: route('machines.edit', { tenant: tenant?.id || '', machine: machine.id }), asChild: true }, () =>
-                    h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
+                h(Tooltip, { text: 'Edit' }, () =>
+                    h(Link, { href: route('machines.edit', { tenant: tenant?.id || '', machine: machine.id }), asChild: true }, () =>
+                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
+                    ),
                 ),
                 h(
                     DeleteDialog,
                     {
                         title: `Delete ${machine.name}`,
                         route: route('machines.destroy', { tenant: tenant?.id || '', machine: machine.id }),
+                        asChild: false,
                     },
                     () =>
-                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
-                            h(Trash2, { class: 'size-3' }),
+                        h(Tooltip, { text: 'Delete' }, () =>
+                            h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
+                                h(Trash2, { class: 'size-3' }),
+                            ),
                         ),
                 ),
             ]);

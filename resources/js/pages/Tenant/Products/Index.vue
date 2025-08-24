@@ -6,6 +6,7 @@ import type { SelectOption } from '@/components/shared/select/types';
 import type { SwitchOption } from '@/components/shared/switch/types';
 import { DataTable } from '@/components/shared/table';
 import type { Filter, SearchConfig, VisibilityState } from '@/components/shared/table/types';
+import { Tooltip } from '@/components/shared/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -87,21 +88,28 @@ const columns: ColumnDef<Product>[] = [
             const product = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(Link, { href: route('products.prices.index', { tenant: tenant?.id || '', product: product.id }), asChild: true }, () =>
-                    h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(CircleDollarSign, { class: 'size-3' })),
+                h(Tooltip, { text: 'Prices' }, () =>
+                    h(Link, { href: route('products.prices.index', { tenant: tenant?.id || '', product: product.id }), asChild: true }, () =>
+                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(CircleDollarSign, { class: 'size-3' })),
+                    ),
                 ),
-                h(Link, { href: route('products.edit', { tenant: tenant?.id || '', product: product.id }), asChild: true }, () =>
-                    h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
+                h(Tooltip, { text: 'Edit' }, () =>
+                    h(Link, { href: route('products.edit', { tenant: tenant?.id || '', product: product.id }), asChild: true }, () =>
+                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
+                    ),
                 ),
                 h(
                     DeleteDialog,
                     {
                         title: `Delete ${product.name}`,
                         route: route('products.destroy', { tenant: tenant?.id || '', product: product.id }),
+                        asChild: false,
                     },
                     () =>
-                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
-                            h(Trash2, { class: 'size-3' }),
+                        h(Tooltip, { text: 'Delete' }, () =>
+                            h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
+                                h(Trash2, { class: 'size-3' }),
+                            ),
                         ),
                 ),
             ]);
