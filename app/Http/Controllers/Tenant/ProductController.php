@@ -33,7 +33,6 @@ class ProductController extends Controller
                     'name' => $status->display(),
                     'value' => $status->value,
                 ]),
-                'materials' => Material::active()->get()->map(fn(Material $material) => ['name' => "{$material->name} ({$material->code})", 'value' => $material->id]),
                 'shelf_life_types' => collect(ShelfLifeType::cases())->map(fn(ShelfLifeType $shelfLifeType) => ['name' => $shelfLifeType->display(), 'value' => $shelfLifeType->value]),
             ],
         ]);
@@ -95,7 +94,6 @@ class ProductController extends Controller
                     'name' => $status->display(),
                     'value' => $status->value,
                 ]),
-                'materials' => Material::active()->get()->map(fn(Material $material) => ['name' => "{$material->name} ({$material->code})", 'value' => $material->id]),
                 'shelf_life_types' => collect(ShelfLifeType::cases())->map(fn(ShelfLifeType $shelfLifeType) => ['name' => $shelfLifeType->display(), 'value' => $shelfLifeType->value]),
             ],
         ]);
