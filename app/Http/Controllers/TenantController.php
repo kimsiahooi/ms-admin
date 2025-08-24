@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tenant;
-use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class TenantController extends Controller
@@ -15,8 +15,8 @@ class TenantController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $tenants = Tenant::when($request->search, function ($query, $search) {
-            $query->where('name', 'like', "%{$search}%");
+        $tenants = Tenant::when($request->search, function (Builder $query, $search) {
+            $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");;
         })->latest()
             ->paginate($entries)
             ->withQueryString();

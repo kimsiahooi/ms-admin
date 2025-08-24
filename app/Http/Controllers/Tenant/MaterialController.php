@@ -6,6 +6,7 @@ use App\enums\Tenant\Material\Status;
 use App\enums\Tenant\Material\UnitType;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Material;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -18,8 +19,8 @@ class MaterialController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $materials = Material::when($request->search, function ($query, $search) {
-            $query->where('name', 'like', "%{$search}%");
+        $materials = Material::when($request->search, function (Builder $query, $search) {
+            $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");;
         })->latest()
             ->paginate($entries)
             ->withQueryString();

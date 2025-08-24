@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Tenant\Machine;
 use App\Models\Tenant\Product;
 use App\Models\Tenant\ProductPreset;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -21,8 +22,8 @@ class ProductPresetController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $presets = $product->presets()->with('machine')->when($request->search, function ($query, $search) {
-            $query->where('name', 'like', "%{$search}%");
+        $presets = $product->presets()->with('machine')->when($request->search, function (Builder $query, $search) {
+            $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");
         })->latest()
             ->paginate($entries)
             ->withQueryString();

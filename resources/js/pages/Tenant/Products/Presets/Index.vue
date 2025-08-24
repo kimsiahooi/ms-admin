@@ -139,7 +139,15 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
         header: () => h('div', null, 'Machine'),
         cell: ({ row }) => {
             const { machine } = row.original;
-            return h('div', null, machine?.name);
+            return machine
+                ? h(
+                      Link,
+                      {
+                          href: route('machines.index', { tenant: tenant?.id || '', search: machine?.id || '' }),
+                      },
+                      () => h(Button, { class: 'cursor-pointer', variant: 'link' }, () => machine?.name),
+                  )
+                : null;
         },
     },
     {

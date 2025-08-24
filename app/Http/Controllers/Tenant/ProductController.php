@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Tenant;
 
-use App\enums\Tenant\Product\Currency;
 use App\enums\Tenant\Product\ShelfLifeType;
 use App\enums\Tenant\Product\Status;
 use App\Http\Controllers\Controller;
-use App\Models\Tenant\Material;
 use App\Models\Tenant\Product;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -20,8 +19,8 @@ class ProductController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $products = Product::with(['prices'])->when($request->search, function ($query, $search) {
-            $query->where('name', 'like', "%{$search}%");
+        $products = Product::with(['prices'])->when($request->search, function (Builder $query, $search) {
+            $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");;
         })->latest()
             ->paginate($entries)
             ->withQueryString();

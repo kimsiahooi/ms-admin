@@ -7,6 +7,7 @@ use App\enums\Tenant\Product\Price\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Product;
 use App\Models\Tenant\ProductPrice;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -19,8 +20,8 @@ class ProductPriceController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $prices = $product->prices()->when($request->search, function ($query, $search) {
-            $query->where('currency', 'like', "%{$search}%");
+        $prices = $product->prices()->when($request->search, function (Builder $query, $search) {
+            $query->where('currency', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");;
         })->latest()
             ->paginate($entries)
             ->withQueryString();
