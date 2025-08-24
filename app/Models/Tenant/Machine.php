@@ -3,6 +3,7 @@
 namespace App\Models\Tenant;
 
 use App\enums\Tenant\Machine\Status;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -30,5 +31,10 @@ class Machine extends Model
     protected function getIsActiveDisplayAttribute(): string | null
     {
         return Status::tryFrom($this->is_active)?->display();
+    }
+
+    public function scopeActive(Builder $query): void
+    {
+        $query->where('is_active', true);
     }
 }

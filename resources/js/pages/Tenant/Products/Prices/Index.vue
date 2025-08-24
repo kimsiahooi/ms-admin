@@ -165,7 +165,7 @@ const create = () =>
 </script>
 
 <template>
-    <Head title="Product Price" />
+    <Head title="Product Prices" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">

@@ -1,9 +1,10 @@
 <?php
 
-namespace App\enums\Tenant\Product;
+namespace App\enums\Tenant\Product\Preset;
 
-enum ShelfLifeType: string
+enum CycleTimeType: string
 {
+    case MILLISECOND = 'MILLISECOND';
     case SECOND = 'SECOND';
     case MINUTE = 'MINUTE';
     case HOUR = 'HOUR';
@@ -14,6 +15,7 @@ enum ShelfLifeType: string
     public function display(): string
     {
         return match ($this) {
+            self::MILLISECOND => 'Millisecond(s)',
             self::SECOND => 'Second(s)',
             self::MINUTE => 'Minute(s)',
             self::HOUR => 'Hour(s)',

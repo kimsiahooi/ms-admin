@@ -33,6 +33,11 @@ class Product extends Model
         return $this->hasMany(ProductPrice::class);
     }
 
+    public function presets()
+    {
+        return $this->hasMany(ProductPreset::class);
+    }
+
     public function boms()
     {
         return $this->hasMany(Bom::class);

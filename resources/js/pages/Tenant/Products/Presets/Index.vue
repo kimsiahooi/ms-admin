@@ -18,26 +18,26 @@ import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import type { Material } from '@/types/Tenant/materials';
-import type { Product, ProductPrice } from '@/types/Tenant/products';
+import type { Machine } from '@/types/Tenant/machines';
+import type { Product, ProductPreset, ProductPresetWithMachine } from '@/types/Tenant/products';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { CircleDollarSign, Loader, Pencil, Settings2, Trash2 } from 'lucide-vue-next';
-import slug from 'slug';
-import { computed, h, reactive, watch } from 'vue';
+import { Loader, Pencil, Trash2 } from 'lucide-vue-next';
+import { computed, h, reactive } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
 });
 
 const props = defineProps<{
-    products: PaginateData<Product[]>;
+    product: Product;
+    presets: PaginateData<ProductPresetWithMachine[]>;
     options: {
+        machines: SelectOption<Machine['id']>[];
+        cavity_types: SelectOption<ProductPreset['cavity_type']>[];
+        cycle_time_types: SelectOption<ProductPreset['cycle_time_type']>[];
         statuses: SwitchOption<number>[];
-        materials: SelectOption<Material['id']>[];
-        currencies: SelectOption<ProductPrice['currency']>[];
-        shelf_life_types: SelectOption<Product['shelf_life_type']>[];
     };
 }>();
 
@@ -69,45 +69,46 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Products',
         href: route('products.index', { tenant: tenant?.id || '' }),
     },
+    {
+        title: props.product.name,
+        href: '#',
+    },
+    {
+        title: 'Presets',
+        href: route('products.presets.index', { tenant: tenant?.id || '', product: props.product.id }),
+    },
 ];
 
-const filterChangeHandler = (filter: Filter) => {
-    router.visit(route('products.index', { ...pickBy(filter), tenant: tenant?.id || '' }));
-};
+const filterChangeHandler = (filter: Filter) =>
+    router.visit(route('products.presets.index', { ...pickBy(filter), tenant: tenant?.id || '', product: props.product.id }));
 
-const columnVisibility = <VisibilityState<Partial<Product>>>{
+const columnVisibility = <VisibilityState<Partial<ProductPresetWithMachine>>>{
     id: false,
     description: false,
 };
 
-const columns: ColumnDef<Product>[] = [
+const columns: ColumnDef<ProductPresetWithMachine>[] = [
     {
         accessorKey: 'actions',
         header: () => h('div', null, 'Actions'),
         cell: ({ row }) => {
-            const product = row.original;
-
+            const preset = row.original;
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(Tooltip, { text: 'Presets' }, () =>
-                    h(Link, { href: route('products.presets.index', { tenant: tenant?.id || '', product: product.id }) }, () =>
-                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Settings2, { class: 'size-3' })),
-                    ),
-                ),
-                h(Tooltip, { text: 'Prices' }, () =>
-                    h(Link, { href: route('products.prices.index', { tenant: tenant?.id || '', product: product.id }), asChild: true }, () =>
-                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(CircleDollarSign, { class: 'size-3' })),
-                    ),
-                ),
                 h(Tooltip, { text: 'Edit' }, () =>
-                    h(Link, { href: route('products.edit', { tenant: tenant?.id || '', product: product.id }), asChild: true }, () =>
-                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
+                    h(
+                        Link,
+                        {
+                            href: route('products.presets.edit', { tenant: tenant?.id || '', product: props.product.id, preset: preset.id }),
+                            asChild: true,
+                        },
+                        () => h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
                     ),
                 ),
                 h(
                     DeleteDialog,
                     {
-                        title: `Delete ${product.name}`,
-                        route: route('products.destroy', { tenant: tenant?.id || '', product: product.id }),
+                        title: `Delete ${preset.name}`,
+                        route: route('products.presets.destroy', { tenant: tenant?.id || '', product: props.product.id, preset: preset.id }),
                         asChild: false,
                     },
                     () =>
@@ -125,7 +126,6 @@ const columns: ColumnDef<Product>[] = [
         header: () => h('div', null, 'Active'),
         cell: ({ row }) => {
             const { is_active, is_active_display } = row.original;
-
             return h(Badge, { variant: is_active ? 'default' : 'destructive' }, () => is_active_display);
         },
     },
@@ -135,14 +135,17 @@ const columns: ColumnDef<Product>[] = [
         cell: ({ row }) => h('div', null, row.getValue('id')),
     },
     {
+        accessorKey: 'machine',
+        header: () => h('div', null, 'Machine'),
+        cell: ({ row }) => {
+            const { machine } = row.original;
+            return h('div', null, machine?.name);
+        },
+    },
+    {
         accessorKey: 'name',
         header: () => h('div', null, 'Name'),
         cell: ({ row }) => h('div', null, row.getValue('name')),
-    },
-    {
-        accessorKey: 'code',
-        header: () => h('div', null, 'Code'),
-        cell: ({ row }) => h('div', null, row.getValue('code')),
     },
     {
         accessorKey: 'description',
@@ -150,59 +153,72 @@ const columns: ColumnDef<Product>[] = [
         cell: ({ row }) => h('div', null, row.getValue('description')),
     },
     {
-        accessorKey: 'shelf_life_duration',
-        header: () => h('div', null, 'Shelf Life Duration'),
-        cell: ({ row }) => h('div', null, row.original.shelf_life_duration || ''),
+        accessorKey: 'cavity_quantity',
+        header: () => h('div', null, 'Cavity Quantity'),
+        cell: ({ row }) => h('div', null, row.getValue('cavity_quantity')),
     },
     {
-        accessorKey: 'shelf_life_type',
-        header: () => h('div', null, 'Shelf Life Type'),
-        cell: ({ row }) => h('div', null, row.original.shelf_life_type_display || ''),
+        accessorKey: 'cavity_type',
+        header: () => h('div', null, 'Cavity Type'),
+        cell: ({ row }) => {
+            const { cavity_type_display } = row.original;
+            return h('div', null, cavity_type_display || '');
+        },
+    },
+    {
+        accessorKey: 'cycle_time',
+        header: () => h('div', null, 'Cycle Time'),
+        cell: ({ row }) => h('div', null, row.getValue('cycle_time')),
+    },
+    {
+        accessorKey: 'cycle_time_type',
+        header: () => h('div', null, 'Cycle Time Type'),
+        cell: ({ row }) => {
+            const { cycle_time_type_display } = row.original;
+            return h('div', null, cycle_time_type_display || '');
+        },
     },
 ];
 
 const statusDisplay = computed(() => props.options.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
 
 const form = useForm<{
+    machine_id: Machine['id'] | '';
     name: string;
-    code: string;
     description: string;
-    shelf_life_duration: string;
-    shelf_life_type: Product['shelf_life_type'] | '';
+    cavity_quantity: number | '';
+    cavity_type: ProductPreset['cavity_type'] | '';
+    cycle_time: number | '';
+    cycle_time_type: ProductPreset['cycle_time_type'] | '';
     is_active: boolean;
 }>({
+    machine_id: '',
     name: '',
-    code: '',
     description: '',
-    shelf_life_duration: '',
-    shelf_life_type: '',
+    cavity_quantity: '',
+    cavity_type: '',
+    cycle_time: '',
+    cycle_time_type: '',
     is_active: true,
 });
 
 const create = () =>
-    form.post(route('products.store', { tenant: tenant?.id || '' }), {
+    form.post(route('products.presets.store', { tenant: tenant?.id || '', product: props.product.id }), {
         onSuccess: () => {
             form.reset();
             setting.create.dialogIsOpen = false;
         },
     });
-
-watch(
-    () => form.name,
-    (newName) => {
-        form.code = slug(newName);
-    },
-);
 </script>
 
 <template>
-    <Head title="Products" />
+    <Head title="Product Presets" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="space-y-3">
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Dialog title="Create Product" v-model:open="setting.create.dialogIsOpen">
+                    <Dialog title="Create Preset" v-model:open="setting.create.dialogIsOpen">
                         <template #trigger>
                             <Button class="cursor-pointer">Create</Button>
                         </template>
@@ -213,40 +229,55 @@ watch(
                                 <p v-if="form.errors.name" class="text-destructive">{{ form.errors.name }}</p>
                             </div>
                             <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label>Code</Label>
-                                <Input type="text" placeholder="Enter Code" v-model:model-value="form.code" />
-                                <p v-if="form.errors.code" class="text-destructive">{{ form.errors.code }}</p>
-                            </div>
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
                                 <Label>Description</Label>
                                 <Textarea placeholder="Enter Description" v-model:model-value="form.description" />
                                 <p v-if="form.errors.description" class="text-destructive">{{ form.errors.description }}</p>
                             </div>
                             <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <div class="grid gap-1.5 md:grid-cols-2">
-                                    <div class="grid gap-1.5">
-                                        <Label>Shelf Life Duration</Label>
-                                        <Input
-                                            type="number"
-                                            placeholder="Enter Shelf Life Duration"
-                                            v-model:model-value="form.shelf_life_duration"
-                                            min="0.01"
-                                            step=".01"
-                                            class="w-full"
-                                        />
-                                    </div>
-                                    <div class="grid gap-1.5">
-                                        <Label>Shelf Life Type</Label>
-                                        <Select
-                                            :options="options.shelf_life_types"
-                                            placeholder="Select Shelf Life Type"
-                                            v-model:model-value="form.shelf_life_type"
-                                            trigger-class="w-full"
-                                        />
-                                    </div>
-                                </div>
-                                <p v-if="form.errors.shelf_life_duration" class="text-destructive">{{ form.errors.shelf_life_duration }}</p>
-                                <p v-if="form.errors.shelf_life_type" class="text-destructive">{{ form.errors.shelf_life_type }}</p>
+                                <Label>Machine</Label>
+                                <Select
+                                    :options="options.machines"
+                                    placeholder="Select Machine"
+                                    v-model:model-value="form.machine_id"
+                                    trigger-class="w-full"
+                                />
+                                <p v-if="form.errors.machine_id" class="text-destructive">{{ form.errors.machine_id }}</p>
+                            </div>
+                            <div class="grid w-full max-w-sm items-center gap-1.5">
+                                <Label>Cavity Quantity</Label>
+                                <Input
+                                    type="number"
+                                    placeholder="Enter Cavity Quantity"
+                                    v-model:model-value.number="form.cavity_quantity"
+                                    min="0"
+                                    step=".01"
+                                />
+                                <p v-if="form.errors.cavity_quantity" class="text-destructive">{{ form.errors.cavity_quantity }}</p>
+                            </div>
+                            <div class="grid w-full max-w-sm items-center gap-1.5">
+                                <Label>Cavity Type</Label>
+                                <Select
+                                    :options="options.cavity_types"
+                                    placeholder="Select Cavity Type"
+                                    v-model:model-value="form.cavity_type"
+                                    trigger-class="w-full"
+                                />
+                                <p v-if="form.errors.cavity_type" class="text-destructive">{{ form.errors.cavity_type }}</p>
+                            </div>
+                            <div class="grid w-full max-w-sm items-center gap-1.5">
+                                <Label>Cycle Time</Label>
+                                <Input type="number" placeholder="Enter Cycle Time" v-model:model-value.number="form.cycle_time" min="0" step=".01" />
+                                <p v-if="form.errors.cycle_time" class="text-destructive">{{ form.errors.cycle_time }}</p>
+                            </div>
+                            <div class="grid w-full max-w-sm items-center gap-1.5">
+                                <Label>Cycle Time Type</Label>
+                                <Select
+                                    :options="options.cycle_time_types"
+                                    placeholder="Select Cycle Time Type"
+                                    v-model:model-value="form.cycle_time_type"
+                                    trigger-class="w-full"
+                                />
+                                <p v-if="form.errors.cycle_time_type" class="text-destructive">{{ form.errors.cycle_time_type }}</p>
                             </div>
                             <div class="grid w-full max-w-sm items-center gap-1.5">
                                 <Label class="mb-1">Status</Label>
@@ -267,7 +298,7 @@ watch(
                 <div>
                     <DataTable
                         :columns="columns"
-                        :paginate-data="products"
+                        :paginate-data="presets"
                         :column-visibility="columnVisibility"
                         :filter="filter"
                         :entry-options="entryOptions"

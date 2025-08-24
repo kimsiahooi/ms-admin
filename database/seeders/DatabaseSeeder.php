@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             MaterialSeeder::class,
             ProductSeeder::class,
             ProductPriceSeeder::class,
+            ProductPresetSeeder::class,
         ]);
     }
 }

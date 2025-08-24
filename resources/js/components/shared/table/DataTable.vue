@@ -108,7 +108,7 @@ const resetHandler = () => {
                                 }
                             "
                         >
-                            {{ column.id }}
+                            {{ column.id.split('_').join(' ') }}
                         </DropdownMenuCheckboxItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

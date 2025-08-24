@@ -1,3 +1,5 @@
+import type { Machine } from '@/types/Tenant/machines';
+
 export interface Product {
     readonly id: string;
     name: string;
@@ -188,4 +190,36 @@ export interface ProductPrice {
 
 export interface ProductWithPrices extends Product {
     prices: ProductPrice[];
+}
+
+export interface ProductPreset {
+    readonly id: string;
+    product_id: string;
+    machine_id: string;
+    name: string;
+    description: string | null;
+    cavity_quantity: string;
+    cavity_type: 'PCS' | 'KILOGRAM' | 'GRAM';
+    cycle_time: string;
+    cycle_time_type: 'MILLISECOND' | 'SECOND' | 'MINUTE' | 'HOUR' | 'DAY' | 'MONTH' | 'YEAR';
+    cycle_time_type_display?: string | null;
+    is_active: boolean;
+    is_active_display?: string | null;
+    cavity_type_display?: string | null;
+    created_at: Date | null;
+    updated_at: Date | null;
+    deleted_at: Date | null;
+}
+
+export interface ProductPresetWithProduct extends ProductPreset {
+    product: Product | null;
+}
+
+export interface ProductPresetWithMachine extends ProductPreset {
+    machine: Machine | null;
+}
+
+export interface ProductPresetWithProductAndMachine extends ProductPreset {
+    product: Product | null;
+    machine: Machine | null;
 }
