@@ -19,7 +19,7 @@ class ProductController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $products = Product::with(['prices'])->when($request->search, function (Builder $query, $search) {
+        $products = Product::when($request->search, function (Builder $query, $search) {
             $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");;
         })->latest()
             ->paginate($entries)
