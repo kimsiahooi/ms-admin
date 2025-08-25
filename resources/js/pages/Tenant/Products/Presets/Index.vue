@@ -24,7 +24,8 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
 import { Loader, Pencil, Trash2 } from 'lucide-vue-next';
-import { computed, h, reactive } from 'vue';
+import slug from 'slug';
+import { computed, h, reactive, watch } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -156,6 +157,11 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
         cell: ({ row }) => h('div', null, row.getValue('name')),
     },
     {
+        accessorKey: 'code',
+        header: () => h('div', null, 'Code'),
+        cell: ({ row }) => h('div', null, row.getValue('code')),
+    },
+    {
         accessorKey: 'description',
         header: () => h('div', null, 'Description'),
         cell: ({ row }) => h('div', null, row.getValue('description')),
@@ -193,6 +199,7 @@ const statusDisplay = computed(() => props.options.statuses.find((status) => (fo
 const form = useForm<{
     machine_id: Machine['id'] | '';
     name: string;
+    code: string;
     description: string;
     cavity_quantity: number | '';
     cavity_type: ProductPreset['cavity_type'] | '';
@@ -202,6 +209,7 @@ const form = useForm<{
 }>({
     machine_id: '',
     name: '',
+    code: '',
     description: '',
     cavity_quantity: '',
     cavity_type: '',
@@ -217,6 +225,13 @@ const create = () =>
             setting.create.dialogIsOpen = false;
         },
     });
+
+watch(
+    () => form.name,
+    (newName) => {
+        form.code = slug(newName);
+    },
+);
 </script>
 
 <template>
@@ -235,6 +250,11 @@ const create = () =>
                                 <Label>Name</Label>
                                 <Input type="text" placeholder="Enter Name" v-model:model-value="form.name" />
                                 <p v-if="form.errors.name" class="text-destructive">{{ form.errors.name }}</p>
+                            </div>
+                            <div class="grid w-full max-w-sm items-center gap-1.5">
+                                <Label>Code</Label>
+                                <Input type="text" placeholder="Enter Code" v-model:model-value="form.code" />
+                                <p v-if="form.errors.code" class="text-destructive">{{ form.errors.code }}</p>
                             </div>
                             <div class="grid w-full max-w-sm items-center gap-1.5">
                                 <Label>Description</Label>

@@ -197,6 +197,7 @@ export interface ProductPreset {
     product_id: string;
     machine_id: string;
     name: string;
+    code: string;
     description: string | null;
     cavity_quantity: string;
     cavity_type: 'PCS' | 'KILOGRAM' | 'GRAM';

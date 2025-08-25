@@ -14,7 +14,7 @@ class Bom extends Model
     /** @use HasFactory<\Database\Factories\Tenant\BomFactory> */
     use HasFactory, BelongsToTenant, SoftDeletes, HasUlids;
 
-    protected $fillables = ['name', 'code', 'description', 'is_active', 'tenant_id', 'product_id'];
+    protected $fillables = ['name', 'code', 'description', 'is_active', 'product_id', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 

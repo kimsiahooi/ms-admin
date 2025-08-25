@@ -7,6 +7,7 @@ use App\enums\Tenant\Product\Preset\CycleTimeType;
 use App\Models\Tenant\Machine;
 use App\Models\Tenant\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Tenant\ProductPreset>
@@ -22,11 +23,13 @@ class ProductPresetFactory extends Factory
     {
         $product = Product::inRandomOrder()->first();
         $machine = Machine::where('tenant_id', $product->tenant_id)->inRandomOrder()->first();
+        $name = fake()->unique()->sentence(2);
 
         return [
             'product_id' => $product->id,
             'machine_id' => $machine->id,
-            'name' => fake()->unique()->sentence(2),
+            'name' => $name,
+            'code' => Str::slug($name),
             'description' => fake()->sentence(),
             'cavity_quantity' => fake()->numberBetween(0, 10),
             'cavity_type' => fake()->randomElement(CavityType::cases()),

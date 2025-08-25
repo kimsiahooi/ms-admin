@@ -62,6 +62,7 @@ const statusDisplay = computed(() => props.options.statuses.find((status) => (fo
 const form = useForm<{
     machine_id: Machine['id'] | '';
     name: string;
+    code: string;
     description: string;
     cavity_quantity: number | '';
     cavity_type: ProductPresetWithMachine['cavity_type'] | '';
@@ -71,6 +72,7 @@ const form = useForm<{
 }>({
     machine_id: props.preset.machine?.id || '',
     name: props.preset.name,
+    code: props.preset.code,
     description: props.preset.description || '',
     cavity_quantity: +props.preset.cavity_quantity,
     cavity_type: props.preset.cavity_type,
@@ -93,6 +95,11 @@ const submit = () => form.put(route('products.presets.update', { tenant: tenant?
                         <Label>Name</Label>
                         <Input type="text" placeholder="Enter Name" v-model:model-value="form.name" />
                         <p v-if="form.errors.name" class="text-destructive">{{ form.errors.name }}</p>
+                    </div>
+                    <div class="grid w-full items-center gap-1.5">
+                        <Label>Code</Label>
+                        <Input type="text" placeholder="Enter Code" v-model:model-value="form.code" />
+                        <p v-if="form.errors.code" class="text-destructive">{{ form.errors.code }}</p>
                     </div>
                     <div class="grid w-full items-center gap-1.5">
                         <Label>Description</Label>

@@ -15,7 +15,7 @@ class ProductPreset extends Model
 {
     use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
-    protected $fillable = ['product_id', 'machine_id', 'is_active', 'name', 'description', 'cavity_quantity', 'cavity_type', 'cycle_time', 'cycle_time_type'];
+    protected $fillable = ['product_id', 'machine_id', 'name', 'code', 'description', 'cavity_quantity', 'cavity_type', 'cycle_time', 'cycle_time_type', 'is_active', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 

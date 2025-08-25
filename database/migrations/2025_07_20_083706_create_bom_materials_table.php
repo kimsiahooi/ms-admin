@@ -22,8 +22,6 @@ return new class extends Migration
             $table->foreignIdFor(Tenant::class)->constrained();
             $table->timestamps();
             $table->softDeletes();
-
-            $table->unique(['bom_id', 'material_id']);
         });
     }
 

@@ -55,7 +55,8 @@ class ProductPresetController extends Controller
     {
         $validated = $request->validate([
             'machine_id' => ['required', Rule::exists('machines', 'id')->where('is_active', true)->where('tenant_id', $product->tenant_id)->whereNull('deleted_at')],
-            'name' => ['required', 'string', 'max:255', Rule::unique('product_presets', 'name')->where('tenant_id', $product->tenant_id)->whereNull('deleted_at')],
+            'name' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255', 'alpha_dash', Rule::unique('product_presets', 'code')->where('tenant_id', $product->tenant_id)->whereNull('deleted_at')],
             'description' => ['nullable', 'string'],
             'cavity_quantity' => ['required', 'numeric', 'min:0'],
             'cavity_type' => ['required', Rule::in(CavityType::cases())],
@@ -108,7 +109,8 @@ class ProductPresetController extends Controller
     {
         $validated = $request->validate([
             'machine_id' => ['required', Rule::exists('machines', 'id')->where('is_active', true)->where('tenant_id', $product->tenant_id)->whereNull('deleted_at')],
-            'name' => ['required', 'string', 'max:255', Rule::unique('product_presets', 'name')->ignore($preset->id)->where('tenant_id', $product->tenant_id)->whereNull('deleted_at')],
+            'name' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255', 'alpha_dash', Rule::unique('product_presets', 'code')->ignore($preset->id)->where('tenant_id', $product->tenant_id)->whereNull('deleted_at')],
             'description' => ['nullable', 'string'],
             'cavity_quantity' => ['required', 'numeric', 'min:0'],
             'cavity_type' => ['required', Rule::in(CavityType::cases())],

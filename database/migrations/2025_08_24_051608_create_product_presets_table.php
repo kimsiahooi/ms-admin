@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignIdFor(Product::class)->constrained();
             $table->foreignIdFor(Machine::class)->constrained();
             $table->string('name');
+            $table->string('code');
             $table->text('description')->nullable();
             $table->decimal('cavity_quantity')->min(0)->default(0);
             $table->enum('cavity_type', array_column(CavityType::cases(), 'value'))->nullable();
@@ -31,7 +32,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->unique(['product_id', 'tenant_id', 'name']);
+            $table->unique(['product_id', 'tenant_id', 'code']);
         });
     }
 
