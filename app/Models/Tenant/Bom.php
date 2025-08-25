@@ -3,6 +3,7 @@
 namespace App\Models\Tenant;
 
 use App\enums\Tenant\Product\Bom\Status;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,9 +12,9 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class Bom extends Model
 {
     /** @use HasFactory<\Database\Factories\Tenant\BomFactory> */
-    use HasFactory, BelongsToTenant, SoftDeletes;
+    use HasFactory, BelongsToTenant, SoftDeletes, HasUlids;
 
-    protected $fillables = ['name', 'code', 'description', 'is_active', 'tenant_id'];
+    protected $fillables = ['name', 'code', 'description', 'is_active', 'tenant_id', 'product_id'];
 
     protected $hidden = ['tenant_id'];
 
@@ -33,7 +34,7 @@ class Bom extends Model
 
     public function materials()
     {
-        return $this->belongsToMany(Material::class)->withPivot(['quantity'])->withTimestamps()->using(BomMaterial::class);
+        return $this->belongsToMany(Material::class)->withPivot(['material_detail'])->withTimestamps()->using(BomMaterial::class);
     }
 
     protected function getIsActiveDisplayAttribute(): string | null

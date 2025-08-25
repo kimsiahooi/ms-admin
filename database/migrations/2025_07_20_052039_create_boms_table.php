@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('boms', function (Blueprint $table) {
-            $table->id();
+            $table->ulid('id')->primary();
             $table->string('name');
             $table->string('code');
             $table->text('description')->nullable();

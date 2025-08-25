@@ -182,7 +182,7 @@ export interface ProductPrice {
     amount: string;
     is_active: boolean;
     is_active_display?: string | null;
-    product_id: number;
+    product_id: Product['id'];
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;
@@ -222,4 +222,20 @@ export interface ProductPresetWithMachine extends ProductPreset {
 export interface ProductPresetWithProductAndMachine extends ProductPreset {
     product: Product | null;
     machine: Machine | null;
+}
+
+export interface ProductBom extends Product {
+    readonly id: string;
+    name: string;
+    code: string;
+    description: string | null;
+    is_active: boolean;
+    product_id: Product['id'];
+    created_at: Date | null;
+    updated_at: Date | null;
+    deleted_at: Date | null;
+}
+
+export interface ProductBomWithProduct extends ProductBom {
+    product: Product | null;
 }

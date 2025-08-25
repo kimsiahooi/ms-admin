@@ -15,10 +15,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('bom_material', function (Blueprint $table) {
-            $table->id();
+            $table->ulid('id')->primary();
             $table->foreignIdFor(Bom::class)->constrained();
             $table->foreignIdFor(Material::class)->constrained();
-            $table->decimal('quantity')->min(0);
+            $table->json('material_detail');
+            $table->foreignIdFor(Tenant::class)->constrained();
             $table->timestamps();
             $table->softDeletes();
 
