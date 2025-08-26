@@ -23,7 +23,7 @@ import type { Product, ProductPrice } from '@/types/Tenant/products';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { CircleDollarSign, Loader, Pencil, Settings2, Trash2 } from 'lucide-vue-next';
+import { CircleDollarSign, Loader, Pencil, ScrollText, Settings2, Trash2 } from 'lucide-vue-next';
 import slug from 'slug';
 import { computed, h, reactive, watch } from 'vue';
 
@@ -94,12 +94,17 @@ const columns: ColumnDef<Product>[] = [
                     ),
                 ),
                 h(Tooltip, { text: 'Prices' }, () =>
-                    h(Link, { href: route('products.prices.index', { tenant: tenant?.id || '', product: product.id }), asChild: true }, () =>
+                    h(Link, { href: route('products.prices.index', { tenant: tenant?.id || '', product: product.id }) }, () =>
                         h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(CircleDollarSign, { class: 'size-3' })),
                     ),
                 ),
+                h(Tooltip, { text: 'Boms' }, () =>
+                    h(Link, { href: route('products.boms.index', { tenant: tenant?.id || '', product: product.id }) }, () =>
+                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(ScrollText, { class: 'size-3' })),
+                    ),
+                ),
                 h(Tooltip, { text: 'Edit' }, () =>
-                    h(Link, { href: route('products.edit', { tenant: tenant?.id || '', product: product.id }), asChild: true }, () =>
+                    h(Link, { href: route('products.edit', { tenant: tenant?.id || '', product: product.id }) }, () =>
                         h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
                     ),
                 ),
@@ -202,7 +207,7 @@ watch(
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="space-y-3">
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Dialog title="Create Product" v-model:open="setting.create.dialogIsOpen">
+                    <Dialog title="Create Product Bom" v-model:open="setting.create.dialogIsOpen">
                         <template #trigger>
                             <Button class="cursor-pointer">Create</Button>
                         </template>

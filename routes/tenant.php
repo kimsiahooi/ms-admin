@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\BomController;
 use App\Http\Controllers\Tenant\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Tenant\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Tenant\Auth\EmailVerificationNotificationController;
@@ -11,6 +10,7 @@ use App\Http\Controllers\Tenant\Auth\NewPasswordController;
 use App\Http\Controllers\Tenant\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Tenant\Auth\RegisteredUserController;
 use App\Http\Controllers\Tenant\Auth\VerifyEmailController;
+use App\Http\Controllers\Tenant\BomController;
 use App\Http\Controllers\Tenant\MachineController;
 use App\Http\Controllers\Tenant\MaterialController;
 use App\Http\Controllers\Tenant\ProductController;
@@ -106,6 +106,6 @@ Route::middleware([
         Route::resource('products', ProductController::class)->except(['create', 'show']);
         Route::resource('products.prices', ProductPriceController::class)->except(['create', 'show']);
         Route::resource('products.presets', ProductPresetController::class)->except(['create', 'show']);
-        // Route::resource('products.boms', BomController::class)->except(['create', 'show']);
+        Route::resource('products.boms', BomController::class)->except(['create', 'show']);
     });
 });

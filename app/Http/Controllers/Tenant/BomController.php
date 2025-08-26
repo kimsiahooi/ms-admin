@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Tenant;
 
 use App\enums\Tenant\Product\Bom\Status;
+use App\Http\Controllers\Controller;
 use App\Models\Tenant\Bom;
 use App\Models\Tenant\Product;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ class BomController extends Controller
         $entries = $request->input('entries', 10);
 
         $boms = $product->boms()->when($request->search, function ($query, $search) {
-            $query->where('name', 'like', "%{$search}%");
+            $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");
         })->latest()
             ->paginate($entries)
             ->withQueryString();
@@ -26,6 +27,7 @@ class BomController extends Controller
             'product' => $product,
             'boms' => $boms,
             'options' => [
+                'products' => Product::active()->get()->map(fn(Product $product) => ['name' => $product->name, 'value' => $product->id]),
                 'statuses' => collect(Status::cases())->map(fn(Status $status) => ['name' => $status->display(), 'value' => $status->value]),
             ]
         ]);
