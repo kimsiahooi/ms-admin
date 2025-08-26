@@ -3,6 +3,7 @@
 namespace Database\Factories\Tenant;
 
 use App\Models\Tenant;
+use App\Models\Tenant\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -25,6 +26,7 @@ class BomFactory extends Factory
             'code' => Str::slug($name),
             'description' => fake()->sentence(),
             'is_active' => fake()->boolean(),
+            'product_id' => Product::inRandomOrder()->first(),
             'tenant_id' => Tenant::inRandomOrder()->first(),
         ];
     }

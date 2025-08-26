@@ -22,7 +22,7 @@ class ProductPriceSeeder extends Seeder
 
             foreach ($currencies as $currency) {
                 ProductPrice::factory()->create([
-                    'product_id' => $product,
+                    'product_id' => $product->id,
                     'tenant_id' => $product->tenant_id,
                     'currency' => $currency->value,
                 ]);
