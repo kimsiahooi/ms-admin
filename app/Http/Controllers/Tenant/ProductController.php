@@ -52,12 +52,22 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'alpha_dash', 'max:255', Rule::unique('products', 'code')->where(function ($query) {
-                return $query->where('tenant_id', tenant('id'))->whereNull('deleted_at');
-            })],
+            'code' => [
+                'required',
+                'string',
+                'alpha_dash',
+                'max:255',
+                Rule::unique('products', 'code')
+                    ->withoutTrashed()
+                    ->where('tenant_id', tenant('id'))
+            ],
             'description' => ['nullable', 'string'],
             'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type',  'numeric', 'min:0.01'],
-            'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::in(ShelfLifeType::cases())],
+            'shelf_life_type' => [
+                'nullable',
+                'required_with:shelf_life_duration',
+                Rule::enum(ShelfLifeType::class)
+            ],
             'is_active' => ['required', 'boolean'],
         ]);
 
@@ -105,13 +115,19 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'alpha_dash', 'max:255', Rule::unique('products', 'code')->ignore($product->id, 'id')->where(function ($query) {
-                return $query->where('tenant_id', tenant('id'));
-            })],
+            'code' => [
+                'required',
+                'string',
+                'alpha_dash',
+                'max:255',
+                Rule::unique('products', 'code')
+                    ->ignore($product->id, 'id')
+                    ->where('tenant_id', tenant('id'))
+            ],
             'description' => ['nullable', 'string'],
             'is_active' => ['required', 'boolean'],
             'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type', 'numeric', 'min:0.01'],
-            'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::in(ShelfLifeType::cases())],
+            'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::enum(ShelfLifeType::class)],
         ]);
 
         $product->update($validated);
@@ -125,7 +141,6 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
-        $product->prices()->delete();
 
         return back()->with('success', 'Product deleted successfully.');
     }

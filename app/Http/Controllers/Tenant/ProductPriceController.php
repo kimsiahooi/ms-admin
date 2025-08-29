@@ -55,14 +55,11 @@ class ProductPriceController extends Controller
         $validated = $request->validate([
             'currency' => [
                 'required',
-                Rule::in(Currency::cases()),
+                Rule::enum(Currency::class),
                 Rule::unique('product_prices', 'currency')
-                    ->where(
-                        fn($query) => $query
-                            ->where('tenant_id', tenant('id'))
-                            ->where('product_id', $product->id)
-                            ->whereNull('deleted_at')
-                    )
+                    ->withoutTrashed()
+                    ->where('tenant_id', tenant('id'))
+                    ->where('product_id', $product->id)
             ],
             'amount' => ['required', 'min:0', 'numeric'],
             'is_active' => ['required', 'boolean'],
@@ -114,15 +111,12 @@ class ProductPriceController extends Controller
         $validated = $request->validate([
             'currency' => [
                 'required',
-                Rule::in(Currency::cases()),
+                Rule::enum(Currency::class),
                 Rule::unique('product_prices', 'currency')
                     ->ignore($price->id, 'id')
-                    ->where(
-                        fn($query) => $query
-                            ->where('tenant_id', tenant('id'))
-                            ->where('product_id', $product->id)
-                            ->whereNull('deleted_at')
-                    )
+                    ->withoutTrashed()
+                    ->where('tenant_id', tenant('id'))
+                    ->where('product_id', $product->id)
             ],
             'amount' => ['required', 'min:0', 'numeric'],
             'is_active' => ['required', 'boolean'],

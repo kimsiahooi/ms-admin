@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('code');
             $table->text('description')->nullable();
-            $table->decimal('shelf_life_duration')->min(0)->nullable();
+            $table->decimal('shelf_life_duration')->nullable();
             $table->enum('shelf_life_type', array_column(ShelfLifeType::cases(), 'value'))->nullable();
             $table->boolean('is_active')->default(true);
             $table->foreignIdFor(Tenant::class)->constrained();

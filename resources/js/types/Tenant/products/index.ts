@@ -1,4 +1,5 @@
 import type { Machine } from '@/types/Tenant/machines';
+import type { Material } from '@/types/Tenant/materials';
 
 export interface Product {
     readonly id: string;
@@ -225,7 +226,7 @@ export interface ProductPresetWithProductAndMachine extends ProductPreset {
     machine: Machine | null;
 }
 
-export interface ProductBom extends Product {
+export interface ProductBom {
     readonly id: string;
     name: string;
     code: string;
@@ -239,4 +240,18 @@ export interface ProductBom extends Product {
 
 export interface ProductBomWithProduct extends ProductBom {
     product: Product | null;
+}
+
+export interface ProductBomWithMaterials extends ProductBom {
+    materials: (Material & {
+        pivot: {
+            id: string;
+            bom_id: ProductBom['id'];
+            material_id: Material['id'];
+            quantity: string;
+            unit_type: Material['unit_type'];
+            created_at: Date | null;
+            updated_at: Date | null;
+        };
+    })[];
 }

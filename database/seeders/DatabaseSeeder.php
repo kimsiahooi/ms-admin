@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             ProductPriceSeeder::class,
             ProductPresetSeeder::class,
             BomSeeder::class,
+            BomMaterialSeeder::class,
         ]);
     }
 }

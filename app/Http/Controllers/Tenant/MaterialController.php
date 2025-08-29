@@ -49,11 +49,17 @@ class MaterialController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'alpha_dash', 'max:255', Rule::unique('materials', 'code')->where(function ($query) {
-                return $query->where('tenant_id', tenant('id'))->whereNull('deleted_at');
-            })],
+            'code' => [
+                'required',
+                'string',
+                'alpha_dash',
+                'max:255',
+                Rule::unique('materials', 'code')
+                    ->withoutTrashed()
+                    ->where('tenant_id', tenant('id'))
+            ],
             'description' => ['nullable', 'string'],
-            'unit_type' => ['required', Rule::in(UnitType::cases())],
+            'unit_type' => ['required', Rule::enum(UnitType::class)],
             'is_active' => ['required', 'boolean'],
         ]);
 
@@ -98,11 +104,17 @@ class MaterialController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'alpha_dash', 'max:255', Rule::unique('materials', 'code')->ignore($material->id)->where(function ($query) {
-                return $query->where('tenant_id', tenant('id'));
-            })],
+            'code' => [
+                'required',
+                'string',
+                'alpha_dash',
+                'max:255',
+                Rule::unique('materials', 'code')
+                    ->ignore($material->id)
+                    ->where('tenant_id', tenant('id'))
+            ],
             'description' => ['nullable', 'string'],
-            'unit_type' => ['required', Rule::in(UnitType::cases())],
+            'unit_type' => ['required', Rule::enum(UnitType::class)],
             'is_active' => ['required', 'boolean'],
         ]);
 

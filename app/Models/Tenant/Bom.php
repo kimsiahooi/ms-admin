@@ -14,7 +14,7 @@ class Bom extends Model
     /** @use HasFactory<\Database\Factories\Tenant\BomFactory> */
     use HasFactory, BelongsToTenant, SoftDeletes, HasUlids;
 
-    protected $fillables = ['name', 'code', 'description', 'is_active', 'product_id', 'tenant_id'];
+    protected $fillable = ['name', 'code', 'description', 'is_active', 'product_id', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
@@ -34,7 +34,11 @@ class Bom extends Model
 
     public function materials()
     {
-        return $this->belongsToMany(Material::class)->withPivot(['material_detail'])->withTimestamps()->using(BomMaterial::class);
+        return $this->belongsToMany(Material::class)
+            ->withPivot(['id', 'quantity', 'unit_type'])
+            ->wherePivotNull('deleted_at')
+            ->withTimestamps()
+            ->using(BomMaterial::class);
     }
 
     protected function getIsActiveDisplayAttribute(): string | null

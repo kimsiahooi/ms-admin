@@ -54,14 +54,28 @@ class ProductPresetController extends Controller
     public function store(Request $request, Product $product)
     {
         $validated = $request->validate([
-            'machine_id' => ['required', Rule::exists('machines', 'id')->where('is_active', true)->where('tenant_id', $product->tenant_id)->whereNull('deleted_at')],
+            'machine_id' => [
+                'required',
+                Rule::exists('machines', 'id')
+                    ->withoutTrashed()
+                    ->where('is_active', true)
+                    ->where('tenant_id', $product->tenant_id)
+            ],
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255', 'alpha_dash', Rule::unique('product_presets', 'code')->where('tenant_id', $product->tenant_id)->whereNull('deleted_at')],
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                'alpha_dash',
+                Rule::unique('product_presets', 'code')
+                    ->withoutTrashed()
+                    ->where('tenant_id', $product->tenant_id)
+            ],
             'description' => ['nullable', 'string'],
             'cavity_quantity' => ['required', 'numeric', 'min:0'],
-            'cavity_type' => ['required', Rule::in(CavityType::cases())],
+            'cavity_type' => ['required', Rule::enum(CavityType::class)],
             'cycle_time' => ['required', 'numeric', 'min:0'],
-            'cycle_time_type' => ['required', Rule::in(CycleTimeType::cases())],
+            'cycle_time_type' => ['required', Rule::enum(CycleTimeType::class)],
             'is_active' => ['required', 'boolean'],
         ]);
 
@@ -108,14 +122,29 @@ class ProductPresetController extends Controller
     public function update(Request $request, Product $product, ProductPreset $preset)
     {
         $validated = $request->validate([
-            'machine_id' => ['required', Rule::exists('machines', 'id')->where('is_active', true)->where('tenant_id', $product->tenant_id)->whereNull('deleted_at')],
+            'machine_id' => [
+                'required',
+                Rule::exists('machines', 'id')
+                    ->withoutTrashed()
+                    ->where('is_active', true)
+                    ->where('tenant_id', $product->tenant_id)
+            ],
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255', 'alpha_dash', Rule::unique('product_presets', 'code')->ignore($preset->id)->where('tenant_id', $product->tenant_id)->whereNull('deleted_at')],
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                'alpha_dash',
+                Rule::unique('product_presets', 'code')
+                    ->ignore($preset->id)
+                    ->withoutTrashed()
+                    ->where('tenant_id', $product->tenant_id)
+            ],
             'description' => ['nullable', 'string'],
             'cavity_quantity' => ['required', 'numeric', 'min:0'],
-            'cavity_type' => ['required', Rule::in(CavityType::cases())],
+            'cavity_type' => ['required', Rule::enum(CavityType::class)],
             'cycle_time' => ['required', 'numeric', 'min:0'],
-            'cycle_time_type' => ['required', Rule::in(CycleTimeType::cases())],
+            'cycle_time_type' => ['required', Rule::enum(CycleTimeType::class)],
             'is_active' => ['required', 'boolean'],
         ]);
 

@@ -17,7 +17,7 @@ return new class extends Migration
         Schema::create('product_prices', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->enum('currency', array_column(Currency::cases(), 'value'));
-            $table->decimal('amount')->min(0);
+            $table->decimal('amount');
             $table->boolean('is_active')->default(true);
             $table->foreignIdFor(Product::class)->constrained();
             $table->foreignIdFor(Tenant::class)->constrained();

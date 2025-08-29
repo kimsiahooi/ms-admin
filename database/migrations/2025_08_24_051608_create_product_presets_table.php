@@ -23,9 +23,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('code');
             $table->text('description')->nullable();
-            $table->decimal('cavity_quantity')->min(0)->default(0);
+            $table->decimal('cavity_quantity')->default(0);
             $table->enum('cavity_type', array_column(CavityType::cases(), 'value'))->nullable();
-            $table->decimal('cycle_time')->min(0)->default(0);
+            $table->decimal('cycle_time')->default(0);
             $table->enum('cycle_time_type', array_column(CycleTimeType::cases(), 'value'))->nullable();
             $table->boolean('is_active')->default(true);
             $table->foreignIdFor(Tenant::class)->constrained();

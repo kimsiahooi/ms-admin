@@ -207,7 +207,7 @@ watch(
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="space-y-3">
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Dialog title="Create Product Bom" v-model:open="setting.create.dialogIsOpen">
+                    <Dialog title="Create Product" v-model:open="setting.create.dialogIsOpen">
                         <template #trigger>
                             <Button class="cursor-pointer">Create</Button>
                         </template>

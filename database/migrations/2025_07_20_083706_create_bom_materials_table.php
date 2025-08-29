@@ -1,5 +1,6 @@
 <?php
 
+use App\enums\Tenant\Material\UnitType;
 use App\Models\Tenant;
 use App\Models\Tenant\Bom;
 use App\Models\Tenant\Material;
@@ -18,10 +19,13 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->foreignIdFor(Bom::class)->constrained();
             $table->foreignIdFor(Material::class)->constrained();
-            $table->json('material_detail');
+            $table->decimal('quantity');
+            $table->enum('unit_type', array_column(UnitType::cases(), 'value'));
             $table->foreignIdFor(Tenant::class)->constrained();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->unique(['bom_id', 'material_id', 'tenant_id']);
         });
     }
 
