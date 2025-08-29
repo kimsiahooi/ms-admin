@@ -52,4 +52,9 @@ class Product extends Model
     {
         return ShelfLifeType::tryFrom($this->shelf_life_type)?->display();
     }
+
+    public function scopeActive(Builder $query): void
+    {
+        $query->where('is_active', true);
+    }
 }
