@@ -2,16 +2,16 @@
 
 namespace App\enums\Tenant\Product;
 
-enum ShelfLifeType: string
+enum ShelfLifeType: int
 {
-    case SECOND = 'SECOND';
-    case MINUTE = 'MINUTE';
-    case HOUR = 'HOUR';
-    case DAY = 'DAY';
-    case MONTH = 'MONTH';
-    case YEAR = 'YEAR';
+    case SECOND = 1;
+    case MINUTE = 2;
+    case HOUR = 3;
+    case DAY = 4;
+    case MONTH = 5;
+    case YEAR = 6;
 
-    public function display(): string
+    public function label(): string
     {
         return match ($this) {
             self::SECOND => 'Second(s)',

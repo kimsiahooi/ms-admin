@@ -2,6 +2,7 @@
 
 use App\enums\Tenant\Product\Preset\CavityType;
 use App\enums\Tenant\Product\Preset\CycleTimeType;
+use App\enums\Tenant\Product\Preset\Status;
 use App\Models\Tenant;
 use App\Models\Tenant\Machine;
 use App\Models\Tenant\Product;
@@ -18,17 +19,17 @@ return new class extends Migration
     {
         Schema::create('product_presets', function (Blueprint $table) {
             $table->ulid('id')->primary();
-            $table->foreignIdFor(Product::class)->constrained();
-            $table->foreignIdFor(Machine::class)->constrained();
+            $table->foreignIdFor(Product::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Machine::class)->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('code');
             $table->text('description')->nullable();
             $table->decimal('cavity_quantity')->default(0);
-            $table->enum('cavity_type', array_column(CavityType::cases(), 'value'))->nullable();
+            $table->integer('cavity_type')->nullable();
             $table->decimal('cycle_time')->default(0);
-            $table->enum('cycle_time_type', array_column(CycleTimeType::cases(), 'value'))->nullable();
-            $table->boolean('is_active')->default(true);
-            $table->foreignIdFor(Tenant::class)->constrained();
+            $table->integer('cycle_time_type')->nullable();
+            $table->integer('status')->default(Status::ACTIVE->value);
+            $table->foreignIdFor(Tenant::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
 

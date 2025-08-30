@@ -2,6 +2,7 @@
 
 namespace Database\Factories\Tenant;
 
+use App\enums\Tenant\Product\Bom\Status;
 use App\Models\Tenant;
 use App\Models\Tenant\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -25,7 +26,7 @@ class BomFactory extends Factory
             'name' => $name,
             'code' => Str::slug($name),
             'description' => fake()->sentence(),
-            'is_active' => fake()->boolean(),
+            'status' => fake()->randomElement(Status::cases()),
             'product_id' => Product::inRandomOrder()->first(),
             'tenant_id' => Tenant::inRandomOrder()->first(),
         ];

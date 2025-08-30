@@ -2,17 +2,17 @@
 
 namespace App\enums\Tenant\Product\Preset;
 
-enum CycleTimeType: string
+enum CycleTimeType: int
 {
-    case MILLISECOND = 'MILLISECOND';
-    case SECOND = 'SECOND';
-    case MINUTE = 'MINUTE';
-    case HOUR = 'HOUR';
-    case DAY = 'DAY';
-    case MONTH = 'MONTH';
-    case YEAR = 'YEAR';
+    case MILLISECOND = 1;
+    case SECOND = 2;
+    case MINUTE = 3;
+    case HOUR = 4;
+    case DAY = 5;
+    case MONTH = 6;
+    case YEAR = 7;
 
-    public function display(): string
+    public function label(): string
     {
         return match ($this) {
             self::MILLISECOND => 'Millisecond(s)',

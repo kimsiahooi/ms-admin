@@ -45,8 +45,17 @@ class ProductBomController extends Controller
             'product' => $product,
             'materials' => $materials,
             'options' => [
-                'statuses' => collect(Status::cases())->map(fn(Status $status) => ['name' => $status->display(), 'value' => $status->value]),
-                'unit_types' => collect(UnitType::cases())->map(fn(UnitType $type) => ['name' => $type->display(), 'value' => $type->value]),
+                'statuses' => collect(Status::cases())
+                    ->map(fn(Status $status) => [
+                        'name' => $status->label(),
+                        'value' => $status->value,
+                        'is_default' => $status->value === Status::ACTIVE->value,
+                    ]),
+                'unit_types' => collect(UnitType::cases())
+                    ->map(fn(UnitType $type) => [
+                        'name' => $type->label(),
+                        'value' => $type->value,
+                    ]),
             ]
         ]);
     }
@@ -58,15 +67,7 @@ class ProductBomController extends Controller
     {
         $validated = $request->validated();
 
-        $bom = Bom::onlyTrashed()->where('code', $validated['code'])->first();
-
-        if ($bom) {
-            $bom->restore();
-            $bom->update($validated);
-            $bom->refresh();
-        } else {
-            $bom = $product->boms()->create($validated);
-        }
+        $bom = $product->boms()->create($validated);
 
         $materials = collect($validated['materials'])
             ->mapWithKeys(fn($m) => [
@@ -75,15 +76,6 @@ class ProductBomController extends Controller
                     'quantity'  => $m['quantity'],
                 ],
             ])->toArray();
-
-        BomMaterial::withoutTrashed()
-            ->where('bom_id', $bom->id)
-            ->delete();
-
-        BomMaterial::onlyTrashed()
-            ->where('bom_id', $bom->id)
-            ->whereIn('material_id', array_keys($materials))
-            ->restore();
 
         $bom->materials()->sync($materials);
 
@@ -107,11 +99,19 @@ class ProductBomController extends Controller
 
         return inertia('Tenant/Products/Boms/Edit', [
             'product' => $product,
-            'bom' => $bom->load('materials'),
+            'bom' => $bom->load(['materials']),
             'materials' => $materials,
             'options' => [
-                'statuses' => collect(Status::cases())->map(fn(Status $status) => ['name' => $status->display(), 'value' => $status->value]),
-                'unit_types' => collect(UnitType::cases())->map(fn(UnitType $type) => ['name' => $type->display(), 'value' => $type->value]),
+                'statuses' => collect(Status::cases())
+                    ->map(fn(Status $status) => [
+                        'name' => $status->label(),
+                        'value' => $status->value,
+                    ]),
+                'unit_types' => collect(UnitType::cases())
+                    ->map(fn(UnitType $type) => [
+                        'name' => $type->label(),
+                        'value' => $type->value,
+                    ]),
             ]
         ]);
     }
@@ -132,16 +132,6 @@ class ProductBomController extends Controller
                     'quantity'  => $m['quantity'],
                 ],
             ])->toArray();
-
-        BomMaterial::withoutTrashed()
-            ->where('bom_id', $bom->id)
-            ->whereNotIn('material_id', array_keys($materials))
-            ->delete();
-
-        BomMaterial::onlyTrashed()
-            ->where('bom_id', $bom->id)
-            ->whereIn('material_id', array_keys($materials))
-            ->restore();
 
         $bom->materials()->sync($materials);
 

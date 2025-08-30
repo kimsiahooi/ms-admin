@@ -15,7 +15,7 @@ import type { Machine } from '@/types/Tenant/machines';
 import type { Product, ProductPresetWithMachine } from '@/types/Tenant/products';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Loader } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -28,7 +28,7 @@ const props = defineProps<{
         machines: SelectOption<Machine['id']>[];
         cavity_types: SelectOption<ProductPresetWithMachine['cavity_type']>[];
         cycle_time_types: SelectOption<ProductPresetWithMachine['cycle_time_type']>[];
-        statuses: SwitchOption<number>[];
+        statuses: SwitchOption<ProductPresetWithMachine['status']>[];
     };
 }>();
 
@@ -57,7 +57,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const statusDisplay = computed(() => props.options.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
+const statusDisplay = computed(() => props.options.statuses.find((status) => (form.status ? status.value : !status.value))?.name);
 
 const form = useForm<{
     machine_id: Machine['id'] | '';
@@ -68,7 +68,7 @@ const form = useForm<{
     cavity_type: ProductPresetWithMachine['cavity_type'] | '';
     cycle_time: number | '';
     cycle_time_type: ProductPresetWithMachine['cycle_time_type'] | '';
-    is_active: boolean;
+    status: ProductPresetWithMachine['status'];
 }>({
     machine_id: props.preset.machine?.id || '',
     name: props.preset.name,
@@ -78,10 +78,25 @@ const form = useForm<{
     cavity_type: props.preset.cavity_type,
     cycle_time: +props.preset.cycle_time,
     cycle_time_type: props.preset.cycle_time_type,
-    is_active: props.preset.is_active,
+    status: props.preset.status,
+});
+
+const config = reactive({
+    status: !!form.status,
 });
 
 const submit = () => form.put(route('products.presets.update', { tenant: tenant?.id || '', product: props.product.id, preset: props.preset.id }));
+
+watch(
+    () => config.status,
+    (newVal) => {
+        const value = props.options.statuses.find((status) => (newVal ? status.value === 1 : status.value === 0))?.value;
+
+        if (value !== undefined) {
+            form.status = value;
+        }
+    },
+);
 </script>
 
 <template>
@@ -155,10 +170,10 @@ const submit = () => form.put(route('products.presets.update', { tenant: tenant?
                     <div class="grid w-full items-center gap-1.5">
                         <Label class="mb-1">Status</Label>
                         <div class="flex items-center space-x-2">
-                            <Switch class="cursor-pointer" v-model:model-value="form.is_active" />
+                            <Switch class="cursor-pointer" v-model:model-value="config.status" />
                             <Label>{{ statusDisplay }}</Label>
                         </div>
-                        <p v-if="form.errors.is_active" class="text-destructive">{{ form.errors.is_active }}</p>
+                        <p v-if="form.errors.status" class="text-destructive">{{ form.errors.status }}</p>
                     </div>
                     <div class="flex gap-2">
                         <Button type="submit" class="cursor-pointer" :disabled="form.processing">

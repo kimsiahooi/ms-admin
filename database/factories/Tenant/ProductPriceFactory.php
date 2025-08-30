@@ -2,7 +2,8 @@
 
 namespace Database\Factories\Tenant;
 
-use App\enums\Tenant\Product\Currency;
+use App\enums\Tenant\Product\Price\Currency;
+use App\enums\Tenant\Product\Price\Status;
 use App\Models\Tenant;
 use App\Models\Tenant\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -24,7 +25,7 @@ class ProductPriceFactory extends Factory
         return [
             'currency' => fake()->randomElement(Currency::cases()),
             'amount' => fake()->randomFloat(2, 10, 99),
-            'is_active' => fake()->boolean(),
+            'status' => fake()->randomElement(Status::cases()),
             'product_id' => $product,
             'tenant_id' => $product->tenant_id,
         ];

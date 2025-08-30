@@ -32,10 +32,28 @@ class ProductPresetController extends Controller
             'product' => $product,
             'presets' => $presets,
             'options' => [
-                'machines' => Machine::active()->get()->map(fn(Machine $machine) => ['name' => $machine->name, 'value' => $machine->id]),
-                'cavity_types' => collect(CavityType::cases())->map(fn(CavityType $type) => ['name' => $type->display(), 'value' => $type->value]),
-                'cycle_time_types' => collect(CycleTimeType::cases())->map(fn(CycleTimeType $type) => ['name' => $type->display(), 'value' => $type->value]),
-                'statuses' => Status::cases(),
+                'machines' => Machine::active()
+                    ->get()
+                    ->map(fn(Machine $machine) => [
+                        'name' => $machine->name,
+                        'value' => $machine->id
+                    ]),
+                'cavity_types' => collect(CavityType::cases())
+                    ->map(fn(CavityType $type) => [
+                        'name' => $type->label(),
+                        'value' => $type->value,
+                    ]),
+                'cycle_time_types' => collect(CycleTimeType::cases())
+                    ->map(fn(CycleTimeType $type) => [
+                        'name' => $type->label(),
+                        'value' => $type->value,
+                    ]),
+                'statuses' => collect(Status::cases())
+                    ->map(fn($status) => [
+                        'name' => $status->label(),
+                        'value' => $status->value,
+                        'is_default' => $status->value === Status::ACTIVE->value,
+                    ]),
             ],
         ]);
     }
@@ -57,9 +75,9 @@ class ProductPresetController extends Controller
             'machine_id' => [
                 'required',
                 Rule::exists('machines', 'id')
-                    ->withoutTrashed()
-                    ->where('is_active', true)
+                    ->where('status', Status::ACTIVE->value)
                     ->where('tenant_id', $product->tenant_id)
+                    ->where('tenant_id', tenant('id'))
             ],
             'name' => ['required', 'string', 'max:255'],
             'code' => [
@@ -67,26 +85,19 @@ class ProductPresetController extends Controller
                 'string',
                 'max:255',
                 'alpha_dash',
-                Rule::unique('product_presets', 'code')
-                    ->withoutTrashed()
+                Rule::unique('product_presets')
                     ->where('tenant_id', $product->tenant_id)
+                    ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
             'cavity_quantity' => ['required', 'numeric', 'min:0'],
             'cavity_type' => ['required', Rule::enum(CavityType::class)],
-            'cycle_time' => ['required', 'numeric', 'min:0'],
+            'cycle_time' => ['required', 'numeric', 'min:0.01'],
             'cycle_time_type' => ['required', Rule::enum(CycleTimeType::class)],
-            'is_active' => ['required', 'boolean'],
+            'status' => ['required', Rule::enum(Status::class)],
         ]);
 
-        $preset = ProductPreset::onlyTrashed()->where('name', $validated['name'])->first();
-
-        if ($preset) {
-            $preset->restore();
-            $preset->update($validated);
-        } else {
-            $product->presets()->create($validated);
-        }
+        $product->presets()->create($validated);
 
         return back()->with('success', 'Product preset created successfully.');
     }
@@ -108,10 +119,28 @@ class ProductPresetController extends Controller
             'product' => $product,
             'preset' => $preset->load(['machine']),
             'options' => [
-                'machines' => Machine::active()->get()->map(fn(Machine $machine) => ['name' => $machine->name, 'value' => $machine->id]),
-                'cavity_types' => collect(CavityType::cases())->map(fn(CavityType $type) => ['name' => $type->display(), 'value' => $type->value]),
-                'cycle_time_types' => collect(CycleTimeType::cases())->map(fn(CycleTimeType $type) => ['name' => $type->display(), 'value' => $type->value]),
-                'statuses' => Status::cases(),
+                'machines' => Machine::active()
+                    ->get()
+                    ->map(fn(Machine $machine) => [
+                        'name' => $machine->name,
+                        'value' => $machine->id,
+                    ]),
+                'cavity_types' => collect(CavityType::cases())
+                    ->map(fn(CavityType $type) => [
+                        'name' => $type->label(),
+                        'value' => $type->value,
+                    ]),
+                'cycle_time_types' => collect(CycleTimeType::cases())
+                    ->map(fn(CycleTimeType $type) => [
+                        'name' => $type->label(),
+                        'value' => $type->value,
+                    ]),
+                'statuses' => collect(Status::cases())
+                    ->map(fn($status) => [
+                        'name' => $status->label(),
+                        'value' => $status->value,
+                        'is_default' => $status->value === Status::ACTIVE->value,
+                    ]),
             ],
         ]);
     }
@@ -125,9 +154,9 @@ class ProductPresetController extends Controller
             'machine_id' => [
                 'required',
                 Rule::exists('machines', 'id')
-                    ->withoutTrashed()
-                    ->where('is_active', true)
+                    ->where('status', Status::ACTIVE->value)
                     ->where('tenant_id', $product->tenant_id)
+                    ->where('tenant_id', tenant('id'))
             ],
             'name' => ['required', 'string', 'max:255'],
             'code' => [
@@ -135,17 +164,17 @@ class ProductPresetController extends Controller
                 'string',
                 'max:255',
                 'alpha_dash',
-                Rule::unique('product_presets', 'code')
+                Rule::unique('product_presets')
                     ->ignore($preset->id)
-                    ->withoutTrashed()
                     ->where('tenant_id', $product->tenant_id)
+                    ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
             'cavity_quantity' => ['required', 'numeric', 'min:0'],
             'cavity_type' => ['required', Rule::enum(CavityType::class)],
             'cycle_time' => ['required', 'numeric', 'min:0'],
             'cycle_time_type' => ['required', Rule::enum(CycleTimeType::class)],
-            'is_active' => ['required', 'boolean'],
+            'status' => ['required', Rule::enum(Status::class)],
         ]);
 
         $preset->update($validated);

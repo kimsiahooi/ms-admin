@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\enums\Tenant\Product\Currency;
+use App\enums\Tenant\Product\Price\Currency;
 use App\Models\Tenant\Product;
 use App\Models\Tenant\ProductPrice;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;

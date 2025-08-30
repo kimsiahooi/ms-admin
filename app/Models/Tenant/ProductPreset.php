@@ -5,6 +5,7 @@ namespace App\Models\Tenant;
 use App\enums\Tenant\Product\Preset\CavityType;
 use App\enums\Tenant\Product\Preset\CycleTimeType;
 use App\enums\Tenant\Product\Preset\Status;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,32 +16,31 @@ class ProductPreset extends Model
 {
     use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
-    protected $fillable = ['product_id', 'machine_id', 'name', 'code', 'description', 'cavity_quantity', 'cavity_type', 'cycle_time', 'cycle_time_type', 'is_active', 'tenant_id'];
+    protected $fillable = ['product_id', 'machine_id', 'name', 'code', 'description', 'cavity_quantity', 'cavity_type', 'cycle_time', 'cycle_time_type', 'status', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
-    protected $appends = ['is_active_display', 'cavity_type_display', 'cycle_time_type_display'];
+    protected $appends = ['status_label', 'cavity_type_label', 'cycle_time_type_label'];
 
-    protected function casts(): array
+    protected function cavityTypeLabel(): Attribute
     {
-        return [
-            'is_active' => 'boolean',
-        ];
+        return Attribute::make(
+            get: fn($value, $attributes) => CavityType::tryFrom($attributes['cavity_type'])?->label(),
+        );
     }
 
-    protected function getCavityTypeDisplayAttribute(): string | null
+    protected function cycleTimeTypeLabel(): Attribute
     {
-        return CavityType::tryFrom($this->cavity_type)?->display();
+        return Attribute::make(
+            get: fn($value, $attributes) => CycleTimeType::tryFrom($attributes['cycle_time_type'])?->label(),
+        );
     }
 
-    protected function getCycleTimeTypeDisplayAttribute(): string | null
+    protected function statusLabel(): Attribute
     {
-        return CycleTimeType::tryFrom($this->cycle_time_type)?->display();
-    }
-
-    protected function getIsActiveDisplayAttribute(): string | null
-    {
-        return Status::tryFrom($this->is_active)?->display();
+        return Attribute::make(
+            get: fn($value, $attributes) => Status::tryFrom($attributes['status'])?->label(),
+        );
     }
 
     public function product()

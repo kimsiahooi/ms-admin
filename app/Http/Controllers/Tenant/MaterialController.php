@@ -28,8 +28,17 @@ class MaterialController extends Controller
         return inertia('Tenant/Materials/Index', [
             'materials' => $materials,
             'options' => [
-                'statuses' => collect(Status::cases())->map(fn(Status $status) => ['name' => $status->display(), 'value' => $status->value]),
-                'unit_types' => collect(UnitType::cases())->map(fn(UnitType $unitType) => ['name' => $unitType->display(), 'value' => $unitType->value]),
+                'statuses' => collect(Status::cases())
+                    ->map(fn(Status $status) => [
+                        'name' => $status->label(),
+                        'value' => $status->value,
+                        'is_default' => $status->value === Status::ACTIVE->value,
+                    ]),
+                'unit_types' => collect(UnitType::cases())
+                    ->map(fn(UnitType $unitType) => [
+                        'name' => $unitType->label(),
+                        'value' => $unitType->value,
+                    ]),
             ]
         ]);
     }
@@ -54,23 +63,15 @@ class MaterialController extends Controller
                 'string',
                 'alpha_dash',
                 'max:255',
-                Rule::unique('materials', 'code')
-                    ->withoutTrashed()
+                Rule::unique('materials')
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
             'unit_type' => ['required', Rule::enum(UnitType::class)],
-            'is_active' => ['required', 'boolean'],
+            'status' => ['required', Rule::enum(Status::class)],
         ]);
 
-        $material = Material::onlyTrashed()->where('code', $validated['code'])->first();
-
-        if ($material) {
-            $material->restore();
-            $material->update($validated);
-        } else {
-            Material::create($validated);
-        }
+        Material::create($validated);
 
         return back()->with('success', 'Material created successfully.');
     }
@@ -91,8 +92,17 @@ class MaterialController extends Controller
         return inertia('Tenant/Materials/Edit', [
             'material' => $material,
             'options' => [
-                'statuses' => collect(Status::cases())->map(fn(Status $status) => ['name' => $status->display(), 'value' => $status->value]),
-                'unit_types' => collect(UnitType::cases())->map(fn(UnitType $unitType) => ['name' => $unitType->display(), 'value' => $unitType->value]),
+                'statuses' => collect(Status::cases())
+                    ->map(fn(Status $status) => [
+                        'name' => $status->label(),
+                        'value' => $status->value,
+                        'is_default' => $status->value === Status::ACTIVE->value,
+                    ]),
+                'unit_types' => collect(UnitType::cases())
+                    ->map(fn(UnitType $unitType) => [
+                        'name' => $unitType->label(),
+                        'value' => $unitType->value,
+                    ]),
             ]
         ]);
     }
@@ -115,7 +125,7 @@ class MaterialController extends Controller
             ],
             'description' => ['nullable', 'string'],
             'unit_type' => ['required', Rule::enum(UnitType::class)],
-            'is_active' => ['required', 'boolean'],
+            'status' => ['required', Rule::enum(Status::class)],
         ]);
 
         $material->update($validated);

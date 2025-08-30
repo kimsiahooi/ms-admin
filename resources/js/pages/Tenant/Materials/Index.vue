@@ -33,7 +33,7 @@ defineOptions({
 const props = defineProps<{
     materials: PaginateData<Material[]>;
     options: {
-        statuses: SwitchOption<number>[];
+        statuses: SwitchOption<Material['status']>[];
         unit_types: SelectOption<Material['unit_type']>[];
     };
 }>();
@@ -108,12 +108,12 @@ const columns: ColumnDef<Material>[] = [
         },
     },
     {
-        accessorKey: 'is_active',
-        header: () => h('div', null, 'Active'),
+        accessorKey: 'status',
+        header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
-            const { is_active, is_active_display } = row.original;
+            const { status, status_label } = row.original;
 
-            return h(Badge, { variant: is_active ? 'default' : 'destructive' }, () => is_active_display);
+            return h(Badge, { variant: status ? 'default' : 'destructive' }, () => status_label);
         },
     },
     {
@@ -139,24 +139,30 @@ const columns: ColumnDef<Material>[] = [
     {
         accessorKey: 'unit_type',
         header: () => h('div', null, 'Unit Type'),
-        cell: ({ row }) => h('div', null, row.original.unit_type_display || ''),
+        cell: ({ row }) => h('div', null, row.original.unit_type_label || ''),
     },
 ];
 
-const statusDisplay = computed(() => props.options.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
+const defaultStatus = computed(() => props.options.statuses.find((status) => status.is_default)?.value);
+
+const statusDisplay = computed(() => props.options.statuses.find((status) => (form.status ? status.value : !status.value))?.name);
 
 const form = useForm<{
     name: string;
     code: string;
     description: string;
     unit_type: Material['unit_type'] | '';
-    is_active: boolean;
+    status: Material['status'];
 }>({
     name: '',
     code: '',
     description: '',
     unit_type: '',
-    is_active: true,
+    status: defaultStatus.value !== undefined ? defaultStatus.value : 1,
+});
+
+const config = reactive({
+    status: !!form.status,
 });
 
 const create = () =>
@@ -171,6 +177,17 @@ watch(
     () => form.name,
     (newName) => {
         form.code = slug(newName);
+    },
+);
+
+watch(
+    () => config.status,
+    (newVal) => {
+        const value = props.options.statuses.find((status) => (newVal ? status.value === 1 : status.value === 0))?.value;
+
+        if (value !== undefined) {
+            form.status = value;
+        }
     },
 );
 </script>
@@ -215,10 +232,10 @@ watch(
                             <div class="grid w-full max-w-sm items-center gap-1.5">
                                 <Label class="mb-1">Status</Label>
                                 <div class="flex items-center space-x-2">
-                                    <Switch class="cursor-pointer" v-model:model-value="form.is_active" />
+                                    <Switch class="cursor-pointer" v-model:model-value="config.status" />
                                     <Label>{{ statusDisplay }}</Label>
                                 </div>
-                                <p v-if="form.errors.is_active" class="text-destructive">{{ form.errors.is_active }}</p>
+                                <p v-if="form.errors.status" class="text-destructive">{{ form.errors.status }}</p>
                             </div>
                             <div class="flex gap-2">
                                 <Button type="submit" class="cursor-pointer" :disabled="form.processing">

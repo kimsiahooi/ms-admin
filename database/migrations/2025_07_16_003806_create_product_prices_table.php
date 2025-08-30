@@ -1,6 +1,7 @@
 <?php
 
-use App\enums\Tenant\Product\Currency;
+use App\enums\Tenant\Product\Price\Currency;
+use App\enums\Tenant\Product\Price\Status;
 use App\Models\Tenant;
 use App\Models\Tenant\Product;
 use Illuminate\Database\Migrations\Migration;
@@ -18,9 +19,9 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->enum('currency', array_column(Currency::cases(), 'value'));
             $table->decimal('amount');
-            $table->boolean('is_active')->default(true);
-            $table->foreignIdFor(Product::class)->constrained();
-            $table->foreignIdFor(Tenant::class)->constrained();
+            $table->integer('status')->default(Status::ACTIVE->value);
+            $table->foreignIdFor(Product::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Tenant::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
 

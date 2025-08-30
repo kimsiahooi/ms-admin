@@ -28,11 +28,17 @@ class ProductController extends Controller
         return inertia('Tenant/Products/Index', [
             'products' => $products,
             'options' => [
-                'statuses' => collect(Status::cases())->map(fn($status) => [
-                    'name' => $status->display(),
-                    'value' => $status->value,
-                ]),
-                'shelf_life_types' => collect(ShelfLifeType::cases())->map(fn(ShelfLifeType $shelfLifeType) => ['name' => $shelfLifeType->display(), 'value' => $shelfLifeType->value]),
+                'statuses' => collect(Status::cases())
+                    ->map(fn($status) => [
+                        'name' => $status->label(),
+                        'value' => $status->value,
+                        'is_default' => $status->value === Status::ACTIVE->value,
+                    ]),
+                'shelf_life_types' => collect(ShelfLifeType::cases())
+                    ->map(fn(ShelfLifeType $shelfLifeType) => [
+                        'name' => $shelfLifeType->label(),
+                        'value' => $shelfLifeType->value,
+                    ]),
             ],
         ]);
     }
@@ -57,8 +63,7 @@ class ProductController extends Controller
                 'string',
                 'alpha_dash',
                 'max:255',
-                Rule::unique('products', 'code')
-                    ->withoutTrashed()
+                Rule::unique('products')
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
@@ -68,17 +73,10 @@ class ProductController extends Controller
                 'required_with:shelf_life_duration',
                 Rule::enum(ShelfLifeType::class)
             ],
-            'is_active' => ['required', 'boolean'],
+            'status' => ['required', Rule::enum(Status::class)],
         ]);
 
-        $product = Product::onlyTrashed()->where('code', $validated['code'])->first();
-
-        if ($product) {
-            $product->restore();
-            $product->update($validated);
-        } else {
-            $product = Product::create($validated);
-        }
+        Product::create($validated);
 
         return back()->with('success', 'Product created successfully.');
     }
@@ -99,11 +97,17 @@ class ProductController extends Controller
         return inertia('Tenant/Products/Edit', [
             'product' => $product,
             'options' => [
-                'statuses' => collect(Status::cases())->map(fn($status) => [
-                    'name' => $status->display(),
-                    'value' => $status->value,
-                ]),
-                'shelf_life_types' => collect(ShelfLifeType::cases())->map(fn(ShelfLifeType $shelfLifeType) => ['name' => $shelfLifeType->display(), 'value' => $shelfLifeType->value]),
+                'statuses' => collect(Status::cases())
+                    ->map(fn($status) => [
+                        'name' => $status->label(),
+                        'value' => $status->value,
+                        'is_default' => $status->value === Status::ACTIVE->value,
+                    ]),
+                'shelf_life_types' => collect(ShelfLifeType::cases())
+                    ->map(fn(ShelfLifeType $shelfLifeType) => [
+                        'name' => $shelfLifeType->label(),
+                        'value' => $shelfLifeType->value
+                    ]),
             ],
         ]);
     }
@@ -120,12 +124,12 @@ class ProductController extends Controller
                 'string',
                 'alpha_dash',
                 'max:255',
-                Rule::unique('products', 'code')
+                Rule::unique('products')
                     ->ignore($product->id, 'id')
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
-            'is_active' => ['required', 'boolean'],
+            'status' => ['required', Rule::enum(Status::class)],
             'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type', 'numeric', 'min:0.01'],
             'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::enum(ShelfLifeType::class)],
         ]);

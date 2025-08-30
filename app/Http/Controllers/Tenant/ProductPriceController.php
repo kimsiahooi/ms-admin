@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Tenant;
 
-use App\enums\Tenant\Product\Currency;
+use App\enums\Tenant\Product\Price\Currency;
 use App\enums\Tenant\Product\Price\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Product;
@@ -30,11 +30,17 @@ class ProductPriceController extends Controller
             'product' => $product,
             'prices' => $prices,
             'options' => [
-                'statuses' => collect(Status::cases())->map(fn($status) => [
-                    'name' => $status->display(),
-                    'value' => $status->value,
-                ]),
-                'currencies' => collect(Currency::cases())->map(fn(Currency $currency) => ['name' => $currency->value, 'value' => $currency->value]),
+                'statuses' => collect(Status::cases())
+                    ->map(fn($status) => [
+                        'name' => $status->label(),
+                        'value' => $status->value,
+                        'is_default' => $status->value === Status::ACTIVE->value,
+                    ]),
+                'currencies' => collect(Currency::cases())
+                    ->map(fn(Currency $currency) => [
+                        'name' => $currency->value,
+                        'value' => $currency->value
+                    ]),
             ],
         ]);
     }
@@ -56,23 +62,16 @@ class ProductPriceController extends Controller
             'currency' => [
                 'required',
                 Rule::enum(Currency::class),
-                Rule::unique('product_prices', 'currency')
-                    ->withoutTrashed()
-                    ->where('tenant_id', tenant('id'))
+                Rule::unique('product_prices')
                     ->where('product_id', $product->id)
+                    ->where('tenant_id', $product->tenant_id)
+                    ->where('tenant_id', tenant('id'))
             ],
             'amount' => ['required', 'min:0', 'numeric'],
-            'is_active' => ['required', 'boolean'],
+            'status' => ['required', Rule::enum(Status::class)],
         ]);
 
-        $price = ProductPrice::onlyTrashed()->where('currency', $validated['currency'])->first();
-
-        if ($price) {
-            $price->restore();
-            $price->update($validated);
-        } else {
-            $product->prices()->create($validated);
-        }
+        $product->prices()->create($validated);
 
         return back()->with('success', 'Product price created successfully.');
     }
@@ -94,11 +93,17 @@ class ProductPriceController extends Controller
             'product' => $product,
             'price' => $price,
             'options' => [
-                'statuses' => collect(Status::cases())->map(fn($status) => [
-                    'name' => $status->display(),
-                    'value' => $status->value,
-                ]),
-                'currencies' => collect(Currency::cases())->map(fn(Currency $currency) => ['name' => $currency->value, 'value' => $currency->value]),
+                'statuses' => collect(Status::cases())
+                    ->map(fn($status) => [
+                        'name' => $status->label(),
+                        'value' => $status->value,
+                        'is_default' => $status->value === Status::ACTIVE->value,
+                    ]),
+                'currencies' => collect(Currency::cases())
+                    ->map(fn(Currency $currency) => [
+                        'name' => $currency->value,
+                        'value' => $currency->value
+                    ]),
             ],
         ]);
     }
@@ -112,14 +117,14 @@ class ProductPriceController extends Controller
             'currency' => [
                 'required',
                 Rule::enum(Currency::class),
-                Rule::unique('product_prices', 'currency')
+                Rule::unique('product_prices')
                     ->ignore($price->id, 'id')
-                    ->withoutTrashed()
-                    ->where('tenant_id', tenant('id'))
                     ->where('product_id', $product->id)
+                    ->where('tenant_id', $product->tenant_id)
+                    ->where('tenant_id', tenant('id'))
             ],
             'amount' => ['required', 'min:0', 'numeric'],
-            'is_active' => ['required', 'boolean'],
+            'status' => ['required', Rule::enum(Status::class)],
         ]);
 
         $price->update($validated);

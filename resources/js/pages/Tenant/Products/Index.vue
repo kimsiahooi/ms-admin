@@ -18,8 +18,7 @@ import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import type { Material } from '@/types/Tenant/materials';
-import type { Product, ProductPrice } from '@/types/Tenant/products';
+import type { Product } from '@/types/Tenant/products';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
@@ -34,9 +33,7 @@ defineOptions({
 const props = defineProps<{
     products: PaginateData<Product[]>;
     options: {
-        statuses: SwitchOption<number>[];
-        materials: SelectOption<Material['id']>[];
-        currencies: SelectOption<ProductPrice['currency']>[];
+        statuses: SwitchOption<Product['status']>[];
         shelf_life_types: SelectOption<Product['shelf_life_type']>[];
     };
 }>();
@@ -126,12 +123,12 @@ const columns: ColumnDef<Product>[] = [
         },
     },
     {
-        accessorKey: 'is_active',
-        header: () => h('div', null, 'Active'),
+        accessorKey: 'status',
+        header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
-            const { is_active, is_active_display } = row.original;
+            const { status, status_label } = row.original;
 
-            return h(Badge, { variant: is_active ? 'default' : 'destructive' }, () => is_active_display);
+            return h(Badge, { variant: status ? 'default' : 'destructive' }, () => status_label);
         },
     },
     {
@@ -162,11 +159,13 @@ const columns: ColumnDef<Product>[] = [
     {
         accessorKey: 'shelf_life_type',
         header: () => h('div', null, 'Shelf Life Type'),
-        cell: ({ row }) => h('div', null, row.original.shelf_life_type_display || ''),
+        cell: ({ row }) => h('div', null, row.original.shelf_life_type_label || ''),
     },
 ];
 
-const statusDisplay = computed(() => props.options.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
+const defaultStatus = computed(() => props.options.statuses.find((status) => status.is_default)?.value);
+
+const statusDisplay = computed(() => props.options.statuses.find((status) => (form.status ? status.value : !status.value))?.name);
 
 const form = useForm<{
     name: string;
@@ -174,14 +173,18 @@ const form = useForm<{
     description: string;
     shelf_life_duration: string;
     shelf_life_type: Product['shelf_life_type'] | '';
-    is_active: boolean;
+    status: Product['status'];
 }>({
     name: '',
     code: '',
     description: '',
     shelf_life_duration: '',
     shelf_life_type: '',
-    is_active: true,
+    status: defaultStatus.value !== undefined ? defaultStatus.value : 1,
+});
+
+const config = reactive({
+    status: !!form.status,
 });
 
 const create = () =>
@@ -196,6 +199,17 @@ watch(
     () => form.name,
     (newName) => {
         form.code = slug(newName);
+    },
+);
+
+watch(
+    () => config.status,
+    (newVal) => {
+        const value = props.options.statuses.find((status) => (newVal ? status.value === 1 : status.value === 0))?.value;
+
+        if (value !== undefined) {
+            form.status = value;
+        }
     },
 );
 </script>
@@ -256,10 +270,10 @@ watch(
                             <div class="grid w-full max-w-sm items-center gap-1.5">
                                 <Label class="mb-1">Status</Label>
                                 <div class="flex items-center space-x-2">
-                                    <Switch class="cursor-pointer" v-model:model-value="form.is_active" />
+                                    <Switch class="cursor-pointer" v-model:model-value="config.status" />
                                     <Label>{{ statusDisplay }}</Label>
                                 </div>
-                                <p v-if="form.errors.is_active" class="text-destructive">{{ form.errors.is_active }}</p>
+                                <p v-if="form.errors.status" class="text-destructive">{{ form.errors.status }}</p>
                             </div>
                             <div class="flex gap-2">
                                 <Button type="submit" class="cursor-pointer" :disabled="form.processing">

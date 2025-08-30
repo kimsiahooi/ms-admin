@@ -27,12 +27,14 @@ class MachineController extends Controller
         return inertia('Tenant/Machines/Index', [
             'machines' => $machines,
             'options' => [
-                'statuses' => collect(Status::cases())->map(function ($status) {
-                    return [
-                        'name' => $status->display(),
-                        'value' => $status->value,
-                    ];
-                }),
+                'statuses' => collect(Status::cases())
+                    ->map(function ($status) {
+                        return [
+                            'name' => $status->label(),
+                            'value' => $status->value,
+                            'is_default' => $status->value === Status::ACTIVE->value,
+                        ];
+                    }),
             ]
         ]);
     }
@@ -57,22 +59,14 @@ class MachineController extends Controller
                 'string',
                 'alpha_dash',
                 'max:255',
-                Rule::unique('machines', 'code')
-                    ->withoutTrashed()
+                Rule::unique('machines')
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
-            'is_active' => ['required', 'boolean'],
+            'status' => ['required', Rule::enum(Status::class)],
         ]);
 
-        $machine = Machine::onlyTrashed()->where('code', $validated['code'])->first();
-
-        if ($machine) {
-            $machine->restore();
-            $machine->update($validated);
-        } else {
-            Machine::create($validated);
-        }
+        Machine::create($validated);
 
         return back()->with('success', 'Machine created successfully.');
     }
@@ -93,12 +87,14 @@ class MachineController extends Controller
         return inertia('Tenant/Machines/Edit', [
             'machine' => $machine,
             'options' => [
-                'statuses' => collect(Status::cases())->map(function ($status) {
-                    return [
-                        'name' => $status->display(),
-                        'value' => $status->value,
-                    ];
-                }),
+                'statuses' => collect(Status::cases())
+                    ->map(function ($status) {
+                        return [
+                            'name' => $status->label(),
+                            'value' => $status->value,
+                            'is_default' => $status->value === Status::ACTIVE->value,
+                        ];
+                    }),
             ]
         ]);
     }
@@ -115,13 +111,12 @@ class MachineController extends Controller
                 'string',
                 'alpha_dash',
                 'max:255',
-                Rule::unique('machines', 'code')
+                Rule::unique('machines')
                     ->ignore($machine->id)
-                    ->withoutTrashed()
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
-            'is_active' => ['required', 'boolean'],
+            'status' => ['required', Rule::enum(Status::class)],
         ]);
 
         $machine->update($validated);

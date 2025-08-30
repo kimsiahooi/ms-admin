@@ -17,11 +17,11 @@ return new class extends Migration
     {
         Schema::create('bom_material', function (Blueprint $table) {
             $table->ulid('id')->primary();
-            $table->foreignIdFor(Bom::class)->constrained();
-            $table->foreignIdFor(Material::class)->constrained();
+            $table->foreignIdFor(Bom::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Material::class)->constrained()->cascadeOnDelete();
             $table->decimal('quantity');
-            $table->enum('unit_type', array_column(UnitType::cases(), 'value'));
-            $table->foreignIdFor(Tenant::class)->constrained();
+            $table->integer('unit_type');
+            $table->foreignIdFor(Tenant::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
 

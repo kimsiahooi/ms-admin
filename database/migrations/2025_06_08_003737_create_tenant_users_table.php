@@ -13,12 +13,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tenant_users', function (Blueprint $table) {
-            $table->id();
+            $table->ulid('id')->primary();
             $table->string('name');
             $table->string('email');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->foreignIdFor(Tenant::class)->constrained();
+            $table->foreignIdFor(Tenant::class)->constrained()->cascadeOnDelete();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

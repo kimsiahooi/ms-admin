@@ -14,18 +14,11 @@ class Bom extends Model
     /** @use HasFactory<\Database\Factories\Tenant\BomFactory> */
     use HasFactory, BelongsToTenant, SoftDeletes, HasUlids;
 
-    protected $fillable = ['name', 'code', 'description', 'is_active', 'product_id', 'tenant_id'];
+    protected $fillable = ['name', 'code', 'description', 'status', 'product_id', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
-    protected $appends = ['is_active_display'];
-
-    protected function casts(): array
-    {
-        return [
-            'is_active' => 'boolean'
-        ];
-    }
+    protected $appends = ['status_label'];
 
     public function product()
     {
@@ -41,8 +34,8 @@ class Bom extends Model
             ->using(BomMaterial::class);
     }
 
-    protected function getIsActiveDisplayAttribute(): string | null
+    protected function getStatusLabelAttribute(): string | null
     {
-        return Status::tryFrom($this->is_active)?->display();
+        return Status::tryFrom($this->status)?->label();
     }
 }

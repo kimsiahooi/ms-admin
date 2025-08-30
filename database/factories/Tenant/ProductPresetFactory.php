@@ -4,6 +4,7 @@ namespace Database\Factories\Tenant;
 
 use App\enums\Tenant\Product\Preset\CavityType;
 use App\enums\Tenant\Product\Preset\CycleTimeType;
+use App\enums\Tenant\Product\Preset\Status;
 use App\Models\Tenant\Machine;
 use App\Models\Tenant\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -35,7 +36,7 @@ class ProductPresetFactory extends Factory
             'cavity_type' => fake()->randomElement(CavityType::cases()),
             'cycle_time' => fake()->randomFloat(2, 0, 10),
             'cycle_time_type' => fake()->randomElement(CycleTimeType::cases()),
-            'is_active' => fake()->boolean(),
+            'status' => fake()->randomElement(Status::cases()),
         ];
     }
 }

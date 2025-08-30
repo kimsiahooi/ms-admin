@@ -12,7 +12,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { Machine } from '@/types/Tenant/machines';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Loader } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -21,7 +21,7 @@ defineOptions({
 const props = defineProps<{
     machine: Machine;
     options: {
-        statuses: SwitchOption<number>[];
+        statuses: SwitchOption<Machine['status']>[];
     };
 }>();
 
@@ -46,16 +46,31 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const statusDisplay = computed(() => props.options.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
+const statusDisplay = computed(() => props.options.statuses.find((status) => (form.status ? status.value : !status.value))?.name);
 
 const form = useForm({
     name: props.machine.name,
     code: props.machine.code,
     description: props.machine.description || '',
-    is_active: props.machine.is_active,
+    status: props.machine.status,
+});
+
+const config = reactive({
+    status: !!form.status,
 });
 
 const submit = () => form.put(route('machines.update', { tenant: tenant?.id || '', machine: props.machine.id }));
+
+watch(
+    () => config.status,
+    (newVal) => {
+        const value = props.options.statuses.find((status) => (newVal ? status.value === 1 : status.value === 0))?.value;
+
+        if (value !== undefined) {
+            form.status = value;
+        }
+    },
+);
 </script>
 
 <template>
@@ -83,10 +98,10 @@ const submit = () => form.put(route('machines.update', { tenant: tenant?.id || '
                     <div class="grid w-full items-center gap-1.5">
                         <Label class="mb-1">Status</Label>
                         <div class="flex items-center space-x-2">
-                            <Switch class="cursor-pointer" v-model:model-value="form.is_active" />
+                            <Switch class="cursor-pointer" v-model:model-value="config.status" />
                             <Label>{{ statusDisplay }}</Label>
                         </div>
-                        <p v-if="form.errors.is_active" class="text-destructive">{{ form.errors.is_active }}</p>
+                        <p v-if="form.errors.status" class="text-destructive">{{ form.errors.status }}</p>
                     </div>
                     <div>
                         <Button type="submit" class="cursor-pointer" :disabled="form.processing">

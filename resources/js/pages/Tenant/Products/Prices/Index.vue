@@ -22,7 +22,7 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
 import { Loader, Pencil, Trash2 } from 'lucide-vue-next';
-import { computed, h, reactive } from 'vue';
+import { computed, h, reactive, watch } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -32,8 +32,8 @@ const props = defineProps<{
     product: Product;
     prices: PaginateData<ProductPrice[]>;
     options: {
-        statuses: SwitchOption<number>[];
-        currencies: SelectOption<string>[];
+        statuses: SwitchOption<ProductPrice['status']>[];
+        currencies: SelectOption<ProductPrice['currency']>[];
     };
 }>();
 
@@ -118,12 +118,12 @@ const columns: ColumnDef<ProductPrice>[] = [
         },
     },
     {
-        accessorKey: 'is_active',
+        accessorKey: 'status',
         header: () => h('div', null, 'Active'),
         cell: ({ row }) => {
-            const { is_active, is_active_display } = row.original;
+            const { status, status_label } = row.original;
 
-            return h(Badge, { variant: is_active ? 'default' : 'destructive' }, () => is_active_display);
+            return h(Badge, { variant: status ? 'default' : 'destructive' }, () => status_label);
         },
     },
     {
@@ -143,16 +143,22 @@ const columns: ColumnDef<ProductPrice>[] = [
     },
 ];
 
-const statusDisplay = computed(() => props.options.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
+const defaultStatus = computed(() => props.options.statuses.find((status) => status.is_default)?.value);
+
+const statusDisplay = computed(() => props.options.statuses.find((status) => (form.status ? status.value : !status.value))?.name);
 
 const form = useForm<{
     currency: string;
     amount: number | '';
-    is_active: boolean;
+    status: ProductPrice['status'];
 }>({
     currency: '',
     amount: '',
-    is_active: true,
+    status: defaultStatus.value !== undefined ? defaultStatus.value : 1,
+});
+
+const config = reactive({
+    status: !!form.status,
 });
 
 const create = () =>
@@ -162,6 +168,17 @@ const create = () =>
             setting.create.dialogIsOpen = false;
         },
     });
+
+watch(
+    () => config.status,
+    (newVal) => {
+        const value = props.options.statuses.find((status) => (newVal ? status.value === 1 : status.value === 0))?.value;
+
+        if (value !== undefined) {
+            form.status = value;
+        }
+    },
+);
 </script>
 
 <template>
@@ -194,10 +211,10 @@ const create = () =>
                             <div class="grid w-full max-w-sm items-center gap-1.5">
                                 <Label class="mb-1">Status</Label>
                                 <div class="flex items-center space-x-2">
-                                    <Switch class="cursor-pointer" v-model:model-value="form.is_active" />
+                                    <Switch class="cursor-pointer" v-model:model-value="config.status" />
                                     <Label>{{ statusDisplay }}</Label>
                                 </div>
-                                <p v-if="form.errors.is_active" class="text-destructive">{{ form.errors.is_active }}</p>
+                                <p v-if="form.errors.status" class="text-destructive">{{ form.errors.status }}</p>
                             </div>
                             <div class="flex gap-2">
                                 <Button type="submit" class="cursor-pointer" :disabled="form.processing">

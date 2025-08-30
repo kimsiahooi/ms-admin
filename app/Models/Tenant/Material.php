@@ -5,6 +5,7 @@ namespace App\Models\Tenant;
 use App\enums\Tenant\Material\Status;
 use App\enums\Tenant\Material\UnitType;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,36 +17,33 @@ class Material extends Model
     /** @use HasFactory<\Database\Factories\Tenant\MaterialFactory> */
     use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
-    protected $fillable = ['name', 'code', 'description', 'unit_type', 'is_active', 'tenant_id'];
+    protected $fillable = ['name', 'code', 'description', 'unit_type', 'status', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
-    protected $appends = ['unit_type_display', 'is_active_display'];
-
-    protected function casts(): array
-    {
-        return [
-            'is_active' => 'boolean',
-        ];
-    }
+    protected $appends = ['unit_type_label', 'status_label'];
 
     public function boms()
     {
         return $this->belongsToMany(Bom::class)->withTimestamps()->using(BomMaterial::class);
     }
 
-    protected function getUnitTypeDisplayAttribute(): string | null
+    protected function unitTypeLabel(): Attribute
     {
-        return UnitType::tryFrom($this->unit_type)?->display();
+        return Attribute::make(
+            get: fn($value, $attributes) => UnitType::tryFrom($attributes['unit_type'])?->label(),
+        );
     }
 
-    protected function getIsActiveDisplayAttribute(): string | null
+    protected function statusLabel(): Attribute
     {
-        return Status::tryFrom($this->is_active)?->display();
+        return Attribute::make(
+            get: fn($value, $attributes) => Status::tryFrom($attributes['status'])?->label(),
+        );
     }
 
     public function scopeActive(Builder $query): void
     {
-        $query->where('is_active', true);
+        $query->where('status', Status::ACTIVE->value);
     }
 }

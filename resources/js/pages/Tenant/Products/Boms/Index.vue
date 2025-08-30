@@ -99,12 +99,12 @@ const columns: ColumnDef<ProductBom>[] = [
         },
     },
     {
-        accessorKey: 'is_active',
-        header: () => h('div', null, 'Active'),
+        accessorKey: 'status',
+        header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
-            const { is_active, is_active_display } = row.original;
+            const { status, status_label } = row.original;
 
-            return h(Badge, { variant: is_active ? 'default' : 'destructive' }, () => is_active_display);
+            return h(Badge, { variant: status ? 'default' : 'destructive' }, () => status_label);
         },
     },
     {

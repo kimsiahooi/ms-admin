@@ -19,6 +19,7 @@ class CreateTenantsTable extends Migration
             $table->string('id')->primary();
             $table->string('name');
             $table->timestamps();
+            $table->softDeletes();
             $table->json('data')->nullable();
         });
     }

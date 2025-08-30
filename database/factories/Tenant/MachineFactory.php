@@ -2,6 +2,7 @@
 
 namespace Database\Factories\Tenant;
 
+use App\enums\Tenant\Machine\Status;
 use App\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -24,7 +25,7 @@ class MachineFactory extends Factory
             'name' => $name,
             'code' => Str::slug($name),
             'description' => fake()->sentence(),
-            'is_active' => fake()->boolean(),
+            'status' => fake()->randomElement(Status::cases()),
             'tenant_id' => Tenant::inRandomOrder()->first(),
         ];
     }

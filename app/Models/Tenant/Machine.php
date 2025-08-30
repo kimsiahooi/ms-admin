@@ -4,6 +4,7 @@ namespace App\Models\Tenant;
 
 use App\enums\Tenant\Machine\Status;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,26 +16,21 @@ class Machine extends Model
     /** @use HasFactory<\Database\Factories\Tenant\MachineFactory> */
     use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
-    protected $fillable = ['name', 'code', 'description', 'is_active', 'tenant_id'];
+    protected $fillable = ['name', 'code', 'description', 'status', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
-    protected $appends = ['is_active_display'];
+    protected $appends = ['status_label'];
 
-    protected function casts(): array
+    protected function statusLabel(): Attribute
     {
-        return [
-            'is_active' => 'boolean',
-        ];
-    }
-
-    protected function getIsActiveDisplayAttribute(): string | null
-    {
-        return Status::tryFrom($this->is_active)?->display();
+        return Attribute::make(
+            get: fn($value, $attributes) => Status::tryFrom($attributes['status'])?->label(),
+        );
     }
 
     public function scopeActive(Builder $query): void
     {
-        $query->where('is_active', true);
+        $query->where('status', Status::ACTIVE->value);
     }
 }

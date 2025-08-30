@@ -3,6 +3,7 @@
 namespace Database\Factories\Tenant;
 
 use App\enums\Tenant\Product\ShelfLifeType;
+use App\enums\Tenant\Product\Status;
 use App\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -28,7 +29,7 @@ class ProductFactory extends Factory
             'description' => fake()->sentence(),
             'shelf_life_duration' => $shelfLifeDuration,
             'shelf_life_type' => $shelfLifeDuration ? fake()->randomElement(ShelfLifeType::cases()) : null,
-            'is_active' => fake()->boolean(),
+            'status' => fake()->randomElement(Status::cases()),
             'tenant_id' => Tenant::inRandomOrder()->first(),
         ];
     }

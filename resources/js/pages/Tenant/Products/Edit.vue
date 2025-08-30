@@ -11,11 +11,10 @@ import { useTenant } from '@/composables/useTenant';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import type { Material } from '@/types/Tenant/materials';
-import type { Product, ProductPrice } from '@/types/Tenant/products';
+import type { Product } from '@/types/Tenant/products';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Loader } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -24,9 +23,7 @@ defineOptions({
 const props = defineProps<{
     product: Product;
     options: {
-        statuses: SwitchOption<number>[];
-        materials: SelectOption<Material['id']>[];
-        currencies: SelectOption<ProductPrice['currency']>[];
+        statuses: SwitchOption<Product['status']>[];
         shelf_life_types: SelectOption<Product['shelf_life_type']>[];
     };
 }>();
@@ -52,7 +49,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const statusDisplay = computed(() => props.options.statuses.find((status) => (form.is_active ? status.value : !status.value))?.name);
+const statusDisplay = computed(() => props.options.statuses.find((status) => (form.status ? status.value : !status.value))?.name);
 
 const form = useForm<{
     name: string;
@@ -60,17 +57,32 @@ const form = useForm<{
     description: string;
     shelf_life_duration: string;
     shelf_life_type: Product['shelf_life_type'] | '';
-    is_active: boolean;
+    status: Product['status'];
 }>({
     name: props.product.name,
     code: props.product.code,
     description: props.product.description || '',
     shelf_life_duration: props.product.shelf_life_duration || '',
     shelf_life_type: props.product.shelf_life_type || '',
-    is_active: true,
+    status: props.product.status,
+});
+
+const config = reactive({
+    status: !!form.status,
 });
 
 const submit = () => form.put(route('products.update', { tenant: tenant?.id || '', product: props.product.id }));
+
+watch(
+    () => config.status,
+    (newVal) => {
+        const value = props.options.statuses.find((status) => (newVal ? status.value === 1 : status.value === 0))?.value;
+
+        if (value !== undefined) {
+            form.status = value;
+        }
+    },
+);
 </script>
 
 <template>
@@ -124,10 +136,10 @@ const submit = () => form.put(route('products.update', { tenant: tenant?.id || '
                     <div class="grid w-full items-center gap-1.5">
                         <Label class="mb-1">Status</Label>
                         <div class="flex items-center space-x-2">
-                            <Switch class="cursor-pointer" v-model:model-value="form.is_active" />
+                            <Switch class="cursor-pointer" v-model:model-value="config.status" />
                             <Label>{{ statusDisplay }}</Label>
                         </div>
-                        <p v-if="form.errors.is_active" class="text-destructive">{{ form.errors.is_active }}</p>
+                        <p v-if="form.errors.status" class="text-destructive">{{ form.errors.status }}</p>
                     </div>
                     <div>
                         <Button type="submit" class="cursor-pointer" :disabled="form.processing">

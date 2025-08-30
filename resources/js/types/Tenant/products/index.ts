@@ -6,11 +6,11 @@ export interface Product {
     name: string;
     code: string;
     description: string | null;
-    is_active: boolean;
-    is_active_display?: string | null;
+    status: number;
+    status_label?: string | null;
     shelf_life_duration: string | null;
-    shelf_life_type: 'SECOND' | 'MINUTE' | 'HOUR' | 'DAY' | 'MONTH' | 'YEAR' | null;
-    shelf_life_type_display?: string | null;
+    shelf_life_type: number | null;
+    shelf_life_type_label?: string | null;
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;
@@ -181,8 +181,8 @@ export interface ProductPrice {
         | 'ZMW'
         | 'ZWL';
     amount: string;
-    is_active: boolean;
-    is_active_display?: string | null;
+    status: number;
+    status_label?: string | null;
     product_id: Product['id'];
     created_at: Date | null;
     updated_at: Date | null;
@@ -201,13 +201,13 @@ export interface ProductPreset {
     code: string;
     description: string | null;
     cavity_quantity: string;
-    cavity_type: 'PCS' | 'KILOGRAM' | 'GRAM';
+    cavity_type: number;
     cycle_time: string;
-    cycle_time_type: 'MILLISECOND' | 'SECOND' | 'MINUTE' | 'HOUR' | 'DAY' | 'MONTH' | 'YEAR';
-    cycle_time_type_display?: string | null;
-    is_active: boolean;
-    is_active_display?: string | null;
-    cavity_type_display?: string | null;
+    cycle_time_type: number;
+    cycle_time_type_label?: string | null;
+    status: number;
+    status_label?: string | null;
+    cavity_type_label?: string | null;
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;
@@ -231,7 +231,8 @@ export interface ProductBom {
     name: string;
     code: string;
     description: string | null;
-    is_active: boolean;
+    status: number;
+    status_label?: string | null;
     product_id: Product['id'];
     created_at: Date | null;
     updated_at: Date | null;

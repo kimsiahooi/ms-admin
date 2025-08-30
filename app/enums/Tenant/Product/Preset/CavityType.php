@@ -2,18 +2,18 @@
 
 namespace App\enums\Tenant\Product\Preset;
 
-enum CavityType: string
+enum CavityType: int
 {
-    case PCS = 'PCS';
-    case KILOGRAM = 'KILOGRAM';
-    case GRAM = 'GRAM';
+    case PCS = 1;
+    case GRAM = 2;
+    case KILOGRAM = 3;
 
-    public function display(): string
+    public function label(): string
     {
         return match ($this) {
             self::PCS => 'Pcs',
-            self::KILOGRAM => 'Kilogram',
             self::GRAM => 'Gram',
+            self::KILOGRAM => 'Kilogram',
         };
     }
 }

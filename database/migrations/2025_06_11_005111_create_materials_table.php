@@ -1,6 +1,6 @@
 <?php
 
-use App\enums\Tenant\Material\UnitType;
+use App\enums\Tenant\Material\Status;
 use App\Models\Tenant;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('code');
             $table->text('description')->nullable();
-            $table->enum('unit_type', array_column(UnitType::cases(), 'value'));
-            $table->boolean('is_active')->default(true);
-            $table->foreignIdFor(Tenant::class)->constrained();
+            $table->integer('unit_type');
+            $table->integer('status')->default(Status::ACTIVE->value);
+            $table->foreignIdFor(Tenant::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
 

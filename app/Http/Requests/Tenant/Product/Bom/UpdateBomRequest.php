@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Tenant\Product\Bom;
 
 use App\enums\Tenant\Material\UnitType;
+use App\enums\Tenant\Product\Bom\Status;
 use App\Models\Tenant\Material;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -31,20 +32,20 @@ class UpdateBomRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('boms', 'code')
+                Rule::unique('boms')
                     ->ignore($this->bom->id)
-                    ->withoutTrashed()
+                    ->where('tenant_id', $this->product->tenant_id)
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
-            'is_active' => ['required', 'boolean'],
+            'status' => ['required', Rule::enum(Status::class)],
             'materials' => ['required', 'array'],
             'materials.*.id' => [
                 'required',
                 'distinct',
-                Rule::exists('materials', 'id')
-                    ->withoutTrashed()
-                    ->where('is_active', true)
+                Rule::exists('materials')
+                    ->where('status', Status::ACTIVE->value)
+                    ->where('tenant_id', $this->product->tenant_id)
                     ->where('tenant_id', tenant('id'))
 
             ],
