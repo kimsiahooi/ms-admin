@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\Product\Bom\StoreBomRequest;
 use App\Http\Requests\Tenant\Product\Bom\UpdateBomRequest;
 use App\Models\Tenant\Bom;
-use App\Models\Tenant\BomMaterial;
 use App\Models\Tenant\Material;
 use App\Models\Tenant\Product;
 use Illuminate\Http\Request;
@@ -39,11 +38,13 @@ class ProductBomController extends Controller
      */
     public function create(Request $request, Product $product)
     {
-        $materials = Material::active()->get();
+        $materials = Material::all();
+        $activeMaterials = Material::active()->get();
 
         return inertia('Tenant/Products/Boms/Create', [
             'product' => $product,
             'materials' => $materials,
+            'active_materials' => $activeMaterials,
             'options' => [
                 'statuses' => collect(Status::cases())
                     ->map(fn(Status $status) => [
@@ -95,12 +96,14 @@ class ProductBomController extends Controller
      */
     public function edit(Request $request, Product $product, Bom $bom)
     {
-        $materials = Material::active()->get();
+        $materials = Material::all();
+        $activeMaterials = Material::active()->get();
 
         return inertia('Tenant/Products/Boms/Edit', [
             'product' => $product,
             'bom' => $bom->load(['materials']),
             'materials' => $materials,
+            'active_materials' => $activeMaterials,
             'options' => [
                 'statuses' => collect(Status::cases())
                     ->map(fn(Status $status) => [

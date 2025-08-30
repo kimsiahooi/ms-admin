@@ -27,6 +27,7 @@ defineOptions({
 const props = defineProps<{
     product: Product;
     materials: Material[];
+    active_materials: Material[];
     options: {
         statuses: SwitchOption<ProductBom['status']>[];
         unit_types: SelectOption<Material['unit_type']>[];
@@ -70,7 +71,9 @@ const selectedMaterials = ref<MaterialConfig[]>([{ ...materialConfig, key: uuid(
 const defaultStatus = computed(() => props.options.statuses.find((status) => status.is_default)?.value);
 
 const statusDisplay = computed(() => props.options.statuses.find((status) => (form.status ? status.value : !status.value))?.name);
-const materialOptions = computed<SelectOption<Material>[]>(() => props.materials.map((material) => ({ name: material.name, value: material })));
+const materialOptions = computed<SelectOption<Material>[]>(() =>
+    props.active_materials.map((material) => ({ name: material.name, value: material })),
+);
 
 const form = useForm<{
     name: string;
