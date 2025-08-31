@@ -1,0 +1,136 @@
+<?php
+
+namespace App\Http\Controllers\Tenant;
+
+use App\Enums\Tenant\Company\Status;
+use App\Http\Controllers\Controller;
+use App\Models\Tenant\Company;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+
+class CompanyController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+        $entries = $request->input('entries', 10);
+
+        $companies = Company::when($request->search, function (Builder $query, $search) {
+            $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");
+        })->latest()
+            ->paginate($entries)
+            ->withQueryString();
+
+        return inertia('Tenant/Companies/Index', [
+            'companies' => $companies,
+            'options' => [
+                'statuses' => collect(Status::cases())
+                    ->map(function ($status) {
+                        return [
+                            'name' => $status->label(),
+                            'value' => $status->value,
+                            'is_default' => $status->value === Status::ACTIVE->value,
+                        ];
+                    }),
+            ]
+        ]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'code' => [
+                'required',
+                'string',
+                'alpha_dash',
+                'max:255',
+                Rule::unique('companies')
+                    ->where('tenant_id', tenant('id'))
+            ],
+            'description' => ['nullable', 'string'],
+            'status' => ['required', Rule::enum(Status::class)],
+        ]);
+
+        Company::create($validated);
+
+        return back()->with('success', 'Company created successfully.');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Company $company)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Company $company)
+    {
+        return inertia('Tenant/Companies/Edit', [
+            'company' => $company,
+            'options' => [
+                'statuses' => collect(Status::cases())
+                    ->map(function ($status) {
+                        return [
+                            'name' => $status->label(),
+                            'value' => $status->value,
+                            'is_default' => $status->value === Status::ACTIVE->value,
+                        ];
+                    }),
+            ]
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Company $company)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'code' => [
+                'required',
+                'string',
+                'alpha_dash',
+                'max:255',
+                Rule::unique('companies')
+                    ->ignore($company->id)
+                    ->where('tenant_id', tenant('id'))
+            ],
+            'description' => ['nullable', 'string'],
+            'status' => ['required', Rule::enum(Status::class)],
+        ]);
+
+        $company->update($validated);
+
+        return to_route('companies.index', ['tenant' => tenant('id')])->with('success', 'Company updated successfully.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Company $company)
+    {
+        $company->delete();
+
+        return back()->with('success', 'Company deleted successfully.');
+    }
+}
