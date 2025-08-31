@@ -21,7 +21,7 @@ class ProductPresetSeeder extends Seeder
         foreach ($products as $product) {
             $machines = Machine::where('tenant_id', $product->tenant_id)->inRandomOrder()->get();
 
-            ProductPreset::factory(20)->state(new Sequence(fn() => [
+            ProductPreset::factory(20)->state(new Sequence([
                 'product_id' => $product->id,
                 'machine_id' => fake()->randomElement($machines),
                 'tenant_id' => $product->tenant_id,

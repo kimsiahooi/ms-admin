@@ -34,6 +34,7 @@ class UpdateBomRequest extends FormRequest
                 'max:255',
                 Rule::unique('boms')
                     ->ignore($this->bom->id)
+                    ->where('product_id', $this->product->id)
                     ->where('tenant_id', $this->product->tenant_id)
                     ->where('tenant_id', tenant('id'))
             ],

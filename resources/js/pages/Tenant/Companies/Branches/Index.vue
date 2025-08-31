@@ -16,11 +16,11 @@ import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import type { Company } from '@/types/Tenant/companies';
+import type { Company, CompanyBranch } from '@/types/Tenant/companies';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { Factory, Loader, Pencil, Trash2 } from 'lucide-vue-next';
+import { Loader, Pencil, Trash2 } from 'lucide-vue-next';
 import slug from 'slug';
 import { computed, h, reactive, watch } from 'vue';
 
@@ -29,9 +29,10 @@ defineOptions({
 });
 
 const props = defineProps<{
-    companies: PaginateData<Company[]>;
+    company: Company;
+    branches: PaginateData<CompanyBranch[]>;
     options: {
-        statuses: SwitchOption<Company['status']>[];
+        statuses: SwitchOption<CompanyBranch['status']>[];
     };
 }>();
 
@@ -63,38 +64,45 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Companies',
         href: route('companies.index', { tenant: tenant?.id || '' }),
     },
+    {
+        title: props.company.name,
+        href: '#',
+    },
+    {
+        title: 'Branches',
+        href: route('companies.branches.index', { tenant: tenant?.id || '', company: props.company.id }),
+    },
 ];
 
-const filterChangeHandler = (filter: Filter) => router.visit(route('companies.index', { ...pickBy(filter), tenant: tenant?.id || '' }));
+const filterChangeHandler = (filter: Filter) =>
+    router.visit(route('companies.branches.index', { ...pickBy(filter), tenant: tenant?.id || '', company: props.company.id }));
 
-const columnVisibility = <VisibilityState<Partial<Company>>>{
+const columnVisibility = <VisibilityState<Partial<CompanyBranch>>>{
     id: false,
     description: false,
+    address: false,
 };
 
-const columns: ColumnDef<Company>[] = [
+const columns: ColumnDef<CompanyBranch>[] = [
     {
         accessorKey: 'actions',
         header: () => h('div', null, 'Actions'),
         cell: ({ row }) => {
-            const company = row.original;
+            const branch = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
                 h(Tooltip, { text: 'Edit' }, () =>
-                    h(Link, { href: route('companies.edit', { tenant: tenant?.id || '', company: company.id }) }, () =>
-                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
-                    ),
-                ),
-                h(Tooltip, { text: 'Branches' }, () =>
-                    h(Link, { href: route('companies.branches.index', { tenant: tenant?.id || '', company: company.id }) }, () =>
-                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Factory, { class: 'size-3' })),
+                    h(
+                        Link,
+                        { href: route('companies.branches.edit', { tenant: tenant?.id || '', company: props.company.id, branch: branch.id }) },
+                        () => h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
                     ),
                 ),
                 h(
                     DeleteDialog,
                     {
-                        title: `Delete ${company.name}`,
-                        route: route('companies.destroy', { tenant: tenant?.id || '', company: company.id }),
+                        title: `Delete ${branch.name}`,
+                        route: route('companies.branches.destroy', { tenant: tenant?.id || '', company: props.company.id, branch: branch.id }),
                         asChild: false,
                     },
                     () =>
@@ -136,6 +144,11 @@ const columns: ColumnDef<Company>[] = [
         header: () => h('div', null, 'Description'),
         cell: ({ row }) => h('div', null, row.getValue('description')),
     },
+    {
+        accessorKey: 'address',
+        header: () => h('div', null, 'Address'),
+        cell: ({ row }) => h('div', null, row.getValue('address')),
+    },
 ];
 
 const defaultStatus = computed(() => props.options.statuses.find((status) => status.is_default)?.value);
@@ -146,6 +159,7 @@ const form = useForm({
     name: '',
     code: '',
     description: '',
+    address: '',
     status: defaultStatus.value !== undefined ? defaultStatus.value : 1,
 });
 
@@ -154,7 +168,7 @@ const config = reactive({
 });
 
 const create = () =>
-    form.post(route('companies.store', { tenant: tenant?.id || '' }), {
+    form.post(route('companies.branches.store', { tenant: tenant?.id || '', company: props.company.id }), {
         onSuccess: () => {
             form.reset();
             setting.create.dialogIsOpen = false;
@@ -181,13 +195,13 @@ watch(
 </script>
 
 <template>
-    <Head title="Companies" />
+    <Head title="Company Branches" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="space-y-3">
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Dialog title="Create Company" v-model:open="setting.create.dialogIsOpen">
+                    <Dialog title="Create Branch" v-model:open="setting.create.dialogIsOpen">
                         <template #trigger>
                             <Button class="cursor-pointer">Create</Button>
                         </template>
@@ -208,6 +222,11 @@ watch(
                                 <p v-if="form.errors.description" class="text-destructive">{{ form.errors.description }}</p>
                             </div>
                             <div class="grid w-full max-w-sm items-center gap-1.5">
+                                <Label>Address</Label>
+                                <Textarea placeholder="Enter Address" v-model:model-value="form.address" />
+                                <p v-if="form.errors.address" class="text-destructive">{{ form.errors.address }}</p>
+                            </div>
+                            <div class="grid w-full max-w-sm items-center gap-1.5">
                                 <Label class="mb-1">Status</Label>
                                 <div class="flex items-center space-x-2">
                                     <Switch class="cursor-pointer" v-model:model-value="config.status" />
@@ -226,7 +245,7 @@ watch(
                 <div>
                     <DataTable
                         :columns="columns"
-                        :paginate-data="companies"
+                        :paginate-data="branches"
                         :column-visibility="columnVisibility"
                         :filter="filter"
                         :entry-options="entryOptions"

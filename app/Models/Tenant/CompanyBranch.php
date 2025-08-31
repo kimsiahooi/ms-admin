@@ -2,7 +2,7 @@
 
 namespace App\Models\Tenant;
 
-use App\Enums\Tenant\Company\Status;
+use App\Enums\Tenant\Company\Branch\Status;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -11,12 +11,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
-class Company extends Model
+class CompanyBranch extends Model
 {
-    /** @use HasFactory<\Database\Factories\Tenant\CompanyFactory> */
+    /** @use HasFactory<\Database\Factories\Tenant\CompanyBranchFactory> */
     use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
-    protected $fillable = ['name', 'code', 'description', 'status', 'tenant_id'];
+    protected $fillable = ['name', 'code', 'description', 'address', 'status', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
@@ -32,10 +32,5 @@ class Company extends Model
     public function scopeActive(Builder $query): void
     {
         $query->where('status', Status::ACTIVE->value);
-    }
-
-    public function branches()
-    {
-        return $this->hasMany(CompanyBranch::class);
     }
 }

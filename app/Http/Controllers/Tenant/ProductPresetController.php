@@ -86,6 +86,7 @@ class ProductPresetController extends Controller
                 'max:255',
                 'alpha_dash',
                 Rule::unique('product_presets')
+                    ->where('product_id', $product->id)
                     ->where('tenant_id', $product->tenant_id)
                     ->where('tenant_id', tenant('id'))
             ],
@@ -166,6 +167,7 @@ class ProductPresetController extends Controller
                 'alpha_dash',
                 Rule::unique('product_presets')
                     ->ignore($preset->id)
+                    ->where('product_id', $product->id)
                     ->where('tenant_id', $product->tenant_id)
                     ->where('tenant_id', tenant('id'))
             ],

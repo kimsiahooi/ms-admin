@@ -10,6 +10,7 @@ use App\Http\Controllers\Tenant\Auth\NewPasswordController;
 use App\Http\Controllers\Tenant\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Tenant\Auth\RegisteredUserController;
 use App\Http\Controllers\Tenant\Auth\VerifyEmailController;
+use App\Http\Controllers\Tenant\CompanyBranchController;
 use App\Http\Controllers\Tenant\CompanyController;
 use App\Http\Controllers\Tenant\ProductBomController;
 use App\Http\Controllers\Tenant\MachineController;
@@ -109,5 +110,6 @@ Route::middleware([
         Route::resource('products.presets', ProductPresetController::class)->except(['create', 'show']);
         Route::resource('products.boms', ProductBomController::class)->except(['show']);
         Route::resource('companies', CompanyController::class)->except(['create', 'show']);
+        Route::resource('companies.branches', CompanyBranchController::class)->except(['create', 'show']);
     });
 });

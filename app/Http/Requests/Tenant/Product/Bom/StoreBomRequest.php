@@ -33,6 +33,7 @@ class StoreBomRequest extends FormRequest
                 'string',
                 'max:255',
                 Rule::unique('boms')
+                    ->where('product_id', $this->product->id)
                     ->where('tenant_id', $this->product->tenant_id)
                     ->where('tenant_id', tenant('id'))
             ],
