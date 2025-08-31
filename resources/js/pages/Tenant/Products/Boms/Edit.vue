@@ -28,7 +28,6 @@ const props = defineProps<{
     product: Product;
     bom: ProductBomWithMaterials;
     materials: Material[];
-    active_materials: Material[];
     options: {
         statuses: SwitchOption<ProductBomWithMaterials['status']>[];
         unit_types: SelectOption<Material['unit_type']>[];
@@ -73,24 +72,18 @@ const materialConfig: Omit<MaterialConfig, 'key'> = {
 
 const selectedMaterials = ref<MaterialConfig[]>(
     props.bom.materials.length
-        ? props.bom.materials.map((m) => {
-              const exitingMaterial = props.active_materials.find((material) => material.id === m.id);
-
-              return {
-                  key: uuid(),
-                  data: exitingMaterial || null,
-                  quantity: exitingMaterial ? +m.pivot.quantity : '',
-                  unit_type: exitingMaterial ? m.pivot.unit_type : '',
-              };
-          })
+        ? props.bom.materials.map((material) => ({
+              key: uuid(),
+              data: material,
+              quantity: +material.pivot.quantity,
+              unit_type: material.pivot.unit_type,
+          }))
         : [{ ...materialConfig, key: uuid() }],
 );
 
 const statusDisplay = computed(() => props.options.statuses.find((status) => (form.status ? status.value : !status.value))?.name);
 
-const materialOptions = computed<SelectOption<Material>[]>(() =>
-    props.active_materials.map((material) => ({ name: material.name, value: material })),
-);
+const materialOptions = computed<SelectOption<Material>[]>(() => props.materials.map((material) => ({ name: material.name, value: material })));
 
 const form = useForm<{
     name: string;

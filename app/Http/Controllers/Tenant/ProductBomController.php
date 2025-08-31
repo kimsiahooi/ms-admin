@@ -39,12 +39,10 @@ class ProductBomController extends Controller
     public function create(Request $request, Product $product)
     {
         $materials = Material::all();
-        $activeMaterials = Material::active()->get();
 
         return inertia('Tenant/Products/Boms/Create', [
             'product' => $product,
             'materials' => $materials,
-            'active_materials' => $activeMaterials,
             'options' => [
                 'statuses' => collect(Status::cases())
                     ->map(fn(Status $status) => [
@@ -97,13 +95,11 @@ class ProductBomController extends Controller
     public function edit(Request $request, Product $product, Bom $bom)
     {
         $materials = Material::all();
-        $activeMaterials = Material::active()->get();
 
         return inertia('Tenant/Products/Boms/Edit', [
             'product' => $product,
             'bom' => $bom->load(['materials']),
             'materials' => $materials,
-            'active_materials' => $activeMaterials,
             'options' => [
                 'statuses' => collect(Status::cases())
                     ->map(fn(Status $status) => [

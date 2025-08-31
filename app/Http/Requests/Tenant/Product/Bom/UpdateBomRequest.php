@@ -44,7 +44,6 @@ class UpdateBomRequest extends FormRequest
                 'required',
                 'distinct',
                 Rule::exists('materials')
-                    ->where('status', Status::ACTIVE->value)
                     ->where('tenant_id', $this->product->tenant_id)
                     ->where('tenant_id', tenant('id'))
 
