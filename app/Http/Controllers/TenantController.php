@@ -20,8 +20,7 @@ class TenantController extends Controller
         $tenants = Tenant::when(
             $request->search,
             fn(Builder $query, $search) =>
-            $query->where(fn(Builder $q) =>
-            $q->whereAny(['id', 'name'], 'like', "%{$search}%"))
+            $query->whereAny(['id', 'name'], 'like', "%{$search}%")
         )
             ->when(
                 $request->status,
