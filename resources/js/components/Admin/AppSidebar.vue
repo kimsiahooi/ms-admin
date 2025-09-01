@@ -18,6 +18,7 @@ const mainNavItems: NavItem[] = [
         title: 'Tenants',
         href: route('admin.tenants.index'),
         icon: LayoutGrid,
+        isActive: route().current('admin.tenants.*'),
     },
 ];
 

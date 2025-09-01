@@ -18,7 +18,7 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Companies',
+        title: 'Client Companies',
         href: route('companies.index', { tenant: tenant?.id || '' }),
         icon: Building2,
         isActive: route().current('companies.*', { tenant: tenant?.id || '' }),
