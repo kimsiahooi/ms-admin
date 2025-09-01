@@ -17,12 +17,12 @@ class VerifyTenantStatus
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $tenant = Tenant::where('id', tenant('id'))->first();
+        $tenant = Tenant::where('id', tenant('id'))->where('status', Status::ACTIVE->value)->first();
 
-        if ($tenant && $tenant->status === Status::ACTIVE->value) {
-            return $next($request);
+        if (!$tenant) {
+            abort(500);
         }
 
-        abort(404);
+        return $next($request);
     }
 }
