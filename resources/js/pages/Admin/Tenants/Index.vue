@@ -13,7 +13,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { Tenant } from '@/types/Admin/tenants';
 import { Head, Link, router } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
-import { Trash2 } from 'lucide-vue-next';
+import { Pencil, Trash2 } from 'lucide-vue-next';
 import { computed, h, reactive } from 'vue';
 
 defineOptions({
@@ -61,9 +61,12 @@ const columns: ColumnDef<Tenant>[] = [
         cell: ({ row }) => {
             const tenant = row.original;
 
-            return h(
-                'div',
-                { class: 'flex items-center gap-2' },
+            return h('div', { class: 'flex items-center gap-2' }, [
+                h(Tooltip, { text: 'Edit' }, () =>
+                    h(Link, { href: route('admin.tenants.edit', { tenant: tenant.id }) }, () =>
+                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
+                    ),
+                ),
                 h(
                     DeleteDialog,
                     {
@@ -78,7 +81,7 @@ const columns: ColumnDef<Tenant>[] = [
                             ),
                         ),
                 ),
-            );
+            ]);
         },
     },
     {

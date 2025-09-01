@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Admin\Tenant\Status;
 use App\Models\Tenant;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class TenantController extends Controller
 {
@@ -31,7 +33,18 @@ class TenantController extends Controller
      */
     public function create()
     {
-        return inertia('Admin/Tenants/Create');
+        return inertia('Admin/Tenants/Create', [
+            'options' => [
+                'statuses' => collect(Status::cases())
+                    ->map(function ($status) {
+                        return [
+                            'name' => $status->label(),
+                            'value' => $status->value,
+                            'is_default' => $status->value === Status::ACTIVE->value,
+                        ];
+                    }),
+            ]
+        ]);
     }
 
     /**
@@ -42,6 +55,7 @@ class TenantController extends Controller
         Tenant::create($request->validate([
             'name' => ['required', 'string', 'max:255'],
             'id' => ['required', 'string', 'max:255', 'alpha_dash', 'unique:tenants,id'],
+            'status' => ['required', Rule::enum(Status::class)],
         ]));
 
         return to_route('admin.tenants.index')->with('success', 'Tenant created successfully.');
@@ -60,7 +74,18 @@ class TenantController extends Controller
      */
     public function edit(Tenant $tenant)
     {
-        //
+        return inertia('Admin/Tenants/Edit', [
+            'tenant' => $tenant,
+            'options' => [
+                'statuses' => collect(Status::cases())
+                    ->map(function ($status) {
+                        return [
+                            'name' => $status->label(),
+                            'value' => $status->value,
+                        ];
+                    }),
+            ]
+        ]);
     }
 
     /**
@@ -68,7 +93,12 @@ class TenantController extends Controller
      */
     public function update(Request $request, Tenant $tenant)
     {
-        //
+        $tenant->update(($request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'status' => ['required', Rule::enum(Status::class)],
+        ])));
+
+        return to_route('admin.tenants.index')->with('success', 'Tenant created successfully.');
     }
 
     /**

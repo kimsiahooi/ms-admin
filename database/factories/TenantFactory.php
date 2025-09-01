@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\Admin\Tenant\Status;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -22,6 +23,7 @@ class TenantFactory extends Factory
         return [
             'id' => Str::slug($name),
             'name' => $name,
+            'status' => Status::ACTIVE->value,
         ];
     }
 }

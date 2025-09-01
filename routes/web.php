@@ -83,6 +83,6 @@ Route::prefix('admin')
                 return Inertia::render('Admin/settings/Appearance');
             })->name('appearance');
 
-            Route::resource('tenants', TenantController::class)->except(['show', 'edit', 'update']);
+            Route::resource('tenants', TenantController::class)->except(['show']);
         });
     });

@@ -11,7 +11,6 @@ import type { BreadcrumbItem } from '@/types';
 import { Tenant } from '@/types/Admin/tenants';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Loader } from 'lucide-vue-next';
-import slug from 'slug';
 import { computed, reactive, watch } from 'vue';
 
 defineOptions({
@@ -19,6 +18,7 @@ defineOptions({
 });
 
 const props = defineProps<{
+    tenant: Tenant;
     options: {
         statuses: SwitchOption<Tenant['status']>[];
     };
@@ -34,33 +34,27 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: route('admin.tenants.index'),
     },
     {
-        title: 'Create',
-        href: route('admin.tenants.create'),
+        title: props.tenant.name,
+        href: '#',
+    },
+    {
+        title: 'Edit',
+        href: route('admin.tenants.edit', { tenant: props.tenant.id }),
     },
 ];
-
-const defaultStatus = computed(() => props.options.statuses.find((status) => status.is_default)?.value);
 
 const statusDisplay = computed(() => props.options.statuses.find((status) => (config.status ? status.value : !status.value))?.name);
 
 const form = useForm({
-    name: '',
-    id: '',
-    status: defaultStatus.value !== undefined ? defaultStatus.value : 1,
+    name: props.tenant.name,
+    status: props.tenant.status,
 });
 
 const config = reactive({
     status: !!form.status,
 });
 
-const submit = () => form.post(route('admin.tenants.store'));
-
-watch(
-    () => form.name,
-    (newName) => {
-        form.id = slug(newName);
-    },
-);
+const submit = () => form.put(route('admin.tenants.update', { tenant: props.tenant.id }));
 
 watch(
     () => config.status,
@@ -75,7 +69,7 @@ watch(
 </script>
 
 <template>
-    <Head title="Create Tenant" />
+    <Head :title="props.tenant.name" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
@@ -83,7 +77,7 @@ watch(
                 <form @submit.prevent="submit">
                     <Card class="w-full">
                         <CardHeader>
-                            <CardTitle>Create Tenant</CardTitle>
+                            <CardTitle>Edit {{ props.tenant.name }}</CardTitle>
                             <CardDescription></CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -92,11 +86,6 @@ watch(
                                     <Label>Name</Label>
                                     <Input type="text" placeholder="Enter Name" v-model:model-value="form.name" />
                                     <p v-if="form.errors.name" class="text-destructive">{{ form.errors.name }}</p>
-                                </div>
-                                <div class="flex flex-col space-y-1.5">
-                                    <Label>ID</Label>
-                                    <Input type="text" placeholder="Enter ID" v-model:model-value="form.id" />
-                                    <p v-if="form.errors.id" class="text-destructive">{{ form.errors.id }}</p>
                                 </div>
                                 <div class="grid w-full max-w-sm items-center gap-1.5">
                                     <Label class="mb-1">Status</Label>
@@ -110,7 +99,7 @@ watch(
                         </CardContent>
                         <CardFooter class="flex justify-between px-6">
                             <Button type="submit" class="cursor-pointer" :disabled="form.processing">
-                                <Loader v-if="form.processing" class="animate-spin" /> Create
+                                <Loader v-if="form.processing" class="animate-spin" /> Update
                             </Button>
                         </CardFooter>
                     </Card>
