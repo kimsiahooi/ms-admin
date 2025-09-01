@@ -19,7 +19,7 @@ class CompanyBranchSeeder extends Seeder
 
         foreach ($companies as $company) {
             CompanyBranch::factory(20)->state(new Sequence(
-                [
+                fn() => [
                     'company_id' => $company->id,
                     'tenant_id' => $company->tenant_id,
                 ]

@@ -22,7 +22,7 @@ class BomMaterialSeeder extends Seeder
             $materials = Material::active()->where('tenant_id', $bom->tenant_id)->inRandomOrder()->limit(rand(1, 2))->get();
 
             foreach ($materials as $material) {
-                BomMaterial::factory()->state(new Sequence([
+                BomMaterial::factory()->state(new Sequence(fn() => [
                     'bom_id' => $bom->id,
                     'material_id' => $material->id,
                     'unit_type' => $material->unit_type,
