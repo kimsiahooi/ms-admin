@@ -55,11 +55,17 @@ class ProductPresetController extends Controller
                         'value' => $status->value,
                         'is_default' => $status->value === Status::ACTIVE->value,
                     ]),
-                'shelf_life_types' => collect(ShelfLifeType::cases())
-                    ->map(fn(ShelfLifeType $shelfLifeType) => [
-                        'name' => $shelfLifeType->label(),
-                        'value' => $shelfLifeType->value,
-                    ]),
+                'shelf_life_types' => [
+                    [
+                        'name' => 'None',
+                        'value' => null,
+                    ],
+                    ...collect(ShelfLifeType::cases())
+                        ->map(fn(ShelfLifeType $shelfLifeType) => [
+                            'name' => $shelfLifeType->label(),
+                            'value' => $shelfLifeType->value,
+                        ])
+                ],
             ],
         ]);
     }
@@ -148,11 +154,17 @@ class ProductPresetController extends Controller
                         'name' => $type->label(),
                         'value' => $type->value,
                     ]),
-                'shelf_life_types' => collect(ShelfLifeType::cases())
-                    ->map(fn(ShelfLifeType $shelfLifeType) => [
-                        'name' => $shelfLifeType->label(),
-                        'value' => $shelfLifeType->value
-                    ]),
+                'shelf_life_types' => [
+                    [
+                        'name' => 'None',
+                        'value' => null,
+                    ],
+                    ...collect(ShelfLifeType::cases())
+                        ->map(fn(ShelfLifeType $shelfLifeType) => [
+                            'name' => $shelfLifeType->label(),
+                            'value' => $shelfLifeType->value,
+                        ])
+                ],
                 'statuses' => collect(Status::cases())
                     ->map(fn($status) => [
                         'name' => $status->label(),
