@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { useFormatDateTime } from '@/composables/useFormatDateTime';
 import { useTenant } from '@/composables/useTenant';
 import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
@@ -38,6 +39,7 @@ const props = defineProps<{
 }>();
 
 const { tenant } = useTenant();
+const { formatDateTime } = useFormatDateTime();
 
 const routeParams = computed(() => route().params);
 
@@ -140,6 +142,16 @@ const columns: ColumnDef<ProductPrice>[] = [
         accessorKey: 'amount',
         header: () => h('div', null, 'Amount'),
         cell: ({ row }) => h('div', null, row.getValue('amount')),
+    },
+    {
+        accessorKey: 'created_at',
+        header: () => h('div', null, 'Created At'),
+        cell: ({ row }) => h('div', null, formatDateTime(row.getValue('created_at')) || ''),
+    },
+    {
+        accessorKey: 'updated_at',
+        header: () => h('div', null, 'Updated At'),
+        cell: ({ row }) => h('div', null, formatDateTime(row.getValue('updated_at')) || ''),
     },
 ];
 

@@ -6,6 +6,7 @@ import type { Filter, SearchConfig, VisibilityState } from '@/components/shared/
 import { Tooltip } from '@/components/shared/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useFormatDateTime } from '@/composables/useFormatDateTime';
 import { useTenant } from '@/composables/useTenant';
 import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
@@ -28,6 +29,7 @@ const props = defineProps<{
 }>();
 
 const { tenant } = useTenant();
+const { formatDateTime } = useFormatDateTime();
 
 const routeParams = computed(() => route().params);
 
@@ -126,6 +128,16 @@ const columns: ColumnDef<ProductBom>[] = [
         accessorKey: 'description',
         header: () => h('div', null, 'Description'),
         cell: ({ row }) => h('div', null, row.getValue('description')),
+    },
+    {
+        accessorKey: 'created_at',
+        header: () => h('div', null, 'Created At'),
+        cell: ({ row }) => h('div', null, formatDateTime(row.getValue('created_at')) || ''),
+    },
+    {
+        accessorKey: 'updated_at',
+        header: () => h('div', null, 'Updated At'),
+        cell: ({ row }) => h('div', null, formatDateTime(row.getValue('updated_at')) || ''),
     },
 ];
 </script>
