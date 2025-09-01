@@ -21,8 +21,7 @@ class CompanyController extends Controller
         $companies = Company::when(
             $request->search,
             fn(Builder $query, $search) =>
-            $query->where(fn(Builder $q) =>
-            $q->whereAny(['id', 'name', 'code'], 'like', "%{$search}%"))
+            $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
         )
             ->when(
                 $request->status,
