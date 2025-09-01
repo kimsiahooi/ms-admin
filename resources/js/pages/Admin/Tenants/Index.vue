@@ -4,6 +4,7 @@ import type { PaginateData } from '@/components/shared/pagination/types';
 import { DataTable } from '@/components/shared/table';
 import type { Filter, SearchConfig, VisibilityState } from '@/components/shared/table/types';
 import { Tooltip } from '@/components/shared/tooltip';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
 import { entryOptions } from '@/constants/entries/options';
@@ -82,6 +83,15 @@ const columns: ColumnDef<Tenant>[] = [
                         ),
                 ),
             ]);
+        },
+    },
+    {
+        accessorKey: 'status',
+        header: () => h('div', null, 'Status'),
+        cell: ({ row }) => {
+            const { status, status_label } = row.original;
+
+            return h(Badge, { variant: status ? 'default' : 'destructive' }, () => status_label);
         },
     },
     {

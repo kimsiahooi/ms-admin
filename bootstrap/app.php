@@ -5,6 +5,7 @@ use App\Http\Middleware\CustomAuthenticate;
 use App\Http\Middleware\CustomRedirectIfAuthenticated;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\VerifyTenantStatus;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -30,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'guest' => CustomRedirectIfAuthenticated::class,
             'auth' => CustomAuthenticate::class,
+            'tenant_status' => VerifyTenantStatus::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

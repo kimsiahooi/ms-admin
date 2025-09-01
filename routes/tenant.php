@@ -38,7 +38,8 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
 
 Route::middleware([
     'web',
-    InitializeTenancyByPath::class
+    InitializeTenancyByPath::class,
+    'tenant_status',
 ])->prefix('{tenant}')->group(function () {
     Route::get('/', function () {
         return to_route('dashboard', ['tenant' => tenant('id')]);
