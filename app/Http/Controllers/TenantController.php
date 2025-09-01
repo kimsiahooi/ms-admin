@@ -17,14 +17,32 @@ class TenantController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $tenants = Tenant::when($request->search, function (Builder $query, $search) {
-            $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");
-        })->latest()
+        $tenants = Tenant::when(
+            $request->search,
+            fn(Builder $query, $search) =>
+            $query->where(fn(Builder $q) =>
+            $q->whereAny(['id', 'name'], 'like', "%{$search}%"))
+        )
+            ->when(
+                $request->status,
+                fn(Builder $query, $status) =>
+                $query->whereIn('status', $status)
+            )->latest()
             ->paginate($entries)
             ->withQueryString();
 
         return inertia('Admin/Tenants/Index', [
             'tenants' => $tenants,
+            'options' => [
+                'statuses' => collect(Status::cases())
+                    ->map(function (Status $status) {
+                        return [
+                            'name' => $status->label(),
+                            'value' => $status->value,
+                            'is_default' => $status->value === Status::ACTIVE->value,
+                        ];
+                    }),
+            ]
         ]);
     }
 

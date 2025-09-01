@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignIdFor(Bom::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Material::class)->constrained()->cascadeOnDelete();
             $table->decimal('quantity');
-            $table->integer('unit_type');
+            $table->string('unit_type');
             $table->foreignIdFor(Tenant::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();

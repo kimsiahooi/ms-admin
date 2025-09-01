@@ -1,27 +1,24 @@
 <script setup lang="ts" generic="TData, TValue">
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { valueUpdater } from '@/lib/utils';
 import type { ColumnDef, SortingState } from '@tanstack/vue-table';
 import { FlexRender, getCoreRowModel, getSortedRowModel, useVueTable } from '@tanstack/vue-table';
 import { ChevronDown } from 'lucide-vue-next';
-import { computed, reactive, ref } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import { Pagination } from '../pagination';
 import type { PaginateData } from '../pagination/types';
 import { Select } from '../select';
 import type { SelectOption } from '../select/types';
-import type { Filter, SearchConfig, VisibilityState } from './types';
+import type { VisibilityState } from './types';
 
 const props = withDefaults(
     defineProps<{
         columns: ColumnDef<TData, TValue>[];
         paginateData: PaginateData<TData[]>;
         columnVisibility?: VisibilityState;
-        filter: Filter;
         entryOptions?: SelectOption[];
-        searchConfig?: SearchConfig;
     }>(),
     {
         columnVisibility: () => ({}),
@@ -31,11 +28,13 @@ const props = withDefaults(
 const sorting = ref<SortingState>([]);
 const columnVisibility = ref<VisibilityState>(props.columnVisibility);
 
-const filter = reactive(props.filter);
+const filterModel = defineModel<Record<string, string>>();
 
 const emits = defineEmits<{
-    filterChange: [value: Filter];
+    search: [];
 }>();
+
+const filter = reactive<Record<string, string>>(filterModel.value || {});
 
 const table = useVueTable({
     get data() {
@@ -58,36 +57,24 @@ const table = useVueTable({
     },
 });
 
-const searchPlaceholder = computed(() => props.searchConfig?.placeholder || 'Search...');
-
 const entryHandler = () => {
     searchHandler();
 };
 
 const searchHandler = () => {
-    emits('filterChange', filter);
+    emits('search');
 };
 
-const resetHandler = () => {
-    filter.search = '';
-    searchHandler();
-};
+watch(filter, (newFilter) => {
+    if (filterModel.value) {
+        filterModel.value = newFilter;
+    }
+});
 </script>
 
 <template>
     <div class="space-y-3">
-        <div class="flex flex-col justify-between gap-2 md:flex-row md:items-center">
-            <div>
-                <form class="flex flex-col gap-2 md:flex-row md:items-center" @submit.prevent="searchHandler">
-                    <div>
-                        <Input class="min-w-60" :placeholder="searchPlaceholder" v-model="filter.search" />
-                    </div>
-                    <div class="flex gap-2">
-                        <Button class="flex-1 cursor-pointer md:flex-auto" type="submit">Search</Button>
-                        <Button class="flex-1 cursor-pointer md:flex-auto" type="reset" variant="secondary" @click="resetHandler">Reset</Button>
-                    </div>
-                </form>
-            </div>
+        <div class="flex flex-col justify-end gap-2 md:flex-row md:items-center">
             <div class="flex flex-wrap items-center justify-end gap-2">
                 <DropdownMenu>
                     <DropdownMenuTrigger as-child>
@@ -146,7 +133,7 @@ const resetHandler = () => {
                     v-if="entryOptions"
                     :options="entryOptions"
                     placeholder="Select Entries"
-                    v-model="filter.entries"
+                    v-model:model-value="filter.entries"
                     @update:model-value="entryHandler"
                 />
             </div>

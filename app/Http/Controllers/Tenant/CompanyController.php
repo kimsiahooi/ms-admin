@@ -18,9 +18,18 @@ class CompanyController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $companies = Company::when($request->search, function (Builder $query, $search) {
-            $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");
-        })->latest()
+        $companies = Company::when(
+            $request->search,
+            fn(Builder $query, $search) =>
+            $query->where(fn(Builder $q) =>
+            $q->whereAny(['id', 'name', 'code'], 'like', "%{$search}%"))
+        )
+            ->when(
+                $request->status,
+                fn(Builder $query, $status) =>
+                $query->whereIn('status', $status)
+            )
+            ->latest()
             ->paginate($entries)
             ->withQueryString();
 

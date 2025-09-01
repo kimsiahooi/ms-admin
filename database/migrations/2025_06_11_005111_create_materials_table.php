@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('code');
             $table->text('description')->nullable();
-            $table->integer('unit_type');
-            $table->integer('status')->default(Status::ACTIVE->value);
+            $table->string('unit_type');
+            $table->string('status')->default(Status::ACTIVE->value);
             $table->foreignIdFor(Tenant::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();

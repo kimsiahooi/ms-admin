@@ -19,7 +19,7 @@ class CreateTenantsTable extends Migration
         Schema::create('tenants', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->string('name');
-            $table->integer('status')->default(Status::ACTIVE->value);
+            $table->string('status')->default(Status::ACTIVE->value);
             $table->timestamps();
             $table->softDeletes();
             $table->json('data')->nullable();

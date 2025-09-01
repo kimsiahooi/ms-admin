@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { DeleteDialog } from '@/components/shared/dialog';
+import { ActionButton } from '@/components/shared/custom/action';
+import Layout from '@/components/shared/custom/container/Layout.vue';
+import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
+import { FormButton, FormInput, FormSwitch } from '@/components/shared/custom/form';
+import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination/types';
+import type { SwitchOption } from '@/components/shared/switch/types';
 import { DataTable } from '@/components/shared/table';
-import type { Filter, SearchConfig, VisibilityState } from '@/components/shared/table/types';
-import { Tooltip } from '@/components/shared/tooltip';
+import type { VisibilityState } from '@/components/shared/table/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
@@ -12,31 +16,41 @@ import AppLayout from '@/layouts/Admin/AppLayout.vue';
 import AppMainLayout from '@/layouts/Admin/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Tenant } from '@/types/Admin/tenants';
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
+import { pickBy } from 'lodash-es';
 import { Pencil, Trash2 } from 'lucide-vue-next';
-import { computed, h, reactive } from 'vue';
+import slug from 'slug';
+import { computed, h, reactive, watch } from 'vue';
+
+type StatusLabel = Exclude<Tenant['status_label'], null | undefined>;
 
 defineOptions({
     layout: AppMainLayout,
 });
 
-defineProps<{
+const props = defineProps<{
     tenants: PaginateData<Tenant[]>;
+    options: {
+        statuses: SwitchOption<Tenant['status'], StatusLabel>[];
+    };
 }>();
-
-const routeParams = computed(() => route().params);
 
 const { formatDateTime } = useFormatDateTime();
 
-const filter = reactive<Filter>({
+const routeParams = computed(() => route().params);
+
+const filter = reactive<Record<string, string>>({
     search: routeParams.value.search,
     entries: routeParams.value.entries || '10',
+    status: routeParams.value.status,
 });
 
-const searchConfig: SearchConfig = {
-    placeholder: 'Search name...',
-};
+const setting = reactive({
+    create: {
+        dialogIsOpen: false,
+    },
+});
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -49,9 +63,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const filterChangeHandler = (filter: Filter) => {
-    router.visit(route('admin.tenants.index', { ...filter }));
-};
+const search = () => router.visit(route('admin.tenants.index', { ...pickBy(filter) }));
+const reset = () => router.visit(route('admin.tenants.index'));
 
 const columnVisibility = <VisibilityState<Partial<Tenant>>>{};
 
@@ -63,11 +76,11 @@ const columns: ColumnDef<Tenant>[] = [
             const tenant = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(Tooltip, { text: 'Edit' }, () =>
-                    h(Link, { href: route('admin.tenants.edit', { tenant: tenant.id }) }, () =>
-                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
-                    ),
-                ),
+                h(ActionButton, {
+                    text: 'Edit',
+                    href: route('admin.tenants.edit', { tenant: tenant.id }),
+                    icon: Pencil,
+                }),
                 h(
                     DeleteDialog,
                     {
@@ -76,11 +89,11 @@ const columns: ColumnDef<Tenant>[] = [
                         asChild: false,
                     },
                     () =>
-                        h(Tooltip, { text: 'Delete' }, () =>
-                            h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
-                                h(Trash2, { class: 'size-3' }),
-                            ),
-                        ),
+                        h(ActionButton, {
+                            variant: 'destructive',
+                            text: 'Delete',
+                            icon: Trash2,
+                        }),
                 ),
             ]);
         },
@@ -91,7 +104,7 @@ const columns: ColumnDef<Tenant>[] = [
         cell: ({ row }) => {
             const { status, status_label } = row.original;
 
-            return h(Badge, { variant: status ? 'default' : 'destructive' }, () => status_label);
+            return h(Badge, { variant: status === 'INACTIVE' ? 'destructive' : 'default' }, () => status_label);
         },
     },
     {
@@ -125,31 +138,85 @@ const columns: ColumnDef<Tenant>[] = [
         cell: ({ row }) => h('div', null, formatDateTime(row.getValue('updated_at')) || ''),
     },
 ];
+
+const defaultStatus = computed<Tenant['status']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? 'ACTIVE');
+
+const statusDisplay = computed<StatusLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
+
+const form = useForm({
+    id: '',
+    name: '',
+    status: defaultStatus.value,
+});
+
+const config = reactive({
+    status: !!form.status,
+});
+
+const submit = () =>
+    form.post(route('admin.tenants.store'), {
+        onSuccess: () => {
+            form.reset();
+            setting.create.dialogIsOpen = false;
+        },
+    });
+
+watch(
+    () => form.name,
+    (newName) => {
+        form.id = slug(newName);
+    },
+);
+
+watch(
+    () => config.status,
+    (newVal) => {
+        const value = props.options.statuses.find((status) => (newVal ? status.value === 'ACTIVE' : status.value === 'INACTIVE'))?.value;
+
+        if (value !== undefined) {
+            form.status = value;
+        }
+    },
+);
 </script>
 
 <template>
     <Head title="Tenants" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+        <Layout>
             <div class="space-y-3">
+                <FilterCard @search="search" @reset="reset">
+                    <FilterInput label="Name" placeholder="Search ID, Name" v-model:model-value="filter.search" />
+                    <FilterSelect
+                        label="Status"
+                        placeholder="Select Status"
+                        :options="options.statuses"
+                        multiple
+                        v-model:model-value="filter.status"
+                    />
+                </FilterCard>
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Link :href="route('admin.tenants.create')" as-child>
-                        <Button class="cursor-pointer">Create</Button>
-                    </Link>
+                    <Dialog title="Create Company" v-model:open="setting.create.dialogIsOpen">
+                        <form @submit.prevent="submit" class="space-y-4">
+                            <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
+                            <FormInput label="ID" :error="form.errors.id" v-model:model-value="form.id" />
+                            <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="config.status" />
+                            <FormButton type="submit" :disabled="form.processing" />
+                        </form>
+                    </Dialog>
                 </div>
                 <div>
                     <DataTable
+                        v-model:model-value="filter"
                         :columns="columns"
                         :paginate-data="tenants"
                         :column-visibility="columnVisibility"
-                        :filter="filter"
                         :entry-options="entryOptions"
-                        :search-config="searchConfig"
-                        @filter-change="filterChangeHandler"
+                        @search="search"
                     />
                 </div>
             </div>
-        </div>
+        </Layout>
     </AppLayout>
 </template>

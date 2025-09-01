@@ -25,12 +25,12 @@ return new class extends Migration
             $table->string('code');
             $table->text('description')->nullable();
             $table->decimal('cavity_quantity')->default(0);
-            $table->integer('cavity_type')->nullable();
+            $table->string('cavity_type')->nullable();
             $table->decimal('cycle_time')->default(0);
-            $table->integer('cycle_time_type')->nullable();
+            $table->string('cycle_time_type')->nullable();
             $table->decimal('shelf_life_duration')->nullable();
-            $table->integer('shelf_life_type')->nullable();
-            $table->integer('status')->default(Status::ACTIVE->value);
+            $table->string('shelf_life_type')->nullable();
+            $table->string('status')->default(Status::ACTIVE->value);
             $table->foreignIdFor(Tenant::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();

@@ -3,8 +3,8 @@ export interface Company {
     name: string;
     code: string;
     description: string | null;
-    status: number;
-    status_label?: string | null;
+    status: 'ACTIVE' | 'INACTIVE';
+    status_label?: 'Active' | 'Inactive' | null;
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;
@@ -16,8 +16,8 @@ export interface CompanyBranch {
     code: string;
     description: string | null;
     address: string;
-    status: number;
-    status_label?: string | null;
+    status: 'ACTIVE' | 'INACTIVE';
+    status_label?: 'Active' | 'Inactive' | null;
     company_id: Company['id'];
     created_at: Date | null;
     updated_at: Date | null;

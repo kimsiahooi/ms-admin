@@ -10,9 +10,9 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { router } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 
-const props = withDefaults(
+withDefaults(
     defineProps<{
         title: string;
         description?: string;
@@ -26,13 +26,6 @@ const props = withDefaults(
 );
 
 const model = defineModel<boolean | undefined>('open');
-
-const deleteHandler = () =>
-    router.delete(props.route, {
-        onSuccess: () => {
-            model.value = false;
-        },
-    });
 </script>
 
 <template>
@@ -51,7 +44,9 @@ const deleteHandler = () =>
                 <DialogClose as-child>
                     <Button type="button" variant="secondary"> Close </Button>
                 </DialogClose>
-                <Button variant="destructive" class="cursor-pointer" @click="deleteHandler">Delete</Button>
+                <Link :href="route" as-child method="delete" :preserve-state="false">
+                    <Button variant="destructive" class="cursor-pointer">Delete</Button>
+                </Link>
             </DialogFooter>
         </DialogScrollContent>
     </Dialog>

@@ -2,15 +2,15 @@
 
 namespace App\enums\Tenant\Product\Preset;
 
-enum CycleTimeType: int
+enum CycleTimeType: string
 {
-    case MILLISECOND = 1;
-    case SECOND = 2;
-    case MINUTE = 3;
-    case HOUR = 4;
-    case DAY = 5;
-    case MONTH = 6;
-    case YEAR = 7;
+    case MILLISECOND = 'MILLISECOND';
+    case SECOND = 'SECOND';
+    case MINUTE = 'MINUTE';
+    case HOUR = 'HOUR';
+    case DAY = 'DAY';
+    case MONTH = 'MONTH';
+    case YEAR = 'YEAR';
 
     public function label(): string
     {

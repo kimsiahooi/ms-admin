@@ -2,11 +2,11 @@
 
 namespace App\enums\Tenant\Material;
 
-enum UnitType: int
+enum UnitType: string
 {
-    case PCS = 1;
-    case GRAM = 2;
-    case KILOGRAM = 3;
+    case PCS = 'PCS';
+    case GRAM = 'GRAM';
+    case KILOGRAM = 'KILOGRAM';
 
     public function label(): string
     {

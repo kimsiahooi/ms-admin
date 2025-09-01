@@ -6,8 +6,8 @@ export interface Product {
     name: string;
     code: string;
     description: string | null;
-    status: number;
-    status_label?: string | null;
+    status: 'ACTIVE' | 'INACTIVE';
+    status_label?: 'Active' | 'Inactive' | null;
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;
@@ -178,8 +178,8 @@ export interface ProductPrice {
         | 'ZMW'
         | 'ZWL';
     amount: string;
-    status: number;
-    status_label?: string | null;
+    status: 'ACTIVE' | 'INACTIVE';
+    status_label?: 'Active' | 'Inactive' | null;
     product_id: Product['id'];
     created_at: Date | null;
     updated_at: Date | null;
@@ -206,8 +206,8 @@ export interface ProductPreset {
     shelf_life_duration: string | null;
     shelf_life_type: number | null;
     shelf_life_type_label?: string | null;
-    status: number;
-    status_label?: string | null;
+    status: 'ACTIVE' | 'INACTIVE';
+    status_label?: 'Active' | 'Inactive' | null;
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;
@@ -231,8 +231,8 @@ export interface ProductBom {
     name: string;
     code: string;
     description: string | null;
-    status: number;
-    status_label?: string | null;
+    status: 'ACTIVE' | 'INACTIVE';
+    status_label?: 'Active' | 'Inactive' | null;
     product_id: Product['id'];
     created_at: Date | null;
     updated_at: Date | null;

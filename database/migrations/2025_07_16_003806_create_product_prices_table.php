@@ -19,7 +19,7 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->enum('currency', array_column(Currency::cases(), 'value'));
             $table->decimal('amount');
-            $table->integer('status')->default(Status::ACTIVE->value);
+            $table->string('status')->default(Status::ACTIVE->value);
             $table->foreignIdFor(Product::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Tenant::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
