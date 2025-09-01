@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Tenant;
 
 use App\enums\Tenant\Product\Preset\CavityType;
 use App\enums\Tenant\Product\Preset\CycleTimeType;
+use App\enums\Tenant\Product\Preset\ShelfLifeType;
 use App\enums\Tenant\Product\Preset\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Machine;
@@ -54,6 +55,11 @@ class ProductPresetController extends Controller
                         'value' => $status->value,
                         'is_default' => $status->value === Status::ACTIVE->value,
                     ]),
+                'shelf_life_types' => collect(ShelfLifeType::cases())
+                    ->map(fn(ShelfLifeType $shelfLifeType) => [
+                        'name' => $shelfLifeType->label(),
+                        'value' => $shelfLifeType->value,
+                    ]),
             ],
         ]);
     }
@@ -95,6 +101,12 @@ class ProductPresetController extends Controller
             'cavity_type' => ['required', Rule::enum(CavityType::class)],
             'cycle_time' => ['required', 'numeric', 'min:0.01'],
             'cycle_time_type' => ['required', Rule::enum(CycleTimeType::class)],
+            'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type',  'numeric', 'min:0.01'],
+            'shelf_life_type' => [
+                'nullable',
+                'required_with:shelf_life_duration',
+                Rule::enum(ShelfLifeType::class)
+            ],
             'status' => ['required', Rule::enum(Status::class)],
         ]);
 
@@ -136,6 +148,11 @@ class ProductPresetController extends Controller
                         'name' => $type->label(),
                         'value' => $type->value,
                     ]),
+                'shelf_life_types' => collect(ShelfLifeType::cases())
+                    ->map(fn(ShelfLifeType $shelfLifeType) => [
+                        'name' => $shelfLifeType->label(),
+                        'value' => $shelfLifeType->value
+                    ]),
                 'statuses' => collect(Status::cases())
                     ->map(fn($status) => [
                         'name' => $status->label(),
@@ -176,6 +193,8 @@ class ProductPresetController extends Controller
             'cavity_type' => ['required', Rule::enum(CavityType::class)],
             'cycle_time' => ['required', 'numeric', 'min:0'],
             'cycle_time_type' => ['required', Rule::enum(CycleTimeType::class)],
+            'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type', 'numeric', 'min:0.01'],
+            'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::enum(ShelfLifeType::class)],
             'status' => ['required', Rule::enum(Status::class)],
         ]);
 

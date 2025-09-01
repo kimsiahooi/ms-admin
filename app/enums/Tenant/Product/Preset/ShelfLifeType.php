@@ -1,6 +1,6 @@
 <?php
 
-namespace App\enums\Tenant\Product;
+namespace App\enums\Tenant\Product\Preset;
 
 enum ShelfLifeType: int
 {

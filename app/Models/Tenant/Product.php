@@ -2,7 +2,6 @@
 
 namespace App\Models\Tenant;
 
-use App\enums\Tenant\Product\ShelfLifeType;
 use App\enums\Tenant\Product\Status;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -17,11 +16,11 @@ class Product extends Model
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
-    protected $fillable = ['name', 'code', 'description', 'shelf_life_duration', 'shelf_life_type', 'status', 'tenant_id'];
+    protected $fillable = ['name', 'code', 'description', 'status', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
-    protected $appends = ['status_label', 'shelf_life_type_label'];
+    protected $appends = ['status_label'];
 
     public function prices()
     {
@@ -42,13 +41,6 @@ class Product extends Model
     {
         return Attribute::make(
             get: fn($value, $attributes) => Status::tryFrom($attributes['status'])?->label(),
-        );
-    }
-
-    protected function shelfLifeTypeLabel(): Attribute
-    {
-        return Attribute::make(
-            get: fn($value, $attributes) => ShelfLifeType::tryFrom($attributes['shelf_life_type'])?->label(),
         );
     }
 

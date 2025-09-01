@@ -4,6 +4,7 @@ namespace Database\Factories\Tenant;
 
 use App\enums\Tenant\Product\Preset\CavityType;
 use App\enums\Tenant\Product\Preset\CycleTimeType;
+use App\enums\Tenant\Product\Preset\ShelfLifeType;
 use App\enums\Tenant\Product\Preset\Status;
 use App\Models\Tenant\Machine;
 use App\Models\Tenant\Product;
@@ -25,6 +26,7 @@ class ProductPresetFactory extends Factory
         $product = Product::inRandomOrder()->first();
         $machine = Machine::where('tenant_id', $product->tenant_id)->inRandomOrder()->first();
         $name = fake()->unique()->sentence(2);
+        $shelfLifeDuration = fake()->optional(0.5)->randomFloat(2, 10, 100);
 
         return [
             'product_id' => $product->id,
@@ -36,6 +38,8 @@ class ProductPresetFactory extends Factory
             'cavity_type' => fake()->randomElement(CavityType::cases()),
             'cycle_time' => fake()->randomFloat(2, 0, 10),
             'cycle_time_type' => fake()->randomElement(CycleTimeType::cases()),
+            'shelf_life_duration' => $shelfLifeDuration,
+            'shelf_life_type' => $shelfLifeDuration ? fake()->randomElement(ShelfLifeType::cases()) : null,
             'status' => fake()->randomElement(Status::cases()),
         ];
     }

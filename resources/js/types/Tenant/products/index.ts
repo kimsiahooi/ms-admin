@@ -8,9 +8,6 @@ export interface Product {
     description: string | null;
     status: number;
     status_label?: string | null;
-    shelf_life_duration: string | null;
-    shelf_life_type: number | null;
-    shelf_life_type_label?: string | null;
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;
@@ -202,12 +199,15 @@ export interface ProductPreset {
     description: string | null;
     cavity_quantity: string;
     cavity_type: number;
+    cavity_type_label?: string | null;
     cycle_time: string;
     cycle_time_type: number;
     cycle_time_type_label?: string | null;
+    shelf_life_duration: string | null;
+    shelf_life_type: number | null;
+    shelf_life_type_label?: string | null;
     status: number;
     status_label?: string | null;
-    cavity_type_label?: string | null;
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;

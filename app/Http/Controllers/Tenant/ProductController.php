@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Tenant;
 
-use App\enums\Tenant\Product\ShelfLifeType;
 use App\enums\Tenant\Product\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Product;
@@ -34,11 +33,6 @@ class ProductController extends Controller
                         'value' => $status->value,
                         'is_default' => $status->value === Status::ACTIVE->value,
                     ]),
-                'shelf_life_types' => collect(ShelfLifeType::cases())
-                    ->map(fn(ShelfLifeType $shelfLifeType) => [
-                        'name' => $shelfLifeType->label(),
-                        'value' => $shelfLifeType->value,
-                    ]),
             ],
         ]);
     }
@@ -67,12 +61,6 @@ class ProductController extends Controller
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
-            'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type',  'numeric', 'min:0.01'],
-            'shelf_life_type' => [
-                'nullable',
-                'required_with:shelf_life_duration',
-                Rule::enum(ShelfLifeType::class)
-            ],
             'status' => ['required', Rule::enum(Status::class)],
         ]);
 
@@ -103,11 +91,6 @@ class ProductController extends Controller
                         'value' => $status->value,
                         'is_default' => $status->value === Status::ACTIVE->value,
                     ]),
-                'shelf_life_types' => collect(ShelfLifeType::cases())
-                    ->map(fn(ShelfLifeType $shelfLifeType) => [
-                        'name' => $shelfLifeType->label(),
-                        'value' => $shelfLifeType->value
-                    ]),
             ],
         ]);
     }
@@ -130,8 +113,6 @@ class ProductController extends Controller
             ],
             'description' => ['nullable', 'string'],
             'status' => ['required', Rule::enum(Status::class)],
-            'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type', 'numeric', 'min:0.01'],
-            'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::enum(ShelfLifeType::class)],
         ]);
 
         $product->update($validated);

@@ -38,6 +38,7 @@ const props = defineProps<{
         machines: SelectOption<Machine['id']>[];
         cavity_types: SelectOption<ProductPreset['cavity_type']>[];
         cycle_time_types: SelectOption<ProductPreset['cycle_time_type']>[];
+        shelf_life_types: SelectOption<ProductPreset['shelf_life_type']>[];
         statuses: SwitchOption<ProductPresetWithMachine['status']>[];
     };
 }>();
@@ -192,6 +193,16 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
             return h('div', null, cycle_time_type_label || '');
         },
     },
+    {
+        accessorKey: 'shelf_life_duration',
+        header: () => h('div', null, 'Shelf Life Duration'),
+        cell: ({ row }) => h('div', null, row.original.shelf_life_duration || ''),
+    },
+    {
+        accessorKey: 'shelf_life_type',
+        header: () => h('div', null, 'Shelf Life Type'),
+        cell: ({ row }) => h('div', null, row.original.shelf_life_type_label || ''),
+    },
 ];
 
 const defaultStatus = computed(() => props.options.statuses.find((status) => status.is_default)?.value);
@@ -207,6 +218,8 @@ const form = useForm<{
     cavity_type: ProductPreset['cavity_type'] | '';
     cycle_time: number | '';
     cycle_time_type: ProductPreset['cycle_time_type'] | '';
+    shelf_life_duration: string;
+    shelf_life_type: ProductPreset['shelf_life_type'] | '';
     status: ProductPreset['status'];
 }>({
     machine_id: '',
@@ -217,6 +230,8 @@ const form = useForm<{
     cavity_type: '',
     cycle_time: '',
     cycle_time_type: '',
+    shelf_life_duration: '',
+    shelf_life_type: '',
     status: defaultStatus.value !== undefined ? defaultStatus.value : 1,
 });
 
@@ -323,6 +338,32 @@ watch(
                                     trigger-class="w-full"
                                 />
                                 <p v-if="form.errors.cycle_time_type" class="text-destructive">{{ form.errors.cycle_time_type }}</p>
+                            </div>
+                            <div class="grid w-full max-w-sm items-center gap-1.5">
+                                <div class="grid gap-1.5 md:grid-cols-2">
+                                    <div class="grid gap-1.5">
+                                        <Label>Shelf Life Duration</Label>
+                                        <Input
+                                            type="number"
+                                            placeholder="Enter Shelf Life Duration"
+                                            v-model:model-value="form.shelf_life_duration"
+                                            min="0.01"
+                                            step=".01"
+                                            class="w-full"
+                                        />
+                                    </div>
+                                    <div class="grid gap-1.5">
+                                        <Label>Shelf Life Type</Label>
+                                        <Select
+                                            :options="options.shelf_life_types"
+                                            placeholder="Select Shelf Life Type"
+                                            v-model:model-value="form.shelf_life_type"
+                                            trigger-class="w-full"
+                                        />
+                                    </div>
+                                </div>
+                                <p v-if="form.errors.shelf_life_duration" class="text-destructive">{{ form.errors.shelf_life_duration }}</p>
+                                <p v-if="form.errors.shelf_life_type" class="text-destructive">{{ form.errors.shelf_life_type }}</p>
                             </div>
                             <div class="grid w-full max-w-sm items-center gap-1.5">
                                 <Label class="mb-1">Status</Label>
