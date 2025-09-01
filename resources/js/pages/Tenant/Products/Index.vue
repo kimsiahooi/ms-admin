@@ -85,14 +85,14 @@ const columns: ColumnDef<Product>[] = [
             const product = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
+                h(Tooltip, { text: 'Edit' }, () =>
+                    h(Link, { href: route('products.edit', { tenant: tenant?.id || '', product: product.id }) }, () =>
+                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
+                    ),
+                ),
                 h(Tooltip, { text: 'Presets' }, () =>
                     h(Link, { href: route('products.presets.index', { tenant: tenant?.id || '', product: product.id }) }, () =>
                         h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Settings2, { class: 'size-3' })),
-                    ),
-                ),
-                h(Tooltip, { text: 'Prices' }, () =>
-                    h(Link, { href: route('products.prices.index', { tenant: tenant?.id || '', product: product.id }) }, () =>
-                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(CircleDollarSign, { class: 'size-3' })),
                     ),
                 ),
                 h(Tooltip, { text: 'Boms' }, () =>
@@ -100,9 +100,9 @@ const columns: ColumnDef<Product>[] = [
                         h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(ScrollText, { class: 'size-3' })),
                     ),
                 ),
-                h(Tooltip, { text: 'Edit' }, () =>
-                    h(Link, { href: route('products.edit', { tenant: tenant?.id || '', product: product.id }) }, () =>
-                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
+                h(Tooltip, { text: 'Prices' }, () =>
+                    h(Link, { href: route('products.prices.index', { tenant: tenant?.id || '', product: product.id }) }, () =>
+                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(CircleDollarSign, { class: 'size-3' })),
                     ),
                 ),
                 h(
