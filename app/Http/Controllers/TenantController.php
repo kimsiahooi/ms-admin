@@ -50,18 +50,7 @@ class TenantController extends Controller
      */
     public function create()
     {
-        return inertia('Admin/Tenants/Create', [
-            'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(function ($status) {
-                        return [
-                            'name' => $status->label(),
-                            'value' => $status->value,
-                            'is_default' => $status->value === Status::ACTIVE->value,
-                        ];
-                    }),
-            ]
-        ]);
+        // 
     }
 
     /**

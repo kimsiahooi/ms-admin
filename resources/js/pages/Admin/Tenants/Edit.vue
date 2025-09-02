@@ -7,11 +7,9 @@ import type { SwitchOption } from '@/components/shared/switch/types';
 import AppLayout from '@/layouts/Admin/AppLayout.vue';
 import AppMainLayout from '@/layouts/Admin/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import type { Tenant } from '@/types/Admin/tenants';
+import type { StatusLabel, Tenant } from '@/types/Admin/tenants';
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed, reactive, watch } from 'vue';
-
-type StatusLabel = Exclude<Tenant['status_label'], null | undefined>;
 
 defineOptions({
     layout: AppMainLayout,

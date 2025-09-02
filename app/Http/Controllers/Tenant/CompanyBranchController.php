@@ -19,9 +19,16 @@ class CompanyBranchController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $branches = $company->branches()->when($request->search, function (Builder $query, $search) {
-            $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");
-        })->latest()
+        $branches = $company->branches()->when(
+            $request->search,
+            fn(Builder $query, $search) =>
+            $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
+        )
+            ->when(
+                $request->status,
+                fn(Builder $query, $status) =>
+                $query->whereIn('status', $status)
+            )->latest()
             ->paginate($entries)
             ->withQueryString();
 
@@ -30,7 +37,7 @@ class CompanyBranchController extends Controller
             'branches' => $branches,
             'options' => [
                 'statuses' => collect(Status::cases())
-                    ->map(function ($status) {
+                    ->map(function (Status $status) {
                         return [
                             'name' => $status->label(),
                             'value' => $status->value,

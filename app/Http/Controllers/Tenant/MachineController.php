@@ -18,9 +18,16 @@ class MachineController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $machines = Machine::when($request->search, function (Builder $query, $search) {
-            $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");
-        })->latest()
+        $machines = Machine::when(
+            $request->search,
+            fn(Builder $query, $search) =>
+            $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
+        )
+            ->when(
+                $request->status,
+                fn(Builder $query, $status) =>
+                $query->whereIn('status', $status)
+            )->latest()
             ->paginate($entries)
             ->withQueryString();
 
@@ -92,7 +99,6 @@ class MachineController extends Controller
                         return [
                             'name' => $status->label(),
                             'value' => $status->value,
-                            'is_default' => $status->value === Status::ACTIVE->value,
                         ];
                     }),
             ]

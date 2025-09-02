@@ -36,7 +36,7 @@ class CompanyController extends Controller
             'companies' => $companies,
             'options' => [
                 'statuses' => collect(Status::cases())
-                    ->map(function ($status) {
+                    ->map(function (Status $status) {
                         return [
                             'name' => $status->label(),
                             'value' => $status->value,
@@ -100,7 +100,6 @@ class CompanyController extends Controller
                         return [
                             'name' => $status->label(),
                             'value' => $status->value,
-                            'is_default' => $status->value === Status::ACTIVE->value,
                         ];
                     }),
             ]

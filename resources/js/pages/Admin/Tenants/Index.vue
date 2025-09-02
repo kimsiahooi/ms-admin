@@ -15,15 +15,13 @@ import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Admin/AppLayout.vue';
 import AppMainLayout from '@/layouts/Admin/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import type { Tenant } from '@/types/Admin/tenants';
+import type { StatusLabel, Tenant } from '@/types/Admin/tenants';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
 import { Pencil, Trash2 } from 'lucide-vue-next';
 import slug from 'slug';
 import { computed, h, reactive, watch } from 'vue';
-
-type StatusLabel = Exclude<Tenant['status_label'], null | undefined>;
 
 defineOptions({
     layout: AppMainLayout,
