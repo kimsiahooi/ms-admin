@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Badge } from '@/components/shared/badge';
 import { ActionButton } from '@/components/shared/custom/action';
 import Layout from '@/components/shared/custom/container/Layout.vue';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
@@ -8,7 +9,6 @@ import type { PaginateData } from '@/components/shared/pagination/types';
 import type { SwitchOption } from '@/components/shared/switch/types';
 import { DataTable } from '@/components/shared/table';
 import type { VisibilityState } from '@/components/shared/table/types';
-import { Badge } from '@/components/ui/badge';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
 import { useTenant } from '@/composables/useTenant';
 import { entryOptions } from '@/constants/entries/options';
@@ -111,7 +111,7 @@ const columns: ColumnDef<Company>[] = [
         cell: ({ row }) => {
             const { status, status_label } = row.original;
 
-            return h(Badge, { variant: status === 'INACTIVE' ? 'destructive' : 'default' }, () => status_label);
+            return (status_label?.name && h(Badge, { variant: status_label.variant }, () => status_label.name)) ?? status;
         },
     },
     {

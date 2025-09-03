@@ -25,7 +25,26 @@ class Company extends Model
     protected function statusLabel(): Attribute
     {
         return Attribute::make(
-            get: fn($value, $attributes) => Status::tryFrom($attributes['status'])?->label(),
+            get: function ($value, $attributes) {
+                $status = $attributes['status'];
+
+                switch ($status) {
+                    case Status::ACTIVE->value:
+                        $variant = 'success';
+                        break;
+                    case Status::INACTIVE->value:
+                        $variant = 'destructive';
+                        break;
+                    default:
+                        $variant = 'default';
+                        break;
+                }
+
+                return [
+                    'name' => Status::tryFrom($status)?->label(),
+                    'variant' => $variant,
+                ];
+            },
         );
     }
 
