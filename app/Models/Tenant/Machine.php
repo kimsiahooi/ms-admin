@@ -3,6 +3,7 @@
 namespace App\Models\Tenant;
 
 use App\enums\Tenant\Machine\Status;
+use App\Traits\Tenant\StatusBadgeTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -14,7 +15,7 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class Machine extends Model
 {
     /** @use HasFactory<\Database\Factories\Tenant\MachineFactory> */
-    use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
+    use HasFactory, SoftDeletes, BelongsToTenant, HasUlids, StatusBadgeTrait;
 
     protected $fillable = ['name', 'code', 'description', 'status', 'tenant_id'];
 
@@ -25,7 +26,7 @@ class Machine extends Model
     protected function statusLabel(): Attribute
     {
         return Attribute::make(
-            get: fn($value, $attributes) => Status::tryFrom($attributes['status'])?->label(),
+            get: fn($value, $attributes) => $this->formatStatus($attributes['status'], Status::class),
         );
     }
 

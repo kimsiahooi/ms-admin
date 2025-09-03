@@ -104,7 +104,7 @@ class TenantController extends Controller
             'status' => ['required', Rule::enum(Status::class)],
         ])));
 
-        return to_route('admin.tenants.index')->with('success', 'Tenant created successfully.');
+        return to_route('admin.tenants.index')->with('success', 'Tenant updated successfully.');
     }
 
     /**

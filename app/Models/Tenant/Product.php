@@ -3,6 +3,7 @@
 namespace App\Models\Tenant;
 
 use App\enums\Tenant\Product\Status;
+use App\Traits\Tenant\StatusBadgeTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -14,13 +15,20 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class Product extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
-    use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
+    use HasFactory, SoftDeletes, BelongsToTenant, HasUlids, StatusBadgeTrait;
 
     protected $fillable = ['name', 'code', 'description', 'status', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
     protected $appends = ['status_label'];
+
+    protected function statusLabel(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value, $attributes) => $this->formatStatus($attributes['status'], Status::class),
+        );
+    }
 
     public function prices()
     {
@@ -35,13 +43,6 @@ class Product extends Model
     public function boms()
     {
         return $this->hasMany(Bom::class);
-    }
-
-    protected function statusLabel(): Attribute
-    {
-        return Attribute::make(
-            get: fn($value, $attributes) => Status::tryFrom($attributes['status'])?->label(),
-        );
     }
 
     public function scopeActive(Builder $query): void

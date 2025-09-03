@@ -6,6 +6,7 @@ use App\enums\Tenant\Product\Preset\CavityType;
 use App\enums\Tenant\Product\Preset\CycleTimeType;
 use App\enums\Tenant\Product\Preset\ShelfLifeType;
 use App\enums\Tenant\Product\Preset\Status;
+use App\Traits\Tenant\StatusBadgeTrait;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,7 +16,7 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class ProductPreset extends Model
 {
-    use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
+    use HasFactory, SoftDeletes, BelongsToTenant, HasUlids, StatusBadgeTrait;
 
     protected $fillable = ['product_id', 'machine_id', 'name', 'code', 'description', 'cavity_quantity', 'cavity_type', 'cycle_time', 'cycle_time_type', 'shelf_life_duration', 'shelf_life_type', 'status', 'tenant_id'];
 
@@ -40,7 +41,7 @@ class ProductPreset extends Model
     protected function statusLabel(): Attribute
     {
         return Attribute::make(
-            get: fn($value, $attributes) => Status::tryFrom($attributes['status'])?->label(),
+            get: fn($value, $attributes) => $this->formatStatus($attributes['status'], Status::class),
         );
     }
 

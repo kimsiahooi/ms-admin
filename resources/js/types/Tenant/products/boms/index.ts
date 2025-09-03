@@ -1,3 +1,4 @@
+import type { BadgeVariants } from '@/components/shared/badge';
 import type { Material } from '@/types/Tenant/materials';
 import type { Product } from '@/types/Tenant/products';
 
@@ -9,7 +10,10 @@ export interface ProductBom {
     code: string;
     description: string | null;
     status: 'ACTIVE' | 'INACTIVE';
-    status_label?: StatusLabel | null;
+    status_label?: {
+        name: StatusLabel | null;
+        variant: BadgeVariants['variant'];
+    };
     product_id: Product['id'];
     created_at: Date | null;
     updated_at: Date | null;

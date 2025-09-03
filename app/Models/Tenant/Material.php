@@ -4,6 +4,7 @@ namespace App\Models\Tenant;
 
 use App\enums\Tenant\Material\Status;
 use App\enums\Tenant\Material\UnitType;
+use App\Traits\Tenant\StatusBadgeTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -15,13 +16,20 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class Material extends Model
 {
     /** @use HasFactory<\Database\Factories\Tenant\MaterialFactory> */
-    use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
+    use HasFactory, SoftDeletes, BelongsToTenant, HasUlids, StatusBadgeTrait;
 
     protected $fillable = ['name', 'code', 'description', 'unit_type', 'status', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
     protected $appends = ['unit_type_label', 'status_label'];
+
+    protected function statusLabel(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value, $attributes) => $this->formatStatus($attributes['status'], Status::class),
+        );
+    }
 
     public function boms()
     {
@@ -32,13 +40,6 @@ class Material extends Model
     {
         return Attribute::make(
             get: fn($value, $attributes) => UnitType::tryFrom($attributes['unit_type'])?->label(),
-        );
-    }
-
-    protected function statusLabel(): Attribute
-    {
-        return Attribute::make(
-            get: fn($value, $attributes) => Status::tryFrom($attributes['status'])?->label(),
         );
     }
 

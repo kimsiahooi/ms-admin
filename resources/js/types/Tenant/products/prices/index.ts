@@ -1,3 +1,4 @@
+import type { BadgeVariants } from '@/components/shared/badge';
 import type { Product } from '@/types/Tenant/products';
 
 export type StatusLabel = 'Active' | 'Inactive';
@@ -168,7 +169,10 @@ export interface ProductPrice {
         | 'ZWL';
     amount: string;
     status: 'ACTIVE' | 'INACTIVE';
-    status_label?: StatusLabel | null;
+    status_label?: {
+        name: StatusLabel | null;
+        variant: BadgeVariants['variant'];
+    };
     product_id: Product['id'];
     created_at: Date | null;
     updated_at: Date | null;

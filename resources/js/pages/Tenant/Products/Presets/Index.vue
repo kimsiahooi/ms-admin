@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { StatusBadge } from '@/components/shared/badge';
 import { ActionButton } from '@/components/shared/custom/action';
 import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
@@ -9,7 +10,6 @@ import type { SelectOption } from '@/components/shared/select/types';
 import type { SwitchOption } from '@/components/shared/switch/types';
 import { DataTable } from '@/components/shared/table';
 import type { VisibilityState } from '@/components/shared/table/types';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
 import { useTenant } from '@/composables/useTenant';
@@ -120,9 +120,9 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
         accessorKey: 'status',
         header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
-            const { status, status_label } = row.original;
+            const { status_label } = row.original;
 
-            return h(Badge, { variant: status === 'INACTIVE' ? 'destructive' : 'default' }, () => status_label);
+            return h(StatusBadge, { statusLabel: status_label });
         },
     },
     {
