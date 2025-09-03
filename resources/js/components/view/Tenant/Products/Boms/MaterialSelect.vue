@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { Select } from '@/components/shared/select';
+import { FormInput, FormSelect } from '@/components/shared/custom/form';
 import type { SelectOption } from '@/components/shared/select/types';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useUuid } from '@/composables/useUuid';
 import type { Material } from '@/types/Tenant/materials';
 import { Minus } from 'lucide-vue-next';
@@ -13,6 +12,7 @@ const props = defineProps<{
     materialOptions: SelectOption<Material>[];
     unitTypeOptions: SelectOption<Material['unit_type']>[];
     totalSelected: number;
+    currIndex: number;
 }>();
 
 const model = defineModel<MaterialConfig>();
@@ -72,15 +72,27 @@ watch(
 
 <template>
     <div>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-col gap-2 md:flex-row md:items-center">
             <div class="flex-1">
-                <Select :options="filteredOptions" placeholder="Select Material" v-model:model-value="selected" trigger-class="w-full" />
+                <FormSelect label="Material" :options="filteredOptions" v-model:model-value="selected" :error-key="`materials.${currIndex}.id`" />
             </div>
             <div class="flex-1">
-                <Select :options="unitTypeOptions" placeholder="Select Unit Type" v-model:model-value="form.unit_type" trigger-class="w-full" />
+                <FormSelect
+                    label="Unit Type"
+                    :options="unitTypeOptions"
+                    v-model:model-value="form.unit_type"
+                    :error-key="`materials.${currIndex}.unit_type`"
+                />
             </div>
             <div class="flex-1">
-                <Input type="number" placeholder="Enter Quantity" v-model:model-value.number="form.quantity" min="0" step=".01" />
+                <FormInput
+                    label="Quantity"
+                    type="number"
+                    v-model:model-value="form.quantity"
+                    min="0"
+                    step=".01"
+                    :error-key="`materials.${currIndex}.quantity`"
+                />
             </div>
             <div v-if="totalSelected > 1">
                 <Button type="button" class="cursor-pointer" size="icon" variant="destructive" @click="removeMaterial">

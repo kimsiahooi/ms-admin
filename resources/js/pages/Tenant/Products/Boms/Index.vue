@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { ActionButton } from '@/components/shared/custom/action';
+import { Layout } from '@/components/shared/custom/container';
+import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
 import { DeleteDialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination/types';
+import type { SwitchOption } from '@/components/shared/switch/types';
 import { DataTable } from '@/components/shared/table';
-import type { Filter, SearchConfig, VisibilityState } from '@/components/shared/table/types';
-import { Tooltip } from '@/components/shared/tooltip';
+import type { VisibilityState } from '@/components/shared/table/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
@@ -12,7 +15,8 @@ import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import type { Product, ProductBom } from '@/types/Tenant/products';
+import type { Product } from '@/types/Tenant/products';
+import type { ProductBom, StatusLabel } from '@/types/Tenant/products/boms';
 import { Head, Link, router } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
@@ -26,6 +30,9 @@ defineOptions({
 const props = defineProps<{
     product: Product;
     boms: PaginateData<ProductBom[]>;
+    options: {
+        statuses: SwitchOption<ProductBom['status'], StatusLabel>[];
+    };
 }>();
 
 const { tenant } = useTenant();
@@ -33,14 +40,11 @@ const { formatDateTime } = useFormatDateTime();
 
 const routeParams = computed(() => route().params);
 
-const filter = reactive<Filter>({
+const filter = reactive<Record<string, string>>({
     search: routeParams.value.search,
     entries: routeParams.value.entries || '10',
+    status: routeParams.value.status,
 });
-
-const searchConfig: SearchConfig = {
-    placeholder: 'Search name...',
-};
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -61,9 +65,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const filterChangeHandler = (filter: Filter) => {
-    router.visit(route('products.boms.index', { ...pickBy(filter), tenant: tenant?.id || '', product: props.product.id }));
-};
+const search = () => router.visit(route('products.boms.index', { ...pickBy(filter), tenant: tenant?.id || '', product: props.product.id }));
+const reset = () => router.visit(route('products.boms.index', { tenant: tenant?.id || '', product: props.product.id }));
 
 const columnVisibility = <VisibilityState<Partial<ProductBom>>>{
     id: false,
@@ -78,11 +81,11 @@ const columns: ColumnDef<ProductBom>[] = [
             const bom = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(Tooltip, { text: 'Edit' }, () =>
-                    h(Link, { href: route('products.boms.edit', { tenant: tenant?.id || '', product: props.product.id, bom: bom.id }) }, () =>
-                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
-                    ),
-                ),
+                h(ActionButton, {
+                    text: 'Edit',
+                    href: route('products.boms.edit', { tenant: tenant?.id || '', product: props.product.id, bom: bom.id }),
+                    icon: Pencil,
+                }),
                 h(
                     DeleteDialog,
                     {
@@ -91,11 +94,11 @@ const columns: ColumnDef<ProductBom>[] = [
                         asChild: false,
                     },
                     () =>
-                        h(Tooltip, { text: 'Delete' }, () =>
-                            h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
-                                h(Trash2, { class: 'size-3' }),
-                            ),
-                        ),
+                        h(ActionButton, {
+                            variant: 'destructive',
+                            text: 'Delete',
+                            icon: Trash2,
+                        }),
                 ),
             ]);
         },
@@ -106,7 +109,7 @@ const columns: ColumnDef<ProductBom>[] = [
         cell: ({ row }) => {
             const { status, status_label } = row.original;
 
-            return h(Badge, { variant: status ? 'default' : 'destructive' }, () => status_label);
+            return h(Badge, { variant: status === 'INACTIVE' ? 'destructive' : 'default' }, () => status_label);
         },
     },
     {
@@ -146,8 +149,19 @@ const columns: ColumnDef<ProductBom>[] = [
     <Head title="Product Boms" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+        <Layout>
             <div class="space-y-3">
+                <FilterCard @search="search" @reset="reset">
+                    <FilterInput label="Name" placeholder="Search ID, Name, Code" v-model:model-value="filter.search" />
+                    <FilterSelect
+                        label="Status"
+                        placeholder="Select Status"
+                        :options="options.statuses"
+                        multiple
+                        v-model:model-value="filter.status"
+                    />
+                </FilterCard>
+
                 <div class="flex flex-wrap items-center justify-end gap-2">
                     <Link :href="route('products.boms.create', { tenant: tenant?.id || '', product: props.product.id })" as-child>
                         <Button class="cursor-pointer">Create</Button>
@@ -155,16 +169,15 @@ const columns: ColumnDef<ProductBom>[] = [
                 </div>
                 <div>
                     <DataTable
+                        v-model:model-value="filter"
                         :columns="columns"
                         :paginate-data="boms"
                         :column-visibility="columnVisibility"
-                        :filter="filter"
                         :entry-options="entryOptions"
-                        :search-config="searchConfig"
-                        @filter-change="filterChangeHandler"
+                        @search="search"
                     />
                 </div>
             </div>
-        </div>
+        </Layout>
     </AppLayout>
 </template>

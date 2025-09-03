@@ -10,6 +10,7 @@ use App\Http\Requests\Tenant\Product\Bom\UpdateBomRequest;
 use App\Models\Tenant\Bom;
 use App\Models\Tenant\Material;
 use App\Models\Tenant\Product;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class ProductBomController extends Controller
@@ -21,15 +22,30 @@ class ProductBomController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $boms = $product->boms()->when($request->search, function ($query, $search) {
-            $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");
-        })->latest()
+        $boms = $product->boms()->when(
+            $request->search,
+            fn(Builder $query, $search) =>
+            $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
+        )
+            ->when(
+                $request->status,
+                fn(Builder $query, $status) =>
+                $query->whereIn('status', $status)
+            )->latest()
             ->paginate($entries)
             ->withQueryString();
 
         return inertia('Tenant/Products/Boms/Index', [
             'product' => $product,
             'boms' => $boms,
+            'options' => [
+                'statuses' => collect(Status::cases())
+                    ->map(fn(Status $status) => [
+                        'name' => $status->label(),
+                        'value' => $status->value,
+                        'is_default' => $status->value === Status::ACTIVE->value,
+                    ]),
+            ]
         ]);
     }
 
@@ -78,7 +94,10 @@ class ProductBomController extends Controller
 
         $bom->materials()->sync($materials);
 
-        return to_route('products.boms.index', ['tenant' => tenant('id'), 'product' => $product->id])->with('success', 'Product Bom created successfully.');
+        return to_route('products.boms.index', [
+            'tenant' => tenant('id'),
+            'product' => $product->id
+        ])->with('success', 'Product Bom created successfully.');
     }
 
     /**
@@ -134,7 +153,10 @@ class ProductBomController extends Controller
 
         $bom->materials()->sync($materials);
 
-        return to_route('products.boms.index', ['tenant' => tenant('id'), 'product' => $product->id])->with('success', 'Product Bom updated successfully.');
+        return to_route('products.boms.index', [
+            'tenant' => tenant('id'),
+            'product' => $product->id
+        ])->with('success', 'Product Bom updated successfully.');
     }
 
     /**

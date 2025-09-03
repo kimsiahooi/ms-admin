@@ -1,18 +1,16 @@
 <script setup lang="ts">
+import { ActionButton } from '@/components/shared/custom/action';
+import { Layout } from '@/components/shared/custom/container';
+import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
+import { FormButton, FormInput, FormSelect, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination/types';
-import { Select } from '@/components/shared/select';
 import type { SelectOption } from '@/components/shared/select/types';
 import type { SwitchOption } from '@/components/shared/switch/types';
 import { DataTable } from '@/components/shared/table';
-import type { Filter, SearchConfig, VisibilityState } from '@/components/shared/table/types';
-import { Tooltip } from '@/components/shared/tooltip';
+import type { VisibilityState } from '@/components/shared/table/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
 import { useTenant } from '@/composables/useTenant';
 import { entryOptions } from '@/constants/entries/options';
@@ -20,11 +18,12 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Machine } from '@/types/Tenant/machines';
-import type { Product, ProductPreset, ProductPresetWithMachine } from '@/types/Tenant/products';
+import type { Product } from '@/types/Tenant/products';
+import type { ProductPreset, ProductPresetWithMachine, StatusLabel } from '@/types/Tenant/products/presets';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { Loader, Pencil, Trash2 } from 'lucide-vue-next';
+import { Pencil, Trash2 } from 'lucide-vue-next';
 import slug from 'slug';
 import { computed, h, reactive, watch } from 'vue';
 
@@ -40,7 +39,7 @@ const props = defineProps<{
         cavity_types: SelectOption<ProductPreset['cavity_type']>[];
         cycle_time_types: SelectOption<ProductPreset['cycle_time_type']>[];
         shelf_life_types: SelectOption<ProductPreset['shelf_life_type']>[];
-        statuses: SwitchOption<ProductPresetWithMachine['status']>[];
+        statuses: SwitchOption<ProductPreset['status'], StatusLabel>[];
     };
 }>();
 
@@ -49,9 +48,10 @@ const { formatDateTime } = useFormatDateTime();
 
 const routeParams = computed(() => route().params);
 
-const filter = reactive<Filter>({
+const filter = reactive<Record<string, string>>({
     search: routeParams.value.search,
     entries: routeParams.value.entries || '10',
+    status: routeParams.value.status,
 });
 
 const setting = reactive({
@@ -59,10 +59,6 @@ const setting = reactive({
         dialogIsOpen: false,
     },
 });
-
-const searchConfig: SearchConfig = {
-    placeholder: 'Search name...',
-};
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -83,8 +79,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const filterChangeHandler = (filter: Filter) =>
-    router.visit(route('products.presets.index', { ...pickBy(filter), tenant: tenant?.id || '', product: props.product.id }));
+const search = () => router.visit(route('products.presets.index', { ...pickBy(filter), tenant: tenant?.id || '', product: props.product.id }));
+const reset = () => router.visit(route('products.presets.index', { tenant: tenant?.id || '', product: props.product.id }));
 
 const columnVisibility = <VisibilityState<Partial<ProductPresetWithMachine>>>{
     id: false,
@@ -98,16 +94,11 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
         cell: ({ row }) => {
             const preset = row.original;
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(Tooltip, { text: 'Edit' }, () =>
-                    h(
-                        Link,
-                        {
-                            href: route('products.presets.edit', { tenant: tenant?.id || '', product: props.product.id, preset: preset.id }),
-                            asChild: true,
-                        },
-                        () => h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
-                    ),
-                ),
+                h(ActionButton, {
+                    text: 'Edit',
+                    href: route('products.presets.edit', { tenant: tenant?.id || '', product: props.product.id, preset: preset.id }),
+                    icon: Pencil,
+                }),
                 h(
                     DeleteDialog,
                     {
@@ -116,11 +107,11 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
                         asChild: false,
                     },
                     () =>
-                        h(Tooltip, { text: 'Delete' }, () =>
-                            h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
-                                h(Trash2, { class: 'size-3' }),
-                            ),
-                        ),
+                        h(ActionButton, {
+                            variant: 'destructive',
+                            text: 'Delete',
+                            icon: Trash2,
+                        }),
                 ),
             ]);
         },
@@ -130,7 +121,8 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
         header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
             const { status, status_label } = row.original;
-            return h(Badge, { variant: status ? 'default' : 'destructive' }, () => status_label);
+
+            return h(Badge, { variant: status === 'INACTIVE' ? 'destructive' : 'default' }, () => status_label);
         },
     },
     {
@@ -217,9 +209,11 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
     },
 ];
 
-const defaultStatus = computed(() => props.options.statuses.find((status) => status.is_default)?.value);
+const defaultStatus = computed<ProductPresetWithMachine['status']>(
+    () => props.options.statuses.find((status) => status.is_default)?.value ?? 'ACTIVE',
+);
 
-const statusDisplay = computed(() => props.options.statuses.find((status) => (form.status ? status.value : !status.value))?.name);
+const statusDisplay = computed<StatusLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
 
 const form = useForm<{
     machine_id: Machine['id'] | '';
@@ -244,14 +238,14 @@ const form = useForm<{
     cycle_time_type: '',
     shelf_life_duration: '',
     shelf_life_type: '',
-    status: defaultStatus.value !== undefined ? defaultStatus.value : 1,
+    status: defaultStatus.value,
 });
 
 const config = reactive({
-    status: !!form.status,
+    status: form.status === 'ACTIVE',
 });
 
-const create = () =>
+const submit = () =>
     form.post(route('products.presets.store', { tenant: tenant?.id || '', product: props.product.id }), {
         onSuccess: () => {
             form.reset();
@@ -269,7 +263,7 @@ watch(
 watch(
     () => config.status,
     (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === 1 : status.value === 0))?.value;
+        const value = props.options.statuses.find((status) => (newVal ? status.value === 'ACTIVE' : status.value === 'INACTIVE'))?.value;
 
         if (value !== undefined) {
             form.status = value;
@@ -282,129 +276,89 @@ watch(
     <Head title="Product Presets" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+        <Layout>
             <div class="space-y-3">
+                <FilterCard @search="search" @reset="reset">
+                    <FilterInput label="Name" placeholder="Search ID, Name, Code" v-model:model-value="filter.search" />
+                    <FilterSelect
+                        label="Status"
+                        placeholder="Select Status"
+                        :options="options.statuses"
+                        multiple
+                        v-model:model-value="filter.status"
+                    />
+                </FilterCard>
+
                 <div class="flex flex-wrap items-center justify-end gap-2">
                     <Dialog title="Create Preset" v-model:open="setting.create.dialogIsOpen">
-                        <template #trigger>
-                            <Button class="cursor-pointer">Create</Button>
-                        </template>
-                        <form @submit.prevent="create" class="space-y-4">
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label>Name</Label>
-                                <Input type="text" placeholder="Enter Name" v-model:model-value="form.name" />
-                                <p v-if="form.errors.name" class="text-destructive">{{ form.errors.name }}</p>
-                            </div>
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label>Code</Label>
-                                <Input type="text" placeholder="Enter Code" v-model:model-value="form.code" />
-                                <p v-if="form.errors.code" class="text-destructive">{{ form.errors.code }}</p>
-                            </div>
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label>Description</Label>
-                                <Textarea placeholder="Enter Description" v-model:model-value="form.description" />
-                                <p v-if="form.errors.description" class="text-destructive">{{ form.errors.description }}</p>
-                            </div>
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label>Machine</Label>
-                                <Select
-                                    :options="options.machines"
-                                    placeholder="Select Machine"
-                                    v-model:model-value="form.machine_id"
-                                    trigger-class="w-full"
-                                />
-                                <p v-if="form.errors.machine_id" class="text-destructive">{{ form.errors.machine_id }}</p>
-                            </div>
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label>Cavity Quantity</Label>
-                                <Input
-                                    type="number"
-                                    placeholder="Enter Cavity Quantity"
-                                    v-model:model-value.number="form.cavity_quantity"
-                                    min="0"
-                                    step=".01"
-                                />
-                                <p v-if="form.errors.cavity_quantity" class="text-destructive">{{ form.errors.cavity_quantity }}</p>
-                            </div>
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label>Cavity Type</Label>
-                                <Select
-                                    :options="options.cavity_types"
-                                    placeholder="Select Cavity Type"
-                                    v-model:model-value="form.cavity_type"
-                                    trigger-class="w-full"
-                                />
-                                <p v-if="form.errors.cavity_type" class="text-destructive">{{ form.errors.cavity_type }}</p>
-                            </div>
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label>Cycle Time</Label>
-                                <Input type="number" placeholder="Enter Cycle Time" v-model:model-value.number="form.cycle_time" min="0" step=".01" />
-                                <p v-if="form.errors.cycle_time" class="text-destructive">{{ form.errors.cycle_time }}</p>
-                            </div>
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label>Cycle Time Type</Label>
-                                <Select
-                                    :options="options.cycle_time_types"
-                                    placeholder="Select Cycle Time Type"
-                                    v-model:model-value="form.cycle_time_type"
-                                    trigger-class="w-full"
-                                />
-                                <p v-if="form.errors.cycle_time_type" class="text-destructive">{{ form.errors.cycle_time_type }}</p>
-                            </div>
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <div class="grid gap-1.5 md:grid-cols-2">
-                                    <div class="grid gap-1.5">
-                                        <Label>Shelf Life Duration</Label>
-                                        <Input
-                                            type="number"
-                                            placeholder="Enter Shelf Life Duration"
-                                            v-model:model-value="form.shelf_life_duration"
-                                            min="0.01"
-                                            step=".01"
-                                            class="w-full"
-                                        />
-                                    </div>
-                                    <div class="grid gap-1.5">
-                                        <Label>Shelf Life Type</Label>
-                                        <Select
-                                            :options="options.shelf_life_types"
-                                            placeholder="Select Shelf Life Type"
-                                            v-model:model-value="form.shelf_life_type"
-                                            trigger-class="w-full"
-                                        />
-                                    </div>
-                                </div>
-                                <p v-if="form.errors.shelf_life_duration" class="text-destructive">{{ form.errors.shelf_life_duration }}</p>
-                                <p v-if="form.errors.shelf_life_type" class="text-destructive">{{ form.errors.shelf_life_type }}</p>
-                            </div>
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label class="mb-1">Status</Label>
-                                <div class="flex items-center space-x-2">
-                                    <Switch class="cursor-pointer" v-model:model-value="config.status" />
-                                    <Label>{{ statusDisplay }}</Label>
-                                </div>
-                                <p v-if="form.errors.status" class="text-destructive">{{ form.errors.status }}</p>
-                            </div>
-                            <div class="flex gap-2">
-                                <Button type="submit" class="cursor-pointer" :disabled="form.processing">
-                                    <Loader v-if="form.processing" class="animate-spin" /> Create
-                                </Button>
-                            </div>
+                        <form @submit.prevent="submit" class="space-y-4">
+                            <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
+                            <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
+                            <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
+                            <FormSelect
+                                label="Machine"
+                                :options="options.machines"
+                                v-model:model-value="form.machine_id"
+                                :error="form.errors.machine_id"
+                            />
+                            <FormInput
+                                label="Cavity Quantity"
+                                :error="form.errors.cavity_quantity"
+                                v-model:model-value="form.cavity_quantity"
+                                type="number"
+                                min="0"
+                                step=".01"
+                            />
+                            <FormSelect
+                                label="Cavity Type"
+                                :options="options.cavity_types"
+                                v-model:model-value="form.cavity_type"
+                                :error="form.errors.cavity_type"
+                            />
+                            <FormInput
+                                label="Cycle Time"
+                                :error="form.errors.cycle_time"
+                                v-model:model-value="form.cycle_time"
+                                type="number"
+                                min="0"
+                                step=".01"
+                            />
+                            <FormSelect
+                                label="Cycle Time Type"
+                                :options="options.cycle_time_types"
+                                v-model:model-value="form.cycle_time_type"
+                                :error="form.errors.cycle_time_type"
+                            />
+                            <FormInput
+                                label="Shelf Life Duration"
+                                :error="form.errors.shelf_life_duration"
+                                v-model:model-value="form.shelf_life_duration"
+                                type="number"
+                                min="0"
+                                step=".01"
+                            />
+                            <FormSelect
+                                label="Shelf Life Type"
+                                :options="options.shelf_life_types"
+                                v-model:model-value="form.shelf_life_type"
+                                :error="form.errors.shelf_life_type"
+                            />
+                            <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="config.status" />
+                            <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
                         </form>
                     </Dialog>
                 </div>
                 <div>
                     <DataTable
+                        v-model:model-value="filter"
                         :columns="columns"
                         :paginate-data="presets"
                         :column-visibility="columnVisibility"
-                        :filter="filter"
                         :entry-options="entryOptions"
-                        :search-config="searchConfig"
-                        @filter-change="filterChangeHandler"
+                        @search="search"
                     />
                 </div>
             </div>
-        </div>
+        </Layout>
     </AppLayout>
 </template>

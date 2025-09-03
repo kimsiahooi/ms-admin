@@ -8,15 +8,14 @@ defineProps<{
     label: string;
     placeholder: string;
     options: SelectOption[];
-    multiple?: boolean;
 }>();
 
-const model = defineModel<string>();
+const model = defineModel<string | string[]>();
 </script>
 
 <template>
     <FilterContainer>
         <Label>{{ label }}:</Label>
-        <Select :options="options" :placeholder="placeholder" trigger-class="w-full" v-model:model-value="model" :multiple="multiple" />
+        <Select v-bind="$attrs" :options="options" :placeholder="placeholder" trigger-class="w-full" v-model:model-value="model" />
     </FilterContainer>
 </template>

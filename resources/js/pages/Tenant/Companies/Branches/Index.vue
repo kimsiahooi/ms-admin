@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ActionButton } from '@/components/shared/custom/action';
-import Layout from '@/components/shared/custom/container/Layout.vue';
+import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
 import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';

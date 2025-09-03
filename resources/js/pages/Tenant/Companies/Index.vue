@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Badge } from '@/components/shared/badge';
+import { StatusBadge } from '@/components/shared/badge';
 import { ActionButton } from '@/components/shared/custom/action';
-import Layout from '@/components/shared/custom/container/Layout.vue';
+import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
 import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
@@ -109,9 +109,9 @@ const columns: ColumnDef<Company>[] = [
         accessorKey: 'status',
         header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
-            const { status, status_label } = row.original;
+            const { status_label } = row.original;
 
-            return (status_label?.name && h(Badge, { variant: status_label.variant }, () => status_label.name)) ?? status;
+            return h(StatusBadge, { statusLabel: status_label });
         },
     },
     {

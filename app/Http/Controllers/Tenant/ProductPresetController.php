@@ -23,9 +23,16 @@ class ProductPresetController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $presets = $product->presets()->with('machine')->when($request->search, function (Builder $query, $search) {
-            $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");
-        })->latest()
+        $presets = $product->presets()->with('machine')->when(
+            $request->search,
+            fn(Builder $query, $search) =>
+            $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
+        )
+            ->when(
+                $request->status,
+                fn(Builder $query, $status) =>
+                $query->whereIn('status', $status)
+            )->latest()
             ->paginate($entries)
             ->withQueryString();
 
@@ -169,7 +176,6 @@ class ProductPresetController extends Controller
                     ->map(fn($status) => [
                         'name' => $status->label(),
                         'value' => $status->value,
-                        'is_default' => $status->value === Status::ACTIVE->value,
                     ]),
             ],
         ]);

@@ -2,7 +2,7 @@
 
 namespace App\enums\Tenant\Product\Preset;
 
-enum ShelfLifeType: int
+enum ShelfLifeType: string
 {
     case MILLISECOND = 'MILLISECOND';
     case SECOND = 'SECOND';

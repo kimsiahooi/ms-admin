@@ -2,7 +2,7 @@
 
 namespace App\enums\Tenant\Product\Preset;
 
-enum CavityType: int
+enum CavityType: string
 {
     case PCS = 'PCS';
     case GRAM = 'GRAM';

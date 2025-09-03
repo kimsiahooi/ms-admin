@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { ErrorMessages } from '@/components/shared/error';
+import { Layout } from '@/components/shared/custom/container';
+import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import type { SelectOption } from '@/components/shared/select/types';
 import type { SwitchOption } from '@/components/shared/switch/types';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
 import { MaterialSelect, type MaterialConfig } from '@/components/view/Tenant/Products/Boms';
 import { useTenant } from '@/composables/useTenant';
 import { useUuid } from '@/composables/useUuid';
@@ -14,9 +12,10 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Material } from '@/types/Tenant/materials';
-import type { Product, ProductBom } from '@/types/Tenant/products';
+import type { Product } from '@/types/Tenant/products';
+import type { ProductBom, StatusLabel } from '@/types/Tenant/products/boms';
 import { Head, useForm } from '@inertiajs/vue3';
-import { Loader, Plus } from 'lucide-vue-next';
+import { Plus } from 'lucide-vue-next';
 import slug from 'slug';
 import { computed, reactive, ref, watch } from 'vue';
 
@@ -28,7 +27,7 @@ const props = defineProps<{
     product: Product;
     materials: Material[];
     options: {
-        statuses: SwitchOption<ProductBom['status']>[];
+        statuses: SwitchOption<ProductBom['status'], StatusLabel>[];
         unit_types: SelectOption<Material['unit_type']>[];
     };
 }>();
@@ -67,9 +66,10 @@ const materialConfig: Omit<MaterialConfig, 'key'> = {
 
 const selectedMaterials = ref<MaterialConfig[]>([{ ...materialConfig, key: uuid() }]);
 
-const defaultStatus = computed(() => props.options.statuses.find((status) => status.is_default)?.value);
+const defaultStatus = computed<ProductBom['status']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? 'ACTIVE');
 
-const statusDisplay = computed(() => props.options.statuses.find((status) => (form.status ? status.value : !status.value))?.name);
+const statusDisplay = computed<StatusLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
+
 const materialOptions = computed<SelectOption<Material>[]>(() => props.materials.map((material) => ({ name: material.name, value: material })));
 
 const form = useForm<{
@@ -88,11 +88,11 @@ const form = useForm<{
     code: '',
     description: '',
     materials: [],
-    status: defaultStatus.value !== undefined ? defaultStatus.value : 1,
+    status: defaultStatus.value,
 });
 
 const config = reactive({
-    status: !!form.status,
+    status: form.status === 'ACTIVE',
 });
 
 const addMeterial = () => {
@@ -128,7 +128,7 @@ watch(
 watch(
     () => config.status,
     (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === 1 : status.value === 0))?.value;
+        const value = props.options.statuses.find((status) => (newVal ? status.value === 'ACTIVE' : status.value === 'INACTIVE'))?.value;
 
         if (value !== undefined) {
             form.status = value;
@@ -141,27 +141,15 @@ watch(
     <Head title="Create Product Bom" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+        <Layout>
             <div class="space-y-3">
                 <form @submit.prevent="submit" class="space-y-4">
-                    <div class="grid w-full items-center gap-1.5">
-                        <Label>Name</Label>
-                        <Input type="text" placeholder="Enter Name" v-model:model-value="form.name" />
-                        <p v-if="form.errors.name" class="text-destructive">{{ form.errors.name }}</p>
-                    </div>
-                    <div class="grid w-full items-center gap-1.5">
-                        <Label>Code</Label>
-                        <Input type="text" placeholder="Enter Code" v-model:model-value="form.code" />
-                        <p v-if="form.errors.code" class="text-destructive">{{ form.errors.code }}</p>
-                    </div>
-                    <div class="grid w-full items-center gap-1.5">
-                        <Label>Description</Label>
-                        <Textarea placeholder="Enter Description" v-model:model-value="form.description" />
-                        <p v-if="form.errors.description" class="text-destructive">{{ form.errors.description }}</p>
-                    </div>
+                    <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
+                    <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
+                    <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
                     <div class="space-y-3">
                         <div>
-                            <Label class="mb-1">Materials</Label>
+                            <Label class="mb-1">Materials:</Label>
                         </div>
                         <div class="space-y-3">
                             <div v-for="(material, index) in selectedMaterials" :key="material.key" class="space-y-1">
@@ -170,31 +158,19 @@ watch(
                                     :unit-type-options="options.unit_types"
                                     :total-selected="selectedMaterials.length"
                                     v-model:model-value="selectedMaterials[index]"
+                                    :curr-index="index"
                                     @remove="removeMaterial"
                                 />
-                                <ErrorMessages :error-key="`materials.${index}`" />
                             </div>
                         </div>
                         <div class="flex items-center justify-center">
                             <Button type="button" class="cursor-pointer" variant="outline" @click="addMeterial"><Plus /> Add Material</Button>
                         </div>
                     </div>
-                    <div class="grid w-full items-center gap-1.5">
-                        <Label class="mb-1">Status</Label>
-                        <div class="flex items-center space-x-2">
-                            <Switch class="cursor-pointer" v-model:model-value="config.status" />
-                            <Label>{{ statusDisplay }}</Label>
-                        </div>
-                        <p v-if="form.errors.status" class="text-destructive">{{ form.errors.status }}</p>
-                    </div>
-
-                    <div class="flex gap-2">
-                        <Button type="submit" class="cursor-pointer" :disabled="form.processing">
-                            <Loader v-if="form.processing" class="animate-spin" /> Create
-                        </Button>
-                    </div>
+                    <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="config.status" />
+                    <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
                 </form>
             </div>
-        </div>
+        </Layout>
     </AppLayout>
 </template>

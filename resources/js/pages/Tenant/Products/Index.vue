@@ -1,27 +1,25 @@
 <script setup lang="ts">
+import { ActionButton } from '@/components/shared/custom/action';
+import { Layout } from '@/components/shared/custom/container';
+import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
+import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination/types';
 import type { SwitchOption } from '@/components/shared/switch/types';
 import { DataTable } from '@/components/shared/table';
-import type { Filter, SearchConfig, VisibilityState } from '@/components/shared/table/types';
-import { Tooltip } from '@/components/shared/tooltip';
+import type { VisibilityState } from '@/components/shared/table/types';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
 import { useTenant } from '@/composables/useTenant';
 import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import type { Product } from '@/types/Tenant/products';
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import type { Product, StatusLabel } from '@/types/Tenant/products';
+import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { CircleDollarSign, Loader, Pencil, ScrollText, Settings2, Trash2 } from 'lucide-vue-next';
+import { CircleDollarSign, Pencil, ScrollText, Settings2, Trash2 } from 'lucide-vue-next';
 import slug from 'slug';
 import { computed, h, reactive, watch } from 'vue';
 
@@ -32,7 +30,7 @@ defineOptions({
 const props = defineProps<{
     products: PaginateData<Product[]>;
     options: {
-        statuses: SwitchOption<Product['status']>[];
+        statuses: SwitchOption<Product['status'], StatusLabel>[];
     };
 }>();
 
@@ -41,9 +39,10 @@ const { formatDateTime } = useFormatDateTime();
 
 const routeParams = computed(() => route().params);
 
-const filter = reactive<Filter>({
+const filter = reactive<Record<string, string>>({
     search: routeParams.value.search,
     entries: routeParams.value.entries || '10',
+    status: routeParams.value.status,
 });
 
 const setting = reactive({
@@ -51,10 +50,6 @@ const setting = reactive({
         dialogIsOpen: false,
     },
 });
-
-const searchConfig: SearchConfig = {
-    placeholder: 'Search name...',
-};
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -67,9 +62,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const filterChangeHandler = (filter: Filter) => {
-    router.visit(route('products.index', { ...pickBy(filter), tenant: tenant?.id || '' }));
-};
+const search = () => router.visit(route('products.index', { ...pickBy(filter), tenant: tenant?.id || '' }));
+const reset = () => router.visit(route('products.index', { tenant: tenant?.id || '' }));
 
 const columnVisibility = <VisibilityState<Partial<Product>>>{
     id: false,
@@ -84,26 +78,26 @@ const columns: ColumnDef<Product>[] = [
             const product = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(Tooltip, { text: 'Edit' }, () =>
-                    h(Link, { href: route('products.edit', { tenant: tenant?.id || '', product: product.id }) }, () =>
-                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
-                    ),
-                ),
-                h(Tooltip, { text: 'Presets' }, () =>
-                    h(Link, { href: route('products.presets.index', { tenant: tenant?.id || '', product: product.id }) }, () =>
-                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Settings2, { class: 'size-3' })),
-                    ),
-                ),
-                h(Tooltip, { text: 'Boms' }, () =>
-                    h(Link, { href: route('products.boms.index', { tenant: tenant?.id || '', product: product.id }) }, () =>
-                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(ScrollText, { class: 'size-3' })),
-                    ),
-                ),
-                h(Tooltip, { text: 'Prices' }, () =>
-                    h(Link, { href: route('products.prices.index', { tenant: tenant?.id || '', product: product.id }) }, () =>
-                        h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(CircleDollarSign, { class: 'size-3' })),
-                    ),
-                ),
+                h(ActionButton, {
+                    text: 'Edit',
+                    href: route('products.edit', { tenant: tenant?.id || '', product: product.id }),
+                    icon: Pencil,
+                }),
+                h(ActionButton, {
+                    text: 'Presets',
+                    href: route('products.presets.index', { tenant: tenant?.id || '', product: product.id }),
+                    icon: Settings2,
+                }),
+                h(ActionButton, {
+                    text: 'Boms',
+                    href: route('products.boms.index', { tenant: tenant?.id || '', product: product.id }),
+                    icon: ScrollText,
+                }),
+                h(ActionButton, {
+                    text: 'Prices',
+                    href: route('products.prices.index', { tenant: tenant?.id || '', product: product.id }),
+                    icon: CircleDollarSign,
+                }),
                 h(
                     DeleteDialog,
                     {
@@ -112,11 +106,11 @@ const columns: ColumnDef<Product>[] = [
                         asChild: false,
                     },
                     () =>
-                        h(Tooltip, { text: 'Delete' }, () =>
-                            h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
-                                h(Trash2, { class: 'size-3' }),
-                            ),
-                        ),
+                        h(ActionButton, {
+                            variant: 'destructive',
+                            text: 'Delete',
+                            icon: Trash2,
+                        }),
                 ),
             ]);
         },
@@ -127,7 +121,7 @@ const columns: ColumnDef<Product>[] = [
         cell: ({ row }) => {
             const { status, status_label } = row.original;
 
-            return h(Badge, { variant: status ? 'default' : 'destructive' }, () => status_label);
+            return h(Badge, { variant: status === 'INACTIVE' ? 'destructive' : 'default' }, () => status_label);
         },
     },
     {
@@ -162,9 +156,9 @@ const columns: ColumnDef<Product>[] = [
     },
 ];
 
-const defaultStatus = computed(() => props.options.statuses.find((status) => status.is_default)?.value);
+const defaultStatus = computed<Product['status']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? 'ACTIVE');
 
-const statusDisplay = computed(() => props.options.statuses.find((status) => (form.status ? status.value : !status.value))?.name);
+const statusDisplay = computed<StatusLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
 
 const form = useForm<{
     name: string;
@@ -175,14 +169,14 @@ const form = useForm<{
     name: '',
     code: '',
     description: '',
-    status: defaultStatus.value !== undefined ? defaultStatus.value : 1,
+    status: defaultStatus.value,
 });
 
 const config = reactive({
-    status: !!form.status,
+    status: form.status === 'ACTIVE',
 });
 
-const create = () =>
+const submit = () =>
     form.post(route('products.store', { tenant: tenant?.id || '' }), {
         onSuccess: () => {
             form.reset();
@@ -200,7 +194,7 @@ watch(
 watch(
     () => config.status,
     (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === 1 : status.value === 0))?.value;
+        const value = props.options.statuses.find((status) => (newVal ? status.value === 'ACTIVE' : status.value === 'INACTIVE'))?.value;
 
         if (value !== undefined) {
             form.status = value;
@@ -213,57 +207,41 @@ watch(
     <Head title="Products" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+        <Layout>
             <div class="space-y-3">
+                <FilterCard @search="search" @reset="reset">
+                    <FilterInput label="Name" placeholder="Search ID, Name, Code" v-model:model-value="filter.search" />
+                    <FilterSelect
+                        label="Status"
+                        placeholder="Select Status"
+                        :options="options.statuses"
+                        multiple
+                        v-model:model-value="filter.status"
+                    />
+                </FilterCard>
+
                 <div class="flex flex-wrap items-center justify-end gap-2">
                     <Dialog title="Create Product" v-model:open="setting.create.dialogIsOpen">
-                        <template #trigger>
-                            <Button class="cursor-pointer">Create</Button>
-                        </template>
-                        <form @submit.prevent="create" class="space-y-4">
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label>Name</Label>
-                                <Input type="text" placeholder="Enter Name" v-model:model-value="form.name" />
-                                <p v-if="form.errors.name" class="text-destructive">{{ form.errors.name }}</p>
-                            </div>
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label>Code</Label>
-                                <Input type="text" placeholder="Enter Code" v-model:model-value="form.code" />
-                                <p v-if="form.errors.code" class="text-destructive">{{ form.errors.code }}</p>
-                            </div>
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label>Description</Label>
-                                <Textarea placeholder="Enter Description" v-model:model-value="form.description" />
-                                <p v-if="form.errors.description" class="text-destructive">{{ form.errors.description }}</p>
-                            </div>
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label class="mb-1">Status</Label>
-                                <div class="flex items-center space-x-2">
-                                    <Switch class="cursor-pointer" v-model:model-value="config.status" />
-                                    <Label>{{ statusDisplay }}</Label>
-                                </div>
-                                <p v-if="form.errors.status" class="text-destructive">{{ form.errors.status }}</p>
-                            </div>
-                            <div class="flex gap-2">
-                                <Button type="submit" class="cursor-pointer" :disabled="form.processing">
-                                    <Loader v-if="form.processing" class="animate-spin" /> Create
-                                </Button>
-                            </div>
+                        <form @submit.prevent="submit" class="space-y-4">
+                            <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
+                            <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
+                            <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
+                            <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="config.status" />
+                            <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
                         </form>
                     </Dialog>
                 </div>
                 <div>
                     <DataTable
+                        v-model:model-value="filter"
                         :columns="columns"
                         :paginate-data="products"
                         :column-visibility="columnVisibility"
-                        :filter="filter"
                         :entry-options="entryOptions"
-                        :search-config="searchConfig"
-                        @filter-change="filterChangeHandler"
+                        @search="search"
                     />
                 </div>
             </div>
-        </div>
+        </Layout>
     </AppLayout>
 </template>

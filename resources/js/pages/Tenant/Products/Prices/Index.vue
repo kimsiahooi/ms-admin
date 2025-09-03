@@ -1,28 +1,27 @@
 <script setup lang="ts">
+import { ActionButton } from '@/components/shared/custom/action';
+import { Layout } from '@/components/shared/custom/container';
+import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
+import { FormButton, FormInput, FormSelect, FormSwitch } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination/types';
-import { Select } from '@/components/shared/select';
 import type { SelectOption } from '@/components/shared/select/types';
 import type { SwitchOption } from '@/components/shared/switch/types';
 import { DataTable } from '@/components/shared/table';
-import type { Filter, SearchConfig, VisibilityState } from '@/components/shared/table/types';
-import { Tooltip } from '@/components/shared/tooltip';
+import type { VisibilityState } from '@/components/shared/table/types';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
 import { useTenant } from '@/composables/useTenant';
 import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import type { Product, ProductPrice } from '@/types/Tenant/products';
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import type { Product } from '@/types/Tenant/products';
+import type { ProductPrice, StatusLabel } from '@/types/Tenant/products/prices';
+import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { Loader, Pencil, Trash2 } from 'lucide-vue-next';
+import { Pencil, Trash2 } from 'lucide-vue-next';
 import { computed, h, reactive, watch } from 'vue';
 
 defineOptions({
@@ -33,7 +32,7 @@ const props = defineProps<{
     product: Product;
     prices: PaginateData<ProductPrice[]>;
     options: {
-        statuses: SwitchOption<ProductPrice['status']>[];
+        statuses: SwitchOption<ProductPrice['status'], StatusLabel>[];
         currencies: SelectOption<ProductPrice['currency']>[];
     };
 }>();
@@ -43,9 +42,10 @@ const { formatDateTime } = useFormatDateTime();
 
 const routeParams = computed(() => route().params);
 
-const filter = reactive<Filter>({
+const filter = reactive<Record<string, string>>({
     search: routeParams.value.search,
     entries: routeParams.value.entries || '10',
+    status: routeParams.value.status,
 });
 
 const setting = reactive({
@@ -53,10 +53,6 @@ const setting = reactive({
         dialogIsOpen: false,
     },
 });
-
-const searchConfig: SearchConfig = {
-    placeholder: 'Search name...',
-};
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -77,8 +73,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const filterChangeHandler = (filter: Filter) =>
-    router.visit(route('products.prices.index', { ...pickBy(filter), tenant: tenant?.id || '', product: props.product.id }));
+const search = () => router.visit(route('products.prices.index', { ...pickBy(filter), tenant: tenant?.id || '', product: props.product.id }));
+const reset = () => router.visit(route('products.prices.index', { tenant: tenant?.id || '', product: props.product.id }));
 
 const columnVisibility = <VisibilityState<Partial<ProductPrice>>>{
     id: false,
@@ -92,16 +88,11 @@ const columns: ColumnDef<ProductPrice>[] = [
             const price = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(Tooltip, { text: 'Edit' }, () =>
-                    h(
-                        Link,
-                        {
-                            href: route('products.prices.edit', { tenant: tenant?.id || '', product: props.product.id, price: price.id }),
-                            asChild: true,
-                        },
-                        () => h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full' }, () => h(Pencil, { class: 'size-3' })),
-                    ),
-                ),
+                h(ActionButton, {
+                    text: 'Edit',
+                    href: route('products.prices.edit', { tenant: tenant?.id || '', product: props.product.id, price: price.id }),
+                    icon: Pencil,
+                }),
                 h(
                     DeleteDialog,
                     {
@@ -110,11 +101,11 @@ const columns: ColumnDef<ProductPrice>[] = [
                         asChild: false,
                     },
                     () =>
-                        h(Tooltip, { text: 'Delete' }, () =>
-                            h(Button, { class: 'h-auto size-6 cursor-pointer rounded-full', variant: 'destructive' }, () =>
-                                h(Trash2, { class: 'size-3' }),
-                            ),
-                        ),
+                        h(ActionButton, {
+                            variant: 'destructive',
+                            text: 'Delete',
+                            icon: Trash2,
+                        }),
                 ),
             ]);
         },
@@ -125,7 +116,7 @@ const columns: ColumnDef<ProductPrice>[] = [
         cell: ({ row }) => {
             const { status, status_label } = row.original;
 
-            return h(Badge, { variant: status ? 'default' : 'destructive' }, () => status_label);
+            return h(Badge, { variant: status === 'INACTIVE' ? 'destructive' : 'default' }, () => status_label);
         },
     },
     {
@@ -155,9 +146,9 @@ const columns: ColumnDef<ProductPrice>[] = [
     },
 ];
 
-const defaultStatus = computed(() => props.options.statuses.find((status) => status.is_default)?.value);
+const defaultStatus = computed<ProductPrice['status']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? 'ACTIVE');
 
-const statusDisplay = computed(() => props.options.statuses.find((status) => (form.status ? status.value : !status.value))?.name);
+const statusDisplay = computed<StatusLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
 
 const form = useForm<{
     currency: string;
@@ -166,14 +157,14 @@ const form = useForm<{
 }>({
     currency: '',
     amount: '',
-    status: defaultStatus.value !== undefined ? defaultStatus.value : 1,
+    status: defaultStatus.value,
 });
 
 const config = reactive({
-    status: !!form.status,
+    status: form.status === 'ACTIVE',
 });
 
-const create = () =>
+const submit = () =>
     form.post(route('products.prices.store', { tenant: tenant?.id || '', product: props.product.id }), {
         onSuccess: () => {
             form.reset();
@@ -184,7 +175,7 @@ const create = () =>
 watch(
     () => config.status,
     (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === 1 : status.value === 0))?.value;
+        const value = props.options.statuses.find((status) => (newVal ? status.value === 'ACTIVE' : status.value === 'INACTIVE'))?.value;
 
         if (value !== undefined) {
             form.status = value;
@@ -197,57 +188,52 @@ watch(
     <Head title="Product Prices" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+        <Layout>
             <div class="space-y-3">
+                <FilterCard @search="search" @reset="reset">
+                    <FilterInput label="Name" placeholder="Search ID, Currency" v-model:model-value="filter.search" />
+                    <FilterSelect
+                        label="Status"
+                        placeholder="Select Status"
+                        :options="options.statuses"
+                        multiple
+                        v-model:model-value="filter.status"
+                    />
+                </FilterCard>
+
                 <div class="flex flex-wrap items-center justify-end gap-2">
                     <Dialog title="Create Price" v-model:open="setting.create.dialogIsOpen">
-                        <template #trigger>
-                            <Button class="cursor-pointer">Create</Button>
-                        </template>
-                        <form @submit.prevent="create" class="space-y-4">
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label>Currency</Label>
-                                <Select
-                                    :options="options.currencies"
-                                    placeholder="Select Currency"
-                                    v-model:model-value="form.currency"
-                                    trigger-class="w-full"
-                                />
-                                <p v-if="form.errors.currency" class="text-destructive">{{ form.errors.currency }}</p>
-                            </div>
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label>Amount</Label>
-                                <Input type="number" placeholder="Enter Amount" v-model:model-value.number="form.amount" step=".01" min="0" />
-                                <p v-if="form.errors.amount" class="text-destructive">{{ form.errors.amount }}</p>
-                            </div>
-                            <div class="grid w-full max-w-sm items-center gap-1.5">
-                                <Label class="mb-1">Status</Label>
-                                <div class="flex items-center space-x-2">
-                                    <Switch class="cursor-pointer" v-model:model-value="config.status" />
-                                    <Label>{{ statusDisplay }}</Label>
-                                </div>
-                                <p v-if="form.errors.status" class="text-destructive">{{ form.errors.status }}</p>
-                            </div>
-                            <div class="flex gap-2">
-                                <Button type="submit" class="cursor-pointer" :disabled="form.processing">
-                                    <Loader v-if="form.processing" class="animate-spin" /> Create
-                                </Button>
-                            </div>
+                        <form @submit.prevent="submit" class="space-y-4">
+                            <FormSelect
+                                label="Currency"
+                                :options="options.currencies"
+                                v-model:model-value="form.currency"
+                                :error="form.errors.currency"
+                            />
+                            <FormInput
+                                label="Amount"
+                                type="number"
+                                :error="form.errors.amount"
+                                v-model:model-value="form.amount"
+                                step=".01"
+                                min="0"
+                            />
+                            <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="config.status" />
+                            <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
                         </form>
                     </Dialog>
                 </div>
                 <div>
                     <DataTable
+                        v-model:model-value="filter"
                         :columns="columns"
                         :paginate-data="prices"
                         :column-visibility="columnVisibility"
-                        :filter="filter"
                         :entry-options="entryOptions"
-                        :search-config="searchConfig"
-                        @filter-change="filterChangeHandler"
+                        @search="search"
                     />
                 </div>
             </div>
-        </div>
+        </Layout>
     </AppLayout>
 </template>

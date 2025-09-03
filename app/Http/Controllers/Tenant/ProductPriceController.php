@@ -20,9 +20,16 @@ class ProductPriceController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $prices = $product->prices()->when($request->search, function (Builder $query, $search) {
-            $query->where('currency', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");
-        })->latest()
+        $prices = $product->prices()->when(
+            $request->search,
+            fn(Builder $query, $search) =>
+            $query->whereAny(['id', 'currency'], 'like', "%{$search}%")
+        )
+            ->when(
+                $request->status,
+                fn(Builder $query, $status) =>
+                $query->whereIn('status', $status)
+            )->latest()
             ->paginate($entries)
             ->withQueryString();
 
@@ -97,7 +104,6 @@ class ProductPriceController extends Controller
                     ->map(fn($status) => [
                         'name' => $status->label(),
                         'value' => $status->value,
-                        'is_default' => $status->value === Status::ACTIVE->value,
                     ]),
                 'currencies' => collect(Currency::cases())
                     ->map(fn(Currency $currency) => [

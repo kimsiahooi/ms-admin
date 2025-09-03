@@ -14,4 +14,13 @@ enum Status: string
             self::INACTIVE => 'Inactive',
         };
     }
+
+    public function variant(): string
+    {
+        return match ($this) {
+            self::ACTIVE => 'success',
+            self::INACTIVE => 'destructive',
+            default => 'default',
+        };
+    }
 }
