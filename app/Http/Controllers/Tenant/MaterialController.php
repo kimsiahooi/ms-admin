@@ -19,9 +19,16 @@ class MaterialController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $materials = Material::when($request->search, function (Builder $query, $search) {
-            $query->where('name', 'like', "%{$search}%")->orWhere('id', 'like', "%{$search}%");
-        })->latest()
+        $materials = Material::when(
+            $request->search,
+            fn(Builder $query, $search) =>
+            $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
+        )
+            ->when(
+                $request->status,
+                fn(Builder $query, $status) =>
+                $query->whereIn('status', $status)
+            )->latest()
             ->paginate($entries)
             ->withQueryString();
 
@@ -96,7 +103,6 @@ class MaterialController extends Controller
                     ->map(fn(Status $status) => [
                         'name' => $status->label(),
                         'value' => $status->value,
-                        'is_default' => $status->value === Status::ACTIVE->value,
                     ]),
                 'unit_types' => collect(UnitType::cases())
                     ->map(fn(UnitType $unitType) => [

@@ -1,3 +1,5 @@
+export type StatusLabel = 'Active' | 'Inactive';
+
 export interface Material {
     readonly id: string;
     name: string;
@@ -6,7 +8,7 @@ export interface Material {
     unit_type: number;
     unit_type_label?: 'Pcs' | 'Kilogram' | 'Gram' | null;
     status: 'ACTIVE' | 'INACTIVE';
-    status_label?: 'Active' | 'Inactive' | null;
+    status_label?: StatusLabel | null;
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;
