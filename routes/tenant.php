@@ -15,6 +15,7 @@ use App\Http\Controllers\Tenant\CompanyController;
 use App\Http\Controllers\Tenant\ProductBomController;
 use App\Http\Controllers\Tenant\MachineController;
 use App\Http\Controllers\Tenant\MaterialController;
+use App\Http\Controllers\Tenant\PlantController;
 use App\Http\Controllers\Tenant\ProductController;
 use App\Http\Controllers\Tenant\ProductPresetController;
 use App\Http\Controllers\Tenant\ProductPriceController;
@@ -104,6 +105,7 @@ Route::middleware([
             return Inertia::render('Tenant/settings/Appearance');
         })->name('appearance');
 
+        Route::resource('plants', PlantController::class)->except(['create', 'show']);
         Route::resource('machines', MachineController::class)->except(['create', 'show']);
         Route::resource('materials', MaterialController::class)->except(['create', 'show']);
         Route::resource('products', ProductController::class)->except(['create', 'show']);

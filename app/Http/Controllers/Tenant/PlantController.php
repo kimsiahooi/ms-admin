@@ -2,18 +2,48 @@
 
 namespace App\Http\Controllers\Tenant;
 
+use App\enums\Tenant\Plant\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Plant;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PlantController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $entries = $request->input('entries', 10);
+
+        $plants = Plant::when(
+            $request->search,
+            fn(Builder $query, $search) =>
+            $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
+        )
+            ->when(
+                $request->status,
+                fn(Builder $query, $status) =>
+                $query->whereIn('status', $status)
+            )->latest()
+            ->paginate($entries)
+            ->withQueryString();
+
+        return inertia('Tenant/Plants/Index', [
+            'plants' => $plants,
+            'options' => [
+                'statuses' => collect(Status::cases())
+                    ->map(function ($status) {
+                        return [
+                            'name' => $status->label(),
+                            'value' => $status->value,
+                            'is_default' => $status->value === Status::ACTIVE->value,
+                        ];
+                    }),
+            ]
+        ]);
     }
 
     /**
@@ -29,7 +59,24 @@ class PlantController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'code' => [
+                'required',
+                'string',
+                'alpha_dash',
+                'max:255',
+                Rule::unique('plants')
+                    ->where('tenant_id', tenant('id'))
+            ],
+            'description' => ['nullable', 'string'],
+            'address' => ['required', 'string'],
+            'status' => ['required', Rule::enum(Status::class)],
+        ]);
+
+        Plant::create($validated);
+
+        return back()->with('success', 'Plant created successfully.');
     }
 
     /**
@@ -45,7 +92,18 @@ class PlantController extends Controller
      */
     public function edit(Plant $plant)
     {
-        //
+        return inertia('Tenant/Plants/Edit', [
+            'plant' => $plant,
+            'options' => [
+                'statuses' => collect(Status::cases())
+                    ->map(function ($status) {
+                        return [
+                            'name' => $status->label(),
+                            'value' => $status->value,
+                        ];
+                    }),
+            ]
+        ]);
     }
 
     /**
@@ -53,7 +111,25 @@ class PlantController extends Controller
      */
     public function update(Request $request, Plant $plant)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'code' => [
+                'required',
+                'string',
+                'alpha_dash',
+                'max:255',
+                Rule::unique('machines')
+                    ->ignore($plant->id)
+                    ->where('tenant_id', tenant('id'))
+            ],
+            'description' => ['nullable', 'string'],
+            'address' => ['required', 'string'],
+            'status' => ['required', Rule::enum(Status::class)],
+        ]);
+
+        $plant->update($validated);
+
+        return to_route('plants.index', ['tenant' => tenant('id')])->with('success', 'Plant updated successfully.');
     }
 
     /**
@@ -61,6 +137,8 @@ class PlantController extends Controller
      */
     public function destroy(Plant $plant)
     {
-        //
+        $plant->delete();
+
+        return back()->with('success', 'Plant deleted successfully.');
     }
 }
