@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             BomMaterialSeeder::class,
             CompanySeeder::class,
             CompanyBranchSeeder::class,
+            PlantSeeder::class,
         ]);
     }
 }
