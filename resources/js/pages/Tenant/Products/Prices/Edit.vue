@@ -99,7 +99,7 @@ watch(
                             v-model:model-value="form.currency"
                             :error="form.errors.currency"
                         />
-                        <FormInput label="Amount" type="number" :error="form.errors.amount" v-model:model-value="form.amount" step=".01" min="0" />
+                        <FormInput label="Amount" type="number" :error="form.errors.amount" v-model:model-value="form.amount" step=".01" min="0.01" />
                         <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="config.status" />
                         <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
                     </Card>

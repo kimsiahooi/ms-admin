@@ -72,7 +72,7 @@ watch(
 
 <template>
     <div>
-        <div class="flex flex-col gap-2 md:flex-row md:items-center">
+        <div class="flex flex-col gap-2 md:flex-row">
             <div class="flex-1">
                 <FormSelect label="Material" :options="filteredOptions" v-model:model-value="selected" :error-key="`materials.${currIndex}.id`" />
             </div>
@@ -89,15 +89,16 @@ watch(
                     label="Quantity"
                     type="number"
                     v-model:model-value="form.quantity"
-                    min="0"
+                    min="0.01"
                     step=".01"
                     :error-key="`materials.${currIndex}.quantity`"
-                />
-            </div>
-            <div v-if="totalSelected > 1">
-                <Button type="button" class="cursor-pointer" size="icon" variant="destructive" @click="removeMaterial">
-                    <Minus />
-                </Button>
+                >
+                    <div v-if="totalSelected > 1">
+                        <Button type="button" class="cursor-pointer" size="icon" variant="destructive" @click="removeMaterial">
+                            <Minus />
+                        </Button>
+                    </div>
+                </FormInput>
             </div>
         </div>
     </div>

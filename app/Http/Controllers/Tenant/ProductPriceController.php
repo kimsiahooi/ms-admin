@@ -74,7 +74,7 @@ class ProductPriceController extends Controller
                     ->where('tenant_id', $product->tenant_id)
                     ->where('tenant_id', tenant('id'))
             ],
-            'amount' => ['required', 'min:0', 'numeric'],
+            'amount' => ['required', 'min:0.01', 'decimal:0,2', 'numeric'],
             'status' => ['required', Rule::enum(Status::class)],
         ]);
 
@@ -129,7 +129,7 @@ class ProductPriceController extends Controller
                     ->where('tenant_id', $product->tenant_id)
                     ->where('tenant_id', tenant('id'))
             ],
-            'amount' => ['required', 'min:0', 'numeric'],
+            'amount' => ['required', 'min:0.01', 'decimal:0,2', 'numeric'],
             'status' => ['required', Rule::enum(Status::class)],
         ]);
 

@@ -110,11 +110,11 @@ class ProductPresetController extends Controller
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
-            'cavity_quantity' => ['required', 'numeric', 'min:0'],
+            'cavity_quantity' => ['required', 'numeric', 'decimal:0,2', 'min:0.01'],
             'cavity_type' => ['required', Rule::enum(CavityType::class)],
-            'cycle_time' => ['required', 'numeric', 'min:0.01'],
+            'cycle_time' => ['required', 'numeric', 'decimal:0,2', 'min:0.01'],
             'cycle_time_type' => ['required', Rule::enum(CycleTimeType::class)],
-            'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type',  'numeric', 'min:0.01'],
+            'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type',  'numeric', 'decimal:0,2', 'min:0.01'],
             'shelf_life_type' => [
                 'nullable',
                 'required_with:shelf_life_duration',
@@ -207,11 +207,11 @@ class ProductPresetController extends Controller
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
-            'cavity_quantity' => ['required', 'numeric', 'min:0'],
+            'cavity_quantity' => ['required', 'numeric', 'decimal:0,2', 'min:0.01'],
             'cavity_type' => ['required', Rule::enum(CavityType::class)],
-            'cycle_time' => ['required', 'numeric', 'min:0'],
+            'cycle_time' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
             'cycle_time_type' => ['required', Rule::enum(CycleTimeType::class)],
-            'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type', 'numeric', 'min:0.01'],
+            'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type', 'numeric', 'decimal:0,2', 'min:0.01'],
             'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::enum(ShelfLifeType::class)],
             'status' => ['required', Rule::enum(Status::class)],
         ]);

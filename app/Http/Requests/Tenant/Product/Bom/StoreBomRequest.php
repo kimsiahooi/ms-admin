@@ -48,7 +48,7 @@ class StoreBomRequest extends FormRequest
                     ->where('tenant_id', tenant('id'))
 
             ],
-            'materials.*.quantity' => ['required', 'numeric', 'min:0'],
+            'materials.*.quantity' => ['required', 'numeric', 'decimal:0,2', 'min:0.01'],
             'materials.*.unit_type' => [
                 'required',
                 Rule::enum(UnitType::class),

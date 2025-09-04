@@ -35,15 +35,18 @@ const existingErrors = computed(() => props.errorKey && findErrors(props.errorKe
         >
             {{ label }}:
         </Label>
-        <Input
-            v-bind="$attrs"
-            :type="props.type"
-            :placeholder="placeholder"
-            v-model:model-value="model"
-            :class="{
-                'border-destructive': error || existingErrors,
-            }"
-        />
+        <div class="flex items-center gap-2">
+            <Input
+                v-bind="$attrs"
+                :type="props.type"
+                :placeholder="placeholder"
+                v-model:model-value="model"
+                :class="{
+                    'border-destructive': error || existingErrors,
+                }"
+            />
+            <slot />
+        </div>
         <FormError :error="error" :error-key="errorKey" />
     </FormContainer>
 </template>
