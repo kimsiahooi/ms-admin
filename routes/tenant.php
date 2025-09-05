@@ -21,6 +21,7 @@ use App\Http\Controllers\Tenant\ProductPresetController;
 use App\Http\Controllers\Tenant\ProductPriceController;
 use App\Http\Controllers\Tenant\Settings\PasswordController;
 use App\Http\Controllers\Tenant\Settings\ProfileController;
+use App\Http\Controllers\Tenant\TenantUserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
@@ -105,6 +106,7 @@ Route::middleware([
             return Inertia::render('Tenant/settings/Appearance');
         })->name('appearance');
 
+        Route::resource('users', TenantUserController::class)->except(['create', 'show']);
         Route::resource('plants', PlantController::class)->except(['create', 'show']);
         Route::resource('machines', MachineController::class)->except(['create', 'show']);
         Route::resource('materials', MaterialController::class)->except(['create', 'show']);

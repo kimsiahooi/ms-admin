@@ -6,7 +6,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { useTenant } from '@/composables/useTenant';
 import type { NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Building2, Computer, Folder, LayoutGrid, Recycle, Route, Speaker } from 'lucide-vue-next';
+import { BookOpen, Building2, Computer, Folder, LayoutGrid, Recycle, Route, Speaker, User } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const { tenant } = useTenant();
@@ -16,6 +16,12 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: route('dashboard', { tenant: tenant?.id || '' }),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Users',
+        href: route('users.index', { tenant: tenant?.id || '' }),
+        icon: User,
+        isActive: route().current('users.*', { tenant: tenant?.id || '' }),
     },
     {
         title: 'Plants',
