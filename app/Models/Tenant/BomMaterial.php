@@ -14,8 +14,6 @@ class BomMaterial extends Pivot
     /** @use HasFactory<\Database\Factories\Tenant\BomMaterialFactory> */
     use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
-    public $incrementing = true;
-
     protected $fillable = ['quantity', 'unit_type', 'tenant_id', 'bom_id', 'material_id'];
 
     protected $hidden = ['tenant_id'];
