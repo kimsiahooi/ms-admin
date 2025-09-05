@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\Product\Bom\StoreBomRequest;
 use App\Http\Requests\Tenant\Product\Bom\UpdateBomRequest;
 use App\Models\Tenant\Bom;
+use App\Models\Tenant\BomMaterial;
 use App\Models\Tenant\Material;
 use App\Models\Tenant\Product;
 use Illuminate\Database\Eloquent\Builder;
@@ -150,6 +151,11 @@ class ProductBomController extends Controller
                     'quantity'  => $m['quantity'],
                 ],
             ])->toArray();
+
+        BomMaterial::onlyTrashed()
+            ->where('bom_id', $bom->id)
+            ->whereIn('material_id', array_keys($materials))
+            ->restore();
 
         $bom->materials()->sync($materials);
 
