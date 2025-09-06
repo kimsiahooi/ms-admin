@@ -8,7 +8,7 @@ import { useTenant } from '@/composables/useTenant';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import type { Material, StatusBadgeLabel } from '@/types/Tenant/materials';
+import { Status, StatusLabel, type Material, type StatusBadgeLabel } from '@/types/Tenant/materials';
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed, reactive, watch } from 'vue';
 
@@ -45,7 +45,9 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const statusDisplay = computed<StatusBadgeLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
+const statusDisplay = computed<StatusBadgeLabel>(
+    () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],
+);
 
 const form = useForm<{
     name: string;
@@ -62,7 +64,7 @@ const form = useForm<{
 });
 
 const config = reactive({
-    status: form.status === 'ACTIVE',
+    status: form.status === Status.ACTIVE,
 });
 
 const submit = () => form.put(route('materials.update', { tenant: tenant?.id || '', material: props.material.id }));
@@ -70,7 +72,7 @@ const submit = () => form.put(route('materials.update', { tenant: tenant?.id || 
 watch(
     () => config.status,
     (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === 'ACTIVE' : status.value === 'INACTIVE'))?.value;
+        const value = props.options.statuses.find((status) => (newVal ? status.value === Status.ACTIVE : status.value === Status.INACTIVE))?.value;
 
         if (value !== undefined) {
             form.status = value;

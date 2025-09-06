@@ -13,7 +13,7 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Material } from '@/types/Tenant/materials';
 import type { Product } from '@/types/Tenant/products';
-import type { ProductBom, StatusBadgeLabel } from '@/types/Tenant/products/boms';
+import { Status, StatusLabel, type ProductBom, type StatusBadgeLabel } from '@/types/Tenant/products/boms';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Plus } from 'lucide-vue-next';
 import slug from 'slug';
@@ -68,9 +68,11 @@ const materialConfig: Omit<MaterialConfig<PartialMaterial>, 'key'> = {
 
 const selectedMaterials = ref<MaterialConfig<PartialMaterial>[]>([{ ...materialConfig, key: uuid() }]);
 
-const defaultStatus = computed<ProductBom['status']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? 'ACTIVE');
+const defaultStatus = computed<ProductBom['status']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE);
 
-const statusDisplay = computed<StatusBadgeLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
+const statusDisplay = computed<StatusBadgeLabel>(
+    () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],
+);
 
 const materialOptions = computed<SelectOption<PartialMaterial>[]>(() =>
     props.materials.map((material) => ({ name: material.name, value: material })),
@@ -96,7 +98,7 @@ const form = useForm<{
 });
 
 const config = reactive({
-    status: form.status === 'ACTIVE',
+    status: form.status === Status.ACTIVE,
 });
 
 const addMeterial = () => {
@@ -132,7 +134,7 @@ watch(
 watch(
     () => config.status,
     (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === 'ACTIVE' : status.value === 'INACTIVE'))?.value;
+        const value = props.options.statuses.find((status) => (newVal ? status.value === Status.ACTIVE : status.value === Status.INACTIVE))?.value;
 
         if (value !== undefined) {
             form.status = value;

@@ -9,7 +9,7 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Product } from '@/types/Tenant/products';
-import type { ProductPrice, StatusBadgeLabel } from '@/types/Tenant/products/prices';
+import { Status, StatusLabel, type ProductPrice, type StatusBadgeLabel } from '@/types/Tenant/products/prices';
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed, reactive, watch } from 'vue';
 
@@ -55,7 +55,9 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const statusDisplay = computed<StatusBadgeLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
+const statusDisplay = computed<StatusBadgeLabel>(
+    () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],
+);
 
 const form = useForm<{
     currency: string;
@@ -68,7 +70,7 @@ const form = useForm<{
 });
 
 const config = reactive({
-    status: form.status === 'ACTIVE',
+    status: form.status === Status.ACTIVE,
 });
 
 const submit = () => form.put(route('products.prices.update', { tenant: tenant?.id || '', product: props.product.id, price: props.price.id }));
@@ -76,7 +78,7 @@ const submit = () => form.put(route('products.prices.update', { tenant: tenant?.
 watch(
     () => config.status,
     (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === 'ACTIVE' : status.value === 'INACTIVE'))?.value;
+        const value = props.options.statuses.find((status) => (newVal ? status.value === Status.ACTIVE : status.value === Status.INACTIVE))?.value;
 
         if (value !== undefined) {
             form.status = value;

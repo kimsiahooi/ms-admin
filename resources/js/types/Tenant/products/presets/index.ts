@@ -2,7 +2,17 @@ import type { BadgeVariants } from '@/components/shared/badge';
 import type { Machine } from '@/types/Tenant/machines';
 import type { Product } from '@/types/Tenant/products';
 
-export type StatusBadgeLabel = 'Active' | 'Inactive';
+export enum Status {
+    ACTIVE = 'ACTIVE',
+    INACTIVE = 'INACTIVE',
+}
+
+export const StatusLabel: Record<Status, string> = {
+    [Status.ACTIVE]: 'Active',
+    [Status.INACTIVE]: 'Inactive',
+};
+
+export type StatusBadgeLabel = (typeof StatusLabel)[Status];
 
 export interface ProductPreset {
     readonly id: string;
@@ -20,7 +30,7 @@ export interface ProductPreset {
     shelf_life_duration: string | null;
     shelf_life_type: number | null;
     shelf_life_type_label?: string | null;
-    status: 'ACTIVE' | 'INACTIVE';
+    status: Status;
     status_badge?: {
         name: StatusBadgeLabel | null;
         variant: BadgeVariants['variant'];

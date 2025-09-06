@@ -15,7 +15,7 @@ import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import type { Machine, StatusBadgeLabel } from '@/types/Tenant/machines';
+import { Status, StatusLabel, type Machine, type StatusBadgeLabel } from '@/types/Tenant/machines';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
@@ -141,9 +141,11 @@ const columns: ColumnDef<Machine>[] = [
     },
 ];
 
-const defaultStatus = computed<Machine['status']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? 'ACTIVE');
+const defaultStatus = computed<Machine['status']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE);
 
-const statusDisplay = computed<StatusBadgeLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
+const statusDisplay = computed<StatusBadgeLabel>(
+    () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],
+);
 
 const form = useForm({
     name: '',
@@ -153,7 +155,7 @@ const form = useForm({
 });
 
 const config = reactive({
-    status: form.status === 'ACTIVE',
+    status: form.status === Status.ACTIVE,
 });
 
 const submit = () =>
@@ -174,7 +176,7 @@ watch(
 watch(
     () => config.status,
     (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === 'ACTIVE' : status.value === 'INACTIVE'))?.value;
+        const value = props.options.statuses.find((status) => (newVal ? status.value === Status.ACTIVE : status.value === Status.INACTIVE))?.value;
 
         if (value !== undefined) {
             form.status = value;
