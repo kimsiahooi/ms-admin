@@ -6,7 +6,7 @@ import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custo
 import { FormButton, FormInput, FormSwitch } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
-import type { SwitchOption } from '@/components/shared/switch';
+import { ToggleStatus, type SwitchOption } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
 import { Button } from '@/components/ui/button';
@@ -75,6 +75,11 @@ const columns: ColumnDef<Tenant>[] = [
             const tenant = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
+                h(ToggleStatus, {
+                    value: tenant.status === Status.ACTIVE,
+                    method: 'put',
+                    href: route('admin.tenants.toggleStatus', { tenant: tenant.id }),
+                }),
                 h(ActionButton, {
                     text: 'Edit',
                     href: route('admin.tenants.edit', { tenant: tenant.id }),

@@ -83,6 +83,9 @@ Route::prefix('admin')
                 return Inertia::render('Admin/settings/Appearance');
             })->name('appearance');
 
+            Route::prefix('tenants/{tenant}')->name('tenants.')->group(function () {
+                Route::match(['put', 'patch'], 'toggleStatus', [TenantController::class, 'toggleStatus'])->name('toggleStatus');
+            });
             Route::resource('tenants', TenantController::class)->except(['create', 'show']);
         });
     });

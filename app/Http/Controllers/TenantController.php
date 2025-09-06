@@ -103,4 +103,15 @@ class TenantController extends Controller
 
         return back()->with('success', 'Tenant deleted successfully.');
     }
+
+    public function toggleStatus(Request $request, Tenant $tenant)
+    {
+        $data = [
+            'status' => $tenant->status === Status::ACTIVE->value ? Status::INACTIVE->value : Status::ACTIVE->value,
+        ];
+
+        $tenant->update($data);
+
+        return back()->with('success', 'Tenant status updated successfully.');
+    }
 }
