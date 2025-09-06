@@ -1,17 +1,17 @@
 <script setup lang="ts" generic="TData, TValue">
+import { Pagination, type PaginateData } from '@/components/shared/pagination';
 import type { SelectOption } from '@/components/shared/select';
+import { Select } from '@/components/shared/select';
+import type { VisibilityState } from '@/components/shared/table';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { valueUpdater } from '@/lib/utils';
+import type { Filter } from '@/types/shared';
 import type { ColumnDef, SortingState } from '@tanstack/vue-table';
 import { FlexRender, getCoreRowModel, getSortedRowModel, useVueTable } from '@tanstack/vue-table';
 import { ChevronDown } from 'lucide-vue-next';
 import { reactive, ref, watch } from 'vue';
-import { Pagination } from '../pagination';
-import type { PaginateData } from '../pagination/types';
-import { Select } from '../select';
-import type { VisibilityState } from './types';
 
 const props = withDefaults(
     defineProps<{
@@ -28,13 +28,13 @@ const props = withDefaults(
 const sorting = ref<SortingState>([]);
 const columnVisibility = ref<VisibilityState>(props.columnVisibility);
 
-const filterModel = defineModel<Record<string, string>>();
+const filterModel = defineModel<Filter>();
 
 const emits = defineEmits<{
     search: [];
 }>();
 
-const filter = reactive<Record<string, string>>(filterModel.value || {});
+const filter = reactive<Filter>(filterModel.value || {});
 
 const table = useVueTable({
     get data() {

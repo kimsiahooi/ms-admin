@@ -5,16 +5,17 @@ import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
 import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
-import type { PaginateData } from '@/components/shared/pagination/types';
+import type { PaginateData } from '@/components/shared/pagination';
 import type { SwitchOption } from '@/components/shared/switch';
+import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
-import type { VisibilityState } from '@/components/shared/table/types';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
 import { useTenant } from '@/composables/useTenant';
 import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
+import type { Filter } from '@/types/shared';
 import { Status, StatusLabel, type Machine, type StatusBadgeLabel } from '@/types/Tenant/machines';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
@@ -39,7 +40,7 @@ const { formatDateTime } = useFormatDateTime();
 
 const routeParams = computed(() => route().params);
 
-const filter = reactive<Record<string, string>>({
+const filter = reactive<Filter>({
     search: routeParams.value.search,
     entries: routeParams.value.entries || '10',
     status: routeParams.value.status,

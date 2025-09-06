@@ -4,10 +4,10 @@ import { ActionButton } from '@/components/shared/custom/action';
 import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
 import { DeleteDialog } from '@/components/shared/dialog';
-import type { PaginateData } from '@/components/shared/pagination/types';
+import type { PaginateData } from '@/components/shared/pagination';
 import type { SwitchOption } from '@/components/shared/switch';
+import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
-import type { VisibilityState } from '@/components/shared/table/types';
 import { Button } from '@/components/ui/button';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
 import { useTenant } from '@/composables/useTenant';
@@ -15,6 +15,7 @@ import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
+import type { Filter } from '@/types/shared';
 import type { Product } from '@/types/Tenant/products';
 import type { ProductBom, StatusBadgeLabel } from '@/types/Tenant/products/boms';
 import { Head, Link, router } from '@inertiajs/vue3';
@@ -40,7 +41,7 @@ const { formatDateTime } = useFormatDateTime();
 
 const routeParams = computed(() => route().params);
 
-const filter = reactive<Record<string, string>>({
+const filter = reactive<Filter>({
     search: routeParams.value.search,
     entries: routeParams.value.entries || '10',
     status: routeParams.value.status,

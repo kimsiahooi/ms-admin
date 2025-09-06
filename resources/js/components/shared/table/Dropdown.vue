@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { DropdownAction } from '@/components/shared/table';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -10,7 +11,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Link } from '@inertiajs/vue3';
 import { MoreHorizontal } from 'lucide-vue-next';
-import type { DropdownAction } from './types';
 
 defineProps<{
     actions: DropdownAction[];

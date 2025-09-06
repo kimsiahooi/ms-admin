@@ -5,11 +5,11 @@ import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
 import { FormButton, FormInput, FormSelect, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
-import type { PaginateData } from '@/components/shared/pagination/types';
+import type { PaginateData } from '@/components/shared/pagination';
 import type { SelectOption } from '@/components/shared/select';
 import type { SwitchOption } from '@/components/shared/switch';
+import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
-import type { VisibilityState } from '@/components/shared/table/types';
 import { Button } from '@/components/ui/button';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
 import { useTenant } from '@/composables/useTenant';
@@ -17,6 +17,7 @@ import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
+import type { Filter } from '@/types/shared';
 import type { Machine } from '@/types/Tenant/machines';
 import type { Product } from '@/types/Tenant/products';
 import { Status, StatusLabel, type ProductPreset, type ProductPresetWithMachine, type StatusBadgeLabel } from '@/types/Tenant/products/presets';
@@ -48,7 +49,7 @@ const { formatDateTime } = useFormatDateTime();
 
 const routeParams = computed(() => route().params);
 
-const filter = reactive<Record<string, string>>({
+const filter = reactive<Filter>({
     search: routeParams.value.search,
     entries: routeParams.value.entries || '10',
     status: routeParams.value.status,
