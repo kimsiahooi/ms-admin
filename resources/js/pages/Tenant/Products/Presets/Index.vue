@@ -96,7 +96,7 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
             const preset = row.original;
             return h('div', { class: 'flex items-center gap-2' }, [
                 h(ToggleStatus, {
-                    value: preset.status === Status.ACTIVE,
+                    value: preset.status_switch,
                     method: 'put',
                     href: route('products.presets.toggleStatus', { tenant: tenant?.id || '', product: props.product.id, preset: preset.id }),
                 }),

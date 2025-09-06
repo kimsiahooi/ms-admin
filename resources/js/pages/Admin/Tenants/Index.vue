@@ -76,7 +76,7 @@ const columns: ColumnDef<Tenant>[] = [
 
             return h('div', { class: 'flex items-center gap-2' }, [
                 h(ToggleStatus, {
-                    value: tenant.status === Status.ACTIVE,
+                    value: tenant.status_switch,
                     method: 'put',
                     href: route('admin.tenants.toggleStatus', { tenant: tenant.id }),
                 }),

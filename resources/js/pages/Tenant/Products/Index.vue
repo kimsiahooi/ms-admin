@@ -80,7 +80,7 @@ const columns: ColumnDef<Product>[] = [
 
             return h('div', { class: 'flex items-center gap-2' }, [
                 h(ToggleStatus, {
-                    value: product.status === Status.ACTIVE,
+                    value: product.status_switch,
                     method: 'put',
                     href: route('products.toggleStatus', { tenant: tenant?.id || '', product: product.id }),
                 }),

@@ -22,7 +22,7 @@ class ProductPreset extends Model
 
     protected $hidden = ['tenant_id'];
 
-    protected $appends = ['status_badge', 'cavity_type_label', 'cycle_time_type_label', 'shelf_life_type_label'];
+    protected $appends = ['status_badge', 'status_switch', 'cavity_type_label', 'cycle_time_type_label', 'shelf_life_type_label'];
 
     protected function cavityTypeLabel(): Attribute
     {
@@ -42,6 +42,13 @@ class ProductPreset extends Model
     {
         return Attribute::make(
             get: fn($value, $attributes) => Status::tryFrom($attributes['status'] ?? null)?->badge(),
+        );
+    }
+
+    protected function statusSwitch(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value, $attributes) => Status::tryFrom($attributes['status'] ?? null)?->switch(),
         );
     }
 

@@ -156,7 +156,7 @@ class ProductBomController extends Controller
     public function toggleStatus(Request $request, Product $product, Bom $bom)
     {
         $data = [
-            'status' => $bom->status === Status::ACTIVE->value ? Status::INACTIVE->value : Status::ACTIVE->value,
+            'status' => $request->status ? Status::ACTIVE->value : Status::INACTIVE->value,
         ];
 
         $bom->update($data);

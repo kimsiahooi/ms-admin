@@ -20,6 +20,7 @@ export interface Tenant {
         name: StatusBadgeLabel | null;
         variant: BadgeVariants['variant'];
     } | null;
+    status_switch?: boolean | null;
     created_at: Date | null;
     updated_at: Date | null;
     data: string | null;

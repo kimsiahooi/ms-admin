@@ -107,7 +107,7 @@ class TenantController extends Controller
     public function toggleStatus(Request $request, Tenant $tenant)
     {
         $data = [
-            'status' => $tenant->status === Status::ACTIVE->value ? Status::INACTIVE->value : Status::ACTIVE->value,
+            'status' => $request->status ? Status::ACTIVE->value : Status::INACTIVE->value,
         ];
 
         $tenant->update($data);

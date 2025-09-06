@@ -130,7 +130,7 @@ class MachineController extends Controller
     public function toggleStatus(Request $request, Machine $machine)
     {
         $data = [
-            'status' => $machine->status === Status::ACTIVE->value ? Status::INACTIVE->value : Status::ACTIVE->value,
+            'status' => $request->status ? Status::ACTIVE->value : Status::INACTIVE->value,
         ];
 
         $machine->update($data);

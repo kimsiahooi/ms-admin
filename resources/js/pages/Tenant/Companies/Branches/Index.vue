@@ -91,7 +91,7 @@ const columns: ColumnDef<CompanyBranch>[] = [
 
             return h('div', { class: 'flex items-center gap-2' }, [
                 h(ToggleStatus, {
-                    value: branch.status === Status.ACTIVE,
+                    value: branch.status_switch,
                     method: 'put',
                     href: route('companies.branches.toggleStatus', { tenant: tenant?.id || '', company: props.company.id, branch: branch.id }),
                 }),

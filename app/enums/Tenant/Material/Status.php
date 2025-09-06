@@ -32,6 +32,14 @@ enum Status: string
         ];
     }
 
+    public function switch(): bool
+    {
+        return match ($this) {
+            self::ACTIVE => true,
+            default => false,
+        };
+    }
+
     public static function options(): array
     {
         return collect(Status::cases())

@@ -131,7 +131,7 @@ class CompanyController extends Controller
     public function toggleStatus(Request $request, Company $company)
     {
         $data = [
-            'status' => $company->status === Status::ACTIVE->value ? Status::INACTIVE->value : Status::ACTIVE->value,
+            'status' => $request->status ? Status::ACTIVE->value : Status::INACTIVE->value,
         ];
 
         $company->update($data);

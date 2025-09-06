@@ -135,7 +135,7 @@ class MaterialController extends Controller
     public function toggleStatus(Request $request, Material $material)
     {
         $data = [
-            'status' => $material->status === Status::ACTIVE->value ? Status::INACTIVE->value : Status::ACTIVE->value,
+            'status' => $request->status ? Status::ACTIVE->value : Status::INACTIVE->value,
         ];
 
         $material->update($data);

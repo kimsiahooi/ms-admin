@@ -132,7 +132,7 @@ class PlantController extends Controller
     public function toggleStatus(Request $request, Plant $plant)
     {
         $data = [
-            'status' => $plant->status === Status::ACTIVE->value ? Status::INACTIVE->value : Status::ACTIVE->value,
+            'status' => $request->status ? Status::ACTIVE->value : Status::INACTIVE->value,
         ];
 
         $plant->update($data);

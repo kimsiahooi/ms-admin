@@ -35,6 +35,7 @@ export interface ProductPreset {
         name: StatusBadgeLabel | null;
         variant: BadgeVariants['variant'];
     } | null;
+    status_switch?: boolean | null;
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;

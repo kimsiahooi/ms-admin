@@ -21,12 +21,19 @@ class Plant extends Model
 
     protected $hidden = ['tenant_id'];
 
-    protected $appends = ['status_badge'];
+    protected $appends = ['status_badge', 'status_switch'];
 
     protected function statusBadge(): Attribute
     {
         return Attribute::make(
             get: fn($value, $attributes) => Status::tryFrom($attributes['status'] ?? null)?->badge(),
+        );
+    }
+
+    protected function statusSwitch(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value, $attributes) => Status::tryFrom($attributes['status'] ?? null)?->switch(),
         );
     }
 

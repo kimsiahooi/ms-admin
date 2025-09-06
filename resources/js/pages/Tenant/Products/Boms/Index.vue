@@ -17,7 +17,7 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
 import type { Product } from '@/types/Tenant/products';
-import { Status, type ProductBom, type StatusBadgeLabel } from '@/types/Tenant/products/boms';
+import type { ProductBom, StatusBadgeLabel } from '@/types/Tenant/products/boms';
 import { Head, Link, router } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
@@ -83,7 +83,7 @@ const columns: ColumnDef<ProductBom>[] = [
 
             return h('div', { class: 'flex items-center gap-2' }, [
                 h(ToggleStatus, {
-                    value: bom.status === Status.ACTIVE,
+                    value: bom.status_switch,
                     method: 'put',
                     href: route('products.boms.toggleStatus', { tenant: tenant?.id || '', product: props.product.id, bom: bom.id }),
                 }),

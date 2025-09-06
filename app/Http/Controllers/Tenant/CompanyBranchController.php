@@ -139,7 +139,7 @@ class CompanyBranchController extends Controller
     public function toggleStatus(Request $request, Company $company, CompanyBranch $branch)
     {
         $data = [
-            'status' => $branch->status === Status::ACTIVE->value ? Status::INACTIVE->value : Status::ACTIVE->value,
+            'status' => $request->status ? Status::ACTIVE->value : Status::INACTIVE->value,
         ];
 
         $branch->update($data);
