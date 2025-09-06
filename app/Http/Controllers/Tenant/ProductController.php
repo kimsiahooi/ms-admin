@@ -126,4 +126,15 @@ class ProductController extends Controller
 
         return back()->with('success', 'Product deleted successfully.');
     }
+
+    public function toggleStatus(Request $request, Product $product)
+    {
+        $data = [
+            'status' => $product->status === Status::ACTIVE->value ? Status::INACTIVE->value : Status::ACTIVE->value,
+        ];
+
+        $product->update($data);
+
+        return back()->with('success', 'Product status updated successfully.');
+    }
 }

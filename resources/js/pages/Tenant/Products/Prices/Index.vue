@@ -7,7 +7,7 @@ import { FormButton, FormInput, FormSelect, FormSwitch } from '@/components/shar
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
 import type { SelectOption } from '@/components/shared/select';
-import type { SwitchOption } from '@/components/shared/switch';
+import { ToggleStatus, type SwitchOption } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
@@ -89,6 +89,11 @@ const columns: ColumnDef<ProductPrice>[] = [
             const price = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
+                h(ToggleStatus, {
+                    value: price.status === Status.ACTIVE,
+                    method: 'put',
+                    href: route('products.prices.toggleStatus', { tenant: tenant?.id || '', product: props.product.id, price: price.id }),
+                }),
                 h(ActionButton, {
                     text: 'Edit',
                     href: route('products.prices.edit', { tenant: tenant?.id || '', product: props.product.id, price: price.id }),

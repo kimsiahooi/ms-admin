@@ -152,4 +152,15 @@ class ProductBomController extends Controller
 
         return back()->with('success', 'Bom deleted successfully.');
     }
+
+    public function toggleStatus(Request $request, Product $product, Bom $bom)
+    {
+        $data = [
+            'status' => $bom->status === Status::ACTIVE->value ? Status::INACTIVE->value : Status::ACTIVE->value,
+        ];
+
+        $bom->update($data);
+
+        return back()->with('success', 'Product Bom status updated successfully.');
+    }
 }

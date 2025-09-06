@@ -107,14 +107,49 @@ Route::middleware([
         })->name('appearance');
 
         Route::resource('users', TenantUserController::class)->except(['create', 'show']);
+
+        Route::prefix('plants/{plant}')->name('plants.')->group(function () {
+            Route::match(['put', 'patch'], 'toggleStatus', [PlantController::class, 'toggleStatus'])->name('toggleStatus');
+        });
         Route::resource('plants', PlantController::class)->except(['create', 'show']);
-        Route::match(['put', 'patch'], 'plants/{plant}/toggleStatus', [PlantController::class, 'toggleStatus'])->name('plants.toggleStatus');
+
+        Route::prefix('machines/{machine}')->name('machines.')->group(function () {
+            Route::match(['put', 'patch'], 'toggleStatus', [MachineController::class, 'toggleStatus'])->name('toggleStatus');
+        });
         Route::resource('machines', MachineController::class)->except(['create', 'show']);
+
+        Route::prefix('materials/{material}')->name('materials.')->group(function () {
+            Route::match(['put', 'patch'], 'toggleStatus', [MaterialController::class, 'toggleStatus'])->name('toggleStatus');
+        });
         Route::resource('materials', MaterialController::class)->except(['create', 'show']);
+
+        Route::prefix('products/{product}')->name('products.')->group(function () {
+            Route::match(['put', 'patch'], 'toggleStatus', [ProductController::class, 'toggleStatus'])->name('toggleStatus');
+
+            Route::prefix('prices/{price}')->name('prices.')->group(function () {
+                Route::match(['put', 'patch'], 'toggleStatus', [ProductPriceController::class, 'toggleStatus'])->name('toggleStatus');
+            });
+
+            Route::prefix('presets/{preset}')->name('presets.')->group(function () {
+                Route::match(['put', 'patch'], 'toggleStatus', [ProductPresetController::class, 'toggleStatus'])->name('toggleStatus');
+            });
+
+            Route::prefix('boms/{bom}')->name('boms.')->group(function () {
+                Route::match(['put', 'patch'], 'toggleStatus', [ProductBomController::class, 'toggleStatus'])->name('toggleStatus');
+            });
+        });
         Route::resource('products', ProductController::class)->except(['create', 'show']);
         Route::resource('products.prices', ProductPriceController::class)->except(['create', 'show']);
         Route::resource('products.presets', ProductPresetController::class)->except(['create', 'show']);
         Route::resource('products.boms', ProductBomController::class)->except(['show']);
+
+        Route::prefix('companies/{company}')->name('companies.')->group(function () {
+            Route::match(['put', 'patch'], 'toggleStatus', [CompanyController::class, 'toggleStatus'])->name('toggleStatus');
+
+            Route::prefix('branches/{branch}')->name('branches.')->group(function () {
+                Route::match(['put', 'patch'], 'toggleStatus', [CompanyBranchController::class, 'toggleStatus'])->name('toggleStatus');
+            });
+        });
         Route::resource('companies', CompanyController::class)->except(['create', 'show']);
         Route::resource('companies.branches', CompanyBranchController::class)->except(['create', 'show']);
     });

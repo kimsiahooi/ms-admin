@@ -131,4 +131,15 @@ class MaterialController extends Controller
 
         return back()->with('success', 'Material deleted successfully.');
     }
+
+    public function toggleStatus(Request $request, Material $material)
+    {
+        $data = [
+            'status' => $material->status === Status::ACTIVE->value ? Status::INACTIVE->value : Status::ACTIVE->value,
+        ];
+
+        $material->update($data);
+
+        return back()->with('success', 'Material status updated successfully.');
+    }
 }

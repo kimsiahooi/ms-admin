@@ -5,7 +5,7 @@ import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
 import { DeleteDialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
-import type { SwitchOption } from '@/components/shared/switch';
+import { ToggleStatus, type SwitchOption } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,7 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
 import type { Product } from '@/types/Tenant/products';
-import type { ProductBom, StatusBadgeLabel } from '@/types/Tenant/products/boms';
+import { Status, type ProductBom, type StatusBadgeLabel } from '@/types/Tenant/products/boms';
 import { Head, Link, router } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
@@ -82,6 +82,11 @@ const columns: ColumnDef<ProductBom>[] = [
             const bom = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
+                h(ToggleStatus, {
+                    value: bom.status === Status.ACTIVE,
+                    method: 'put',
+                    href: route('products.boms.toggleStatus', { tenant: tenant?.id || '', product: props.product.id, bom: bom.id }),
+                }),
                 h(ActionButton, {
                     text: 'Edit',
                     href: route('products.boms.edit', { tenant: tenant?.id || '', product: props.product.id, bom: bom.id }),

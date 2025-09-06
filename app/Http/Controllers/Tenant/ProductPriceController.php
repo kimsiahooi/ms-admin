@@ -130,4 +130,15 @@ class ProductPriceController extends Controller
 
         return back()->with('success', 'Price deleted successfully.');
     }
+
+    public function toggleStatus(Request $request, Product $product, ProductPrice $price)
+    {
+        $data = [
+            'status' => $price->status === Status::ACTIVE->value ? Status::INACTIVE->value : Status::ACTIVE->value,
+        ];
+
+        $price->update($data);
+
+        return back()->with('success', 'Price status updated successfully.');
+    }
 }

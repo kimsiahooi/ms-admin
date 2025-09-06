@@ -197,4 +197,15 @@ class ProductPresetController extends Controller
 
         return back()->with('success', 'Preset deleted successfully.');
     }
+
+    public function toggleStatus(Request $request, Product $product, ProductPreset $preset)
+    {
+        $data = [
+            'status' => $preset->status === Status::ACTIVE->value ? Status::INACTIVE->value : Status::ACTIVE->value,
+        ];
+
+        $preset->update($data);
+
+        return back()->with('success', 'Preset status updated successfully.');
+    }
 }

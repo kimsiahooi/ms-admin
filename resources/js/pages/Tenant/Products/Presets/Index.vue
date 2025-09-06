@@ -7,7 +7,7 @@ import { FormButton, FormInput, FormSelect, FormSwitch, FormTextarea } from '@/c
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
 import type { SelectOption } from '@/components/shared/select';
-import type { SwitchOption } from '@/components/shared/switch';
+import { ToggleStatus, type SwitchOption } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
 import { Button } from '@/components/ui/button';
@@ -95,6 +95,11 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
         cell: ({ row }) => {
             const preset = row.original;
             return h('div', { class: 'flex items-center gap-2' }, [
+                h(ToggleStatus, {
+                    value: preset.status === Status.ACTIVE,
+                    method: 'put',
+                    href: route('products.presets.toggleStatus', { tenant: tenant?.id || '', product: props.product.id, preset: preset.id }),
+                }),
                 h(ActionButton, {
                     text: 'Edit',
                     href: route('products.presets.edit', { tenant: tenant?.id || '', product: props.product.id, preset: preset.id }),

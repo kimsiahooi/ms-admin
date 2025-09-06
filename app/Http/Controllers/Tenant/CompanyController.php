@@ -127,4 +127,15 @@ class CompanyController extends Controller
 
         return back()->with('success', 'Company deleted successfully.');
     }
+
+    public function toggleStatus(Request $request, Company $company)
+    {
+        $data = [
+            'status' => $company->status === Status::ACTIVE->value ? Status::INACTIVE->value : Status::ACTIVE->value,
+        ];
+
+        $company->update($data);
+
+        return back()->with('success', 'Company status updated successfully.');
+    }
 }

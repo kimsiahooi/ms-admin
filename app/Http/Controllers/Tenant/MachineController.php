@@ -126,4 +126,15 @@ class MachineController extends Controller
 
         return back()->with('success', 'Machine deleted successfully.');
     }
+
+    public function toggleStatus(Request $request, Machine $machine)
+    {
+        $data = [
+            'status' => $machine->status === Status::ACTIVE->value ? Status::INACTIVE->value : Status::ACTIVE->value,
+        ];
+
+        $machine->update($data);
+
+        return back()->with('success', 'Machine status updated successfully.');
+    }
 }

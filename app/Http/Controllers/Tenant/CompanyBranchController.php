@@ -135,4 +135,15 @@ class CompanyBranchController extends Controller
 
         return back()->with('success', 'Branch deleted successfully.');
     }
+
+    public function toggleStatus(Request $request, Company $company, CompanyBranch $branch)
+    {
+        $data = [
+            'status' => $branch->status === Status::ACTIVE->value ? Status::INACTIVE->value : Status::ACTIVE->value,
+        ];
+
+        $branch->update($data);
+
+        return back()->with('success', 'Branch status updated successfully.');
+    }
 }
