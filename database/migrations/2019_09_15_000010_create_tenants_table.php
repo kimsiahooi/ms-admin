@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Enums\Admin\Tenant\Status;
+use App\enums\Admin\Tenant\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
