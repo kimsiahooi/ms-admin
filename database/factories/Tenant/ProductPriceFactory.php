@@ -2,8 +2,8 @@
 
 namespace Database\Factories\Tenant;
 
-use App\enums\Tenant\Product\Price\Currency;
-use App\enums\Tenant\Product\Price\Status;
+use App\Enums\Tenant\Product\Price\Currency;
+use App\Enums\Tenant\Product\Price\Status;
 use App\Models\Tenant;
 use App\Models\Tenant\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;

@@ -1,6 +1,6 @@
 <?php
 
-use App\enums\Tenant\Product\Bom\Status;
+use App\Enums\Tenant\Product\Bom\Status;
 use App\Models\Tenant;
 use App\Models\Tenant\Product;
 use Illuminate\Database\Migrations\Migration;

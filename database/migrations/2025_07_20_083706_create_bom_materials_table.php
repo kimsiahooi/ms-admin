@@ -1,6 +1,6 @@
 <?php
 
-use App\enums\Tenant\Material\UnitType;
+use App\Enums\Tenant\Material\UnitType;
 use App\Models\Tenant;
 use App\Models\Tenant\Bom;
 use App\Models\Tenant\Material;

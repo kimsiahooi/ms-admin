@@ -2,8 +2,8 @@
 
 namespace App\Models\Tenant;
 
-use App\enums\Tenant\Material\Status;
-use App\enums\Tenant\Material\UnitType;
+use App\Enums\Tenant\Material\Status;
+use App\Enums\Tenant\Material\UnitType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;

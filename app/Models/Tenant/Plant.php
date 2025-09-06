@@ -2,7 +2,7 @@
 
 namespace App\Models\Tenant;
 
-use App\enums\Tenant\Plant\Status;
+use App\Enums\Tenant\Plant\Status;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;

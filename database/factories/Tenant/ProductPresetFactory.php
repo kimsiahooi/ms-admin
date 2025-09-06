@@ -2,10 +2,10 @@
 
 namespace Database\Factories\Tenant;
 
-use App\enums\Tenant\Product\Preset\CavityType;
-use App\enums\Tenant\Product\Preset\CycleTimeType;
-use App\enums\Tenant\Product\Preset\ShelfLifeType;
-use App\enums\Tenant\Product\Preset\Status;
+use App\Enums\Tenant\Product\Preset\CavityType;
+use App\Enums\Tenant\Product\Preset\CycleTimeType;
+use App\Enums\Tenant\Product\Preset\ShelfLifeType;
+use App\Enums\Tenant\Product\Preset\Status;
 use App\Models\Tenant\Machine;
 use App\Models\Tenant\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;

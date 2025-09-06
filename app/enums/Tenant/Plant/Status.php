@@ -1,6 +1,6 @@
 <?php
 
-namespace App\enums\Tenant\Plant;
+namespace App\Enums\Tenant\Plant;
 
 enum Status: string
 {

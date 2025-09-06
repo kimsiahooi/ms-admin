@@ -2,8 +2,8 @@
 
 namespace Database\Factories\Tenant;
 
-use App\enums\Tenant\Material\Status;
-use App\enums\Tenant\Material\UnitType;
+use App\Enums\Tenant\Material\Status;
+use App\Enums\Tenant\Material\UnitType;
 use App\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;

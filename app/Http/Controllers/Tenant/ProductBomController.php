@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Tenant;
 
-use App\enums\Tenant\Material\UnitType;
-use App\enums\Tenant\Product\Bom\Status;
+use App\Enums\Tenant\Material\UnitType;
+use App\Enums\Tenant\Product\Bom\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\Product\Bom\StoreBomRequest;
 use App\Http\Requests\Tenant\Product\Bom\UpdateBomRequest;

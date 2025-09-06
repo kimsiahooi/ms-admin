@@ -1,6 +1,6 @@
 <?php
 
-namespace App\enums\Tenant\Product\Preset;
+namespace App\Enums\Tenant\Product\Preset;
 
 enum CavityType: string
 {

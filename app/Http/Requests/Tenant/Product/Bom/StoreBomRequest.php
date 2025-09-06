@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Tenant\Product\Bom;
 
-use App\enums\Tenant\Material\Status as MaterialStatus;
-use App\enums\Tenant\Material\UnitType;
-use App\enums\Tenant\Product\Bom\Status;
+use App\Enums\Tenant\Material\Status as MaterialStatus;
+use App\Enums\Tenant\Material\UnitType;
+use App\Enums\Tenant\Product\Bom\Status;
 use App\Models\Tenant\Material;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;

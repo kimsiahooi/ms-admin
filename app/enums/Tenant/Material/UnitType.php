@@ -1,6 +1,6 @@
 <?php
 
-namespace App\enums\Tenant\Material;
+namespace App\Enums\Tenant\Material;
 
 enum UnitType: string
 {

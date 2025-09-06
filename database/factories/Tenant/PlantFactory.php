@@ -2,7 +2,7 @@
 
 namespace Database\Factories\Tenant;
 
-use App\enums\Tenant\Plant\Status;
+use App\Enums\Tenant\Plant\Status;
 use App\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;

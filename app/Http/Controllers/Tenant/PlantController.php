@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Tenant;
 
-use App\enums\Tenant\Plant\Status;
+use App\Enums\Tenant\Plant\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Plant;
 use Illuminate\Database\Eloquent\Builder;

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Tenant;
 
-use App\enums\Tenant\Product\Price\Currency;
-use App\enums\Tenant\Product\Price\Status;
+use App\Enums\Tenant\Product\Price\Currency;
+use App\Enums\Tenant\Product\Price\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Product;
 use App\Models\Tenant\ProductPrice;

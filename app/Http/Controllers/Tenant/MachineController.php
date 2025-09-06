@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Tenant;
 
-use App\enums\Tenant\Machine\Status;
+use App\Enums\Tenant\Machine\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Machine;
 use Illuminate\Database\Eloquent\Builder;

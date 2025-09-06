@@ -1,6 +1,6 @@
 <?php
 
-namespace App\enums\Tenant\Product;
+namespace App\Enums\Tenant\Product;
 
 enum Status: string
 {
