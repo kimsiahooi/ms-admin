@@ -108,6 +108,7 @@ Route::middleware([
 
         Route::resource('users', TenantUserController::class)->except(['create', 'show']);
         Route::resource('plants', PlantController::class)->except(['create', 'show']);
+        Route::match(['put', 'patch'], 'plants/{plant}/toggleStatus', [PlantController::class, 'toggleStatus'])->name('plants.toggleStatus');
         Route::resource('machines', MachineController::class)->except(['create', 'show']);
         Route::resource('materials', MaterialController::class)->except(['create', 'show']);
         Route::resource('products', ProductController::class)->except(['create', 'show']);

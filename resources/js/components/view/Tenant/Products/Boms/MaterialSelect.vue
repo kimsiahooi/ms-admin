@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { FormInput, FormSelect } from '@/components/shared/custom/form';
-import type { SelectOption } from '@/components/shared/select/types';
+import type { SelectOption } from '@/components/shared/select';
 import { Button } from '@/components/ui/button';
 import { useUuid } from '@/composables/useUuid';
 import type { Material } from '@/types/Tenant/materials';

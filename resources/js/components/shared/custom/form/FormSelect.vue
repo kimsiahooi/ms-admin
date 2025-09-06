@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T extends AcceptableValue">
 import { FormContainer, FormError } from '@/components/shared/custom/form';
+import type { SelectOption } from '@/components/shared/select';
 import { Select } from '@/components/shared/select';
-import type { SelectOption } from '@/components/shared/select/types';
 import { Label } from '@/components/ui/label';
 import { useError } from '@/composables/useError';
 import type { AcceptableValue } from 'reka-ui';

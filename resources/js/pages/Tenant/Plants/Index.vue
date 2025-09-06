@@ -6,7 +6,8 @@ import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custo
 import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination/types';
-import type { SwitchOption } from '@/components/shared/switch/types';
+import type { SwitchOption } from '@/components/shared/switch';
+import { ToggleStatus } from '@/components/shared/switch';
 import { DataTable } from '@/components/shared/table';
 import type { VisibilityState } from '@/components/shared/table/types';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
@@ -79,6 +80,11 @@ const columns: ColumnDef<Plant>[] = [
             const plant = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
+                h(ToggleStatus, {
+                    value: plant.status === 'ACTIVE',
+                    method: 'put',
+                    href: route('plants.toggleStatus', { tenant: tenant?.id || '', plant: plant.id }),
+                }),
                 h(ActionButton, {
                     text: 'Edit',
                     href: route('plants.edit', { tenant: tenant?.id || '', plant: plant.id }),

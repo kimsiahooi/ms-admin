@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { SelectOption } from '@/components/shared/select';
 import { Button } from '@/components/ui/button';
 import {
     Combobox,
@@ -15,7 +16,6 @@ import { cn } from '@/lib/utils';
 import { Check, ChevronsUpDown, Search } from 'lucide-vue-next';
 import type { AcceptableValue } from 'reka-ui';
 import { ref, watch } from 'vue';
-import type { SelectOption } from '../select/types';
 
 const props = defineProps<{
     options: SelectOption[];
@@ -59,7 +59,7 @@ watch(model, (newValue) => {
             <div class="relative w-full max-w-sm items-center">
                 <ComboboxInput class="h-10 rounded-none border-0 border-b pl-9 focus-visible:ring-0" :placeholder="placeholder" />
                 <span class="absolute inset-y-0 start-0 flex items-center justify-center px-3">
-                    <Search class="text-muted-foreground size-4" />
+                    <Search class="size-4 text-muted-foreground" />
                 </span>
             </div>
 

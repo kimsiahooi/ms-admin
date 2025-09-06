@@ -128,4 +128,15 @@ class PlantController extends Controller
 
         return back()->with('success', 'Plant deleted successfully.');
     }
+
+    public function toggleStatus(Request $request, Plant $plant)
+    {
+        $data = [
+            'status' => $plant->status === Status::ACTIVE->value ? Status::INACTIVE->value : Status::ACTIVE->value,
+        ];
+
+        $plant->update($data);
+
+        return back()->with('success', 'Plant status updated successfully.');
+    }
 }

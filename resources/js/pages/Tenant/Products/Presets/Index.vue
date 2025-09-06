@@ -6,8 +6,8 @@ import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custo
 import { FormButton, FormInput, FormSelect, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination/types';
-import type { SelectOption } from '@/components/shared/select/types';
-import type { SwitchOption } from '@/components/shared/switch/types';
+import type { SelectOption } from '@/components/shared/select';
+import type { SwitchOption } from '@/components/shared/switch';
 import { DataTable } from '@/components/shared/table';
 import type { VisibilityState } from '@/components/shared/table/types';
 import { Button } from '@/components/ui/button';

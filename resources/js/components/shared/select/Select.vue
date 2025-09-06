@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import type { SelectOption } from '@/components/shared/select';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { AcceptableValue } from 'reka-ui';
 import { type HTMLAttributes, watch } from 'vue';
-import type { SelectOption } from './types';
 
 defineProps<{
     options: SelectOption[];

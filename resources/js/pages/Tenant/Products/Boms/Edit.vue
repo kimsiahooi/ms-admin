@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Layout } from '@/components/shared/custom/container';
 import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
-import type { SelectOption } from '@/components/shared/select/types';
-import type { SwitchOption } from '@/components/shared/switch/types';
+import type { SelectOption } from '@/components/shared/select';
+import type { SwitchOption } from '@/components/shared/switch';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { MaterialSelect, type MaterialConfig } from '@/components/view/Tenant/Products/Boms';

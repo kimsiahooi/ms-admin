@@ -5,7 +5,7 @@ import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
 import { DeleteDialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination/types';
-import type { SwitchOption } from '@/components/shared/switch/types';
+import type { SwitchOption } from '@/components/shared/switch';
 import { DataTable } from '@/components/shared/table';
 import type { VisibilityState } from '@/components/shared/table/types';
 import { Button } from '@/components/ui/button';

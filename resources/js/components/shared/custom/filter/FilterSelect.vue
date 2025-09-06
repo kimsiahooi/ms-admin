@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { FilterContainer } from '@/components/shared/custom/filter';
+import type { SelectOption } from '@/components/shared/select';
 import { Select } from '@/components/shared/select';
-import type { SelectOption } from '@/components/shared/select/types';
 import { Label } from '@/components/ui/label';
 
 defineProps<{

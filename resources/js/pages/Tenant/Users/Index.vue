@@ -5,7 +5,7 @@ import { FilterCard, FilterInput } from '@/components/shared/custom/filter';
 import { FormButton, FormInput, FormSelect } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination/types';
-import type { SelectOption } from '@/components/shared/select/types';
+import type { SelectOption } from '@/components/shared/select';
 import { DataTable } from '@/components/shared/table';
 import type { VisibilityState } from '@/components/shared/table/types';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';

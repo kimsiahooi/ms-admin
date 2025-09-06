@@ -1,4 +1,5 @@
 <script setup lang="ts" generic="TData, TValue">
+import type { SelectOption } from '@/components/shared/select';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -10,7 +11,6 @@ import { reactive, ref, watch } from 'vue';
 import { Pagination } from '../pagination';
 import type { PaginateData } from '../pagination/types';
 import { Select } from '../select';
-import type { SelectOption } from '../select/types';
 import type { VisibilityState } from './types';
 
 const props = withDefaults(

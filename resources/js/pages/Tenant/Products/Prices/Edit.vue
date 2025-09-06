@@ -2,8 +2,8 @@
 import { Card } from '@/components/shared/card';
 import { Layout } from '@/components/shared/custom/container';
 import { FormButton, FormInput, FormSelect, FormSwitch } from '@/components/shared/custom/form';
-import type { SelectOption } from '@/components/shared/select/types';
-import type { SwitchOption } from '@/components/shared/switch/types';
+import type { SelectOption } from '@/components/shared/select';
+import type { SwitchOption } from '@/components/shared/switch';
 import { useTenant } from '@/composables/useTenant';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';

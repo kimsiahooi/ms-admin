@@ -2,7 +2,7 @@
 import { Card } from '@/components/shared/card';
 import { Layout } from '@/components/shared/custom/container';
 import { FormButton, FormInput, FormSwitch } from '@/components/shared/custom/form';
-import type { SwitchOption } from '@/components/shared/switch/types';
+import type { SwitchOption } from '@/components/shared/switch';
 
 import AppLayout from '@/layouts/Admin/AppLayout.vue';
 import AppMainLayout from '@/layouts/Admin/AppMainLayout.vue';

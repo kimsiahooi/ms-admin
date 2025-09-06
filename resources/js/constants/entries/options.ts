@@ -1,4 +1,4 @@
-import type { SelectOption } from '@/components/shared/select/types';
+import type { SelectOption } from '@/components/shared/select';
 
 export const entryOptions: SelectOption[] = [
     { name: '10 Entries', value: '10' },
