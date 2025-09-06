@@ -138,11 +138,13 @@ class CompanyBranchController extends Controller
 
     public function toggleStatus(Request $request, Company $company, CompanyBranch $branch)
     {
-        $data = [
-            'status' => $request->status ? Status::ACTIVE->value : Status::INACTIVE->value,
-        ];
+        $validated = $request->validate([
+            'status' => ['required', 'boolean'],
+        ]);
 
-        $branch->update($data);
+        $validated['status'] = $validated['status'] ? Status::ACTIVE->value : Status::INACTIVE->value;
+
+        $branch->update($validated);
 
         return back()->with('success', 'Branch status updated successfully.');
     }

@@ -133,11 +133,13 @@ class ProductPriceController extends Controller
 
     public function toggleStatus(Request $request, Product $product, ProductPrice $price)
     {
-        $data = [
-            'status' => $request->status ? Status::ACTIVE->value : Status::INACTIVE->value,
-        ];
+        $validated = $request->validate([
+            'status' => ['required', 'boolean'],
+        ]);
 
-        $price->update($data);
+        $validated['status'] = $validated['status'] ? Status::ACTIVE->value : Status::INACTIVE->value;
+
+        $price->update($validated);
 
         return back()->with('success', 'Price status updated successfully.');
     }

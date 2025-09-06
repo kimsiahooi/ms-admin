@@ -131,11 +131,13 @@ class PlantController extends Controller
 
     public function toggleStatus(Request $request, Plant $plant)
     {
-        $data = [
-            'status' => $request->status ? Status::ACTIVE->value : Status::INACTIVE->value,
-        ];
+        $validated = $request->validate([
+            'status' => ['required', 'boolean'],
+        ]);
 
-        $plant->update($data);
+        $validated['status'] = $validated['status'] ? Status::ACTIVE->value : Status::INACTIVE->value;
+
+        $plant->update($validated);
 
         return back()->with('success', 'Plant status updated successfully.');
     }

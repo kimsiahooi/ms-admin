@@ -200,11 +200,12 @@ class ProductPresetController extends Controller
 
     public function toggleStatus(Request $request, Product $product, ProductPreset $preset)
     {
-        $data = [
-            'status' => $request->status ? Status::ACTIVE->value : Status::INACTIVE->value,
-        ];
+        $validated = $request->validate([
+            'status' => ['required', 'boolean'],
+        ]);
 
-        $preset->update($data);
+        $validated['status'] = $validated['status'] ? Status::ACTIVE->value : Status::INACTIVE->value;
+        $preset->update($validated);
 
         return back()->with('success', 'Preset status updated successfully.');
     }

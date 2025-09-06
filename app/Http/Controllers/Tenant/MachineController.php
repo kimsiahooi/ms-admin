@@ -129,11 +129,13 @@ class MachineController extends Controller
 
     public function toggleStatus(Request $request, Machine $machine)
     {
-        $data = [
-            'status' => $request->status ? Status::ACTIVE->value : Status::INACTIVE->value,
-        ];
+        $validated = $request->validate([
+            'status' => ['required', 'boolean'],
+        ]);
 
-        $machine->update($data);
+        $validated['status'] = $validated['status'] ? Status::ACTIVE->value : Status::INACTIVE->value;
+
+        $machine->update($validated);
 
         return back()->with('success', 'Machine status updated successfully.');
     }

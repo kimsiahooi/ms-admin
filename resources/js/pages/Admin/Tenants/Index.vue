@@ -17,7 +17,7 @@ import AppMainLayout from '@/layouts/Admin/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import { Status, StatusLabel, type StatusBadgeLabel, type Tenant } from '@/types/Admin/tenants';
 import type { Filter } from '@/types/shared';
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
 import { Pencil, Trash2 } from 'lucide-vue-next';
@@ -120,7 +120,9 @@ const columns: ColumnDef<Tenant>[] = [
             return h(
                 'div',
                 null,
-                h(Link, { href: route('dashboard', { tenant: id }), asChild: true }, () =>
+                h(
+                    'a',
+                    { href: route('dashboard', { tenant: id }), target: '_blank' },
                     h(Button, { variant: 'link', class: 'cursor-pointer' }, () => row.getValue('id')),
                 ),
             );

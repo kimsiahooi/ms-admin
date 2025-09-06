@@ -130,11 +130,13 @@ class CompanyController extends Controller
 
     public function toggleStatus(Request $request, Company $company)
     {
-        $data = [
-            'status' => $request->status ? Status::ACTIVE->value : Status::INACTIVE->value,
-        ];
+        $validated = $request->validate([
+            'status' => ['required', 'boolean'],
+        ]);
 
-        $company->update($data);
+        $validated['status'] = $validated['status'] ? Status::ACTIVE->value : Status::INACTIVE->value;
+
+        $company->update($validated);
 
         return back()->with('success', 'Company status updated successfully.');
     }

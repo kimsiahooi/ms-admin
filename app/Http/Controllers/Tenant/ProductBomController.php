@@ -155,11 +155,13 @@ class ProductBomController extends Controller
 
     public function toggleStatus(Request $request, Product $product, Bom $bom)
     {
-        $data = [
-            'status' => $request->status ? Status::ACTIVE->value : Status::INACTIVE->value,
-        ];
+        $validated = $request->validate([
+            'status' => ['required', 'boolean'],
+        ]);
 
-        $bom->update($data);
+        $validated['status'] = $validated['status'] ? Status::ACTIVE->value : Status::INACTIVE->value;
+
+        $bom->update($validated);
 
         return back()->with('success', 'Product Bom status updated successfully.');
     }

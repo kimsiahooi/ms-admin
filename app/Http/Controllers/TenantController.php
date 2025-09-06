@@ -106,11 +106,13 @@ class TenantController extends Controller
 
     public function toggleStatus(Request $request, Tenant $tenant)
     {
-        $data = [
-            'status' => $request->status ? Status::ACTIVE->value : Status::INACTIVE->value,
-        ];
+        $validated = $request->validate([
+            'status' => ['required', 'boolean'],
+        ]);
 
-        $tenant->update($data);
+        $validated['status'] = $validated['status'] ? Status::ACTIVE->value : Status::INACTIVE->value;
+
+        $tenant->update($validated);
 
         return back()->with('success', 'Tenant status updated successfully.');
     }
