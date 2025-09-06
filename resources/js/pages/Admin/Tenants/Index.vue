@@ -62,7 +62,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const search = () => router.visit(route('admin.tenants.index', { ...pickBy(filter) }));
+const search = () =>
+    router.visit(route('admin.tenants.index', { ...pickBy(filter) }), {
+        preserveScroll: true,
+        preserveState: true,
+    });
 const reset = () => router.visit(route('admin.tenants.index'));
 
 const columnVisibility = <VisibilityState<Partial<Tenant>>>{};
@@ -163,6 +167,8 @@ const config = reactive({
 
 const submit = () =>
     form.post(route('admin.tenants.store'), {
+        preserveState: true,
+        preserveScroll: true,
         onSuccess: () => {
             form.reset();
             setting.create.dialogIsOpen = false;

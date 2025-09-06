@@ -81,10 +81,7 @@ class ProductBomController extends Controller
 
         $bom->materials()->sync($materials);
 
-        return to_route('products.boms.index', [
-            'tenant' => tenant('id'),
-            'product' => $product->id
-        ])->with('success', 'Product Bom created successfully.');
+        return back()->with('success', 'Product Bom created successfully.');
     }
 
     /**
@@ -137,10 +134,7 @@ class ProductBomController extends Controller
 
         $bom->materials()->sync($materials);
 
-        return to_route('products.boms.index', [
-            'tenant' => tenant('id'),
-            'product' => $product->id
-        ])->with('success', 'Product Bom updated successfully.');
+        return back()->with('success', 'Product Bom updated successfully.');
     }
 
     /**

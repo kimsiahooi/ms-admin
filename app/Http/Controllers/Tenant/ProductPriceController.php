@@ -118,7 +118,7 @@ class ProductPriceController extends Controller
 
         $price->update($validated);
 
-        return to_route('products.prices.index', ['tenant' => tenant('id'), 'product' => $product->id])->with('success', 'Prices updated successfully.');
+        return back()->with('success', 'Prices updated successfully.');
     }
 
     /**

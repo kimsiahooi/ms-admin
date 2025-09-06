@@ -1,6 +1,5 @@
 <script setup lang="ts" generic="T">
-import { PaginationButton } from '@/components/shared/pagination';
-import type { PaginateData } from '@/components/shared/pagination/types';
+import { PaginationButton, type PaginateData } from '@/components/shared/pagination';
 import { Button } from '@/components/ui/button';
 import { Pagination, PaginationContent, PaginationEllipsis } from '@/components/ui/pagination';
 import { Link } from '@inertiajs/vue3';
@@ -49,7 +48,7 @@ const props = withDefaults(
                             hidden: item.value !== page,
                         }"
                         :value="item.value"
-                        :is-active="item.value === page"
+                        :is-active="item.value === paginateData.current_page"
                         :links="paginateData.links"
                     />
                     <PaginationEllipsis v-else class="hidden md:inline-flex" />

@@ -73,7 +73,11 @@ const config = reactive({
     status: form.status === Status.ACTIVE,
 });
 
-const submit = () => form.put(route('products.prices.update', { tenant: tenant?.id || '', product: props.product.id, price: props.price.id }));
+const submit = () =>
+    form.put(route('products.prices.update', { tenant: tenant?.id || '', product: props.product.id, price: props.price.id }), {
+        preserveScroll: true,
+        preserveState: true,
+    });
 
 watch(
     () => config.status,

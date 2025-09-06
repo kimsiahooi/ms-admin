@@ -109,7 +109,11 @@ const removeMaterial = (key: string) => {
     selectedMaterials.value = selectedMaterials.value.filter((material) => material.key !== key);
 };
 
-const submit = () => form.post(route('products.boms.store', { tenant: tenant?.id || '', product: props.product.id }));
+const submit = () =>
+    form.post(route('products.boms.store', { tenant: tenant?.id || '', product: props.product.id }), {
+        preserveScroll: true,
+        preserveState: true,
+    });
 
 watch(
     selectedMaterials,

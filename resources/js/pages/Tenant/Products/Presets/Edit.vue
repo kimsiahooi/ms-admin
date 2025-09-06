@@ -89,7 +89,11 @@ const config = reactive({
     status: form.status === Status.ACTIVE,
 });
 
-const submit = () => form.put(route('products.presets.update', { tenant: tenant?.id || '', product: props.product.id, preset: props.preset.id }));
+const submit = () =>
+    form.put(route('products.presets.update', { tenant: tenant?.id || '', product: props.product.id, preset: props.preset.id }), {
+        preserveScroll: true,
+        preserveState: true,
+    });
 
 watch(
     () => config.status,

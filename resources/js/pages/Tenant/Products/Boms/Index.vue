@@ -66,7 +66,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const search = () => router.visit(route('products.boms.index', { ...pickBy(filter), tenant: tenant?.id || '', product: props.product.id }));
+const search = () =>
+    router.visit(route('products.boms.index', { ...pickBy(filter), tenant: tenant?.id || '', product: props.product.id }), {
+        preserveScroll: true,
+        preserveState: true,
+    });
 const reset = () => router.visit(route('products.boms.index', { tenant: tenant?.id || '', product: props.product.id }));
 
 const columnVisibility = <VisibilityState<Partial<ProductBom>>>{

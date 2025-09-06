@@ -115,7 +115,7 @@ class CompanyController extends Controller
 
         $company->update($validated);
 
-        return to_route('companies.index', ['tenant' => tenant('id')])->with('success', 'Company updated successfully.');
+        return back()->with('success', 'Company updated successfully.');
     }
 
     /**

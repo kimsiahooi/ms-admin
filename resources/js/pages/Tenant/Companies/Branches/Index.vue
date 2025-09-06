@@ -73,7 +73,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const search = () => router.visit(route('companies.branches.index', { ...pickBy(filter), tenant: tenant?.id || '', company: props.company.id }));
+const search = () =>
+    router.visit(route('companies.branches.index', { ...pickBy(filter), tenant: tenant?.id || '', company: props.company.id }), {
+        preserveScroll: true,
+        preserveState: true,
+    });
 const reset = () => router.visit(route('companies.branches.index', { tenant: tenant?.id || '', company: props.company.id }));
 
 const columnVisibility = <VisibilityState<Partial<CompanyBranch>>>{
@@ -181,8 +185,10 @@ const config = reactive({
     status: form.status === Status.ACTIVE,
 });
 
-const create = () =>
+const submit = () =>
     form.post(route('companies.branches.store', { tenant: tenant?.id || '', company: props.company.id }), {
+        preserveScroll: true,
+        preserveState: true,
         onSuccess: () => {
             form.reset();
             setting.create.dialogIsOpen = false;
@@ -226,7 +232,7 @@ watch(
                 </FilterCard>
                 <div class="flex flex-wrap items-center justify-end gap-2">
                     <Dialog title="Create Branch" v-model:open="setting.create.dialogIsOpen">
-                        <form @submit.prevent="create" class="space-y-4">
+                        <form @submit.prevent="submit" class="space-y-4">
                             <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
                             <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
                             <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />

@@ -58,7 +58,11 @@ const config = reactive({
     status: form.status === Status.ACTIVE,
 });
 
-const submit = () => form.put(route('companies.update', { tenant: tenant?.id || '', company: props.company.id }));
+const submit = () =>
+    form.put(route('companies.update', { tenant: tenant?.id || '', company: props.company.id }), {
+        preserveScroll: true,
+        preserveState: true,
+    });
 
 watch(
     () => config.status,

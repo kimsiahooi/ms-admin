@@ -80,7 +80,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const search = () => router.visit(route('products.presets.index', { ...pickBy(filter), tenant: tenant?.id || '', product: props.product.id }));
+const search = () =>
+    router.visit(route('products.presets.index', { ...pickBy(filter), tenant: tenant?.id || '', product: props.product.id }), {
+        preserveScroll: true,
+        preserveState: true,
+    });
 const reset = () => router.visit(route('products.presets.index', { tenant: tenant?.id || '', product: props.product.id }));
 
 const columnVisibility = <VisibilityState<Partial<ProductPresetWithMachine>>>{
@@ -255,6 +259,8 @@ const config = reactive({
 
 const submit = () =>
     form.post(route('products.presets.store', { tenant: tenant?.id || '', product: props.product.id }), {
+        preserveScroll: true,
+        preserveState: true,
         onSuccess: () => {
             form.reset();
             setting.create.dialogIsOpen = false;

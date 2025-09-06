@@ -117,7 +117,11 @@ const removeMaterial = (key: string) => {
     selectedMaterials.value = selectedMaterials.value.filter((material) => material.key !== key);
 };
 
-const submit = () => form.put(route('products.boms.update', { tenant: tenant?.id || '', product: props.product.id, bom: props.bom.id }));
+const submit = () =>
+    form.put(route('products.boms.update', { tenant: tenant?.id || '', product: props.product.id, bom: props.bom.id }), {
+        preserveScroll: true,
+        preserveState: true,
+    });
 
 watch(
     selectedMaterials,

@@ -144,7 +144,7 @@ class TenantUserController extends Controller
 
         $user->plants()->sync($validated['plants']);
 
-        return to_route('users.index', ['tenant' => tenant('id')])->with('success', 'User updated successfully.');
+        return back()->with('success', 'User updated successfully.');
     }
 
     /**

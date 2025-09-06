@@ -57,7 +57,11 @@ const form = useForm<{
     plants: props.user.plants.map((plant) => plant.id),
 });
 
-const submit = () => form.put(route('users.update', { tenant: tenant?.id || '', user: props.user.id }));
+const submit = () =>
+    form.put(route('users.update', { tenant: tenant?.id || '', user: props.user.id }), {
+        preserveScroll: true,
+        preserveState: true,
+    });
 </script>
 
 <template>

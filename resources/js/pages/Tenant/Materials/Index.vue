@@ -65,7 +65,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const search = () => router.visit(route('materials.index', { ...pickBy(filter), tenant: tenant?.id || '' }));
+const search = () =>
+    router.visit(route('materials.index', { ...pickBy(filter), tenant: tenant?.id || '' }), {
+        preserveScroll: true,
+        preserveState: true,
+    });
 const reset = () => router.visit(route('materials.index', { tenant: tenant?.id || '' }));
 
 const columnVisibility = <VisibilityState<Partial<Material>>>{
@@ -180,6 +184,8 @@ const config = reactive({
 
 const submit = () =>
     form.post(route('materials.store', { tenant: tenant?.id || '' }), {
+        preserveScroll: true,
+        preserveState: true,
         onSuccess: () => {
             form.reset();
             setting.create.dialogIsOpen = false;

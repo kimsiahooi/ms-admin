@@ -62,7 +62,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const search = () => router.visit(route('users.index', { ...pickBy(filter), tenant: tenant?.id || '' }));
+const search = () =>
+    router.visit(route('users.index', { ...pickBy(filter), tenant: tenant?.id || '' }), {
+        preserveScroll: true,
+        preserveState: true,
+    });
 const reset = () => router.visit(route('users.index', { tenant: tenant?.id || '' }));
 
 const columnVisibility = <VisibilityState<Partial<TenantUser>>>{
@@ -142,6 +146,8 @@ const form = useForm<{
 
 const submit = () =>
     form.post(route('users.store', { tenant: tenant?.id || '' }), {
+        preserveScroll: true,
+        preserveState: true,
         onSuccess: () => {
             form.reset();
             setting.create.dialogIsOpen = false;

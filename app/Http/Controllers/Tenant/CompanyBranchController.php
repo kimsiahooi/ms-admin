@@ -123,7 +123,7 @@ class CompanyBranchController extends Controller
 
         $branch->update($validated);
 
-        return to_route('companies.branches.index', ['tenant' => tenant('id'), 'company' => $company->id])->with('success', 'Branch updated successfully.');
+        return back()->with('success', 'Branch updated successfully.');
     }
 
     /**

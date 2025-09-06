@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Tenant;
 
-use App\Enums\Tenant\Material\Status;
-use App\Enums\Tenant\Material\UnitType;
+use App\enums\Tenant\Material\Status;
+use App\enums\Tenant\Material\UnitType;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Material;
 use Illuminate\Database\Eloquent\Builder;
@@ -119,7 +119,7 @@ class MaterialController extends Controller
 
         $material->update($validated);
 
-        return to_route('materials.index', ['tenant' => tenant('id')])->with('success', 'Material updated successfully.');
+        return back()->with('success', 'Material updated successfully.');
     }
 
     /**

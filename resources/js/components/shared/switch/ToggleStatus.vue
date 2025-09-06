@@ -8,7 +8,7 @@ const props = defineProps<{
     href: string;
 }>();
 
-const update = () => router.visit(props.href, { method: props.method, data: { status: !props.value } });
+const update = () => router.visit(props.href, { method: props.method, data: { status: !props.value }, preserveState: true, preserveScroll: true });
 </script>
 
 <template>

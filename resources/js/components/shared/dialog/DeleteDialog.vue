@@ -25,7 +25,7 @@ withDefaults(
     },
 );
 
-const model = defineModel<boolean | undefined>('open');
+const model = defineModel<boolean>('open');
 </script>
 
 <template>
@@ -44,7 +44,7 @@ const model = defineModel<boolean | undefined>('open');
                 <DialogClose as-child>
                     <Button type="button" variant="secondary"> Close </Button>
                 </DialogClose>
-                <Link :href="route" as-child method="delete" :preserve-state="false">
+                <Link :href="route" as-child method="delete" :preserve-state="true" :preserve-scroll="true">
                     <Button variant="destructive" class="cursor-pointer">Delete</Button>
                 </Link>
             </DialogFooter>
