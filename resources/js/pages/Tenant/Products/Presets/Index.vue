@@ -19,7 +19,7 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Machine } from '@/types/Tenant/machines';
 import type { Product } from '@/types/Tenant/products';
-import type { ProductPreset, ProductPresetWithMachine, StatusLabel } from '@/types/Tenant/products/presets';
+import type { ProductPreset, ProductPresetWithMachine, StatusBadgeLabel } from '@/types/Tenant/products/presets';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
@@ -39,7 +39,7 @@ const props = defineProps<{
         cavity_types: SelectOption<ProductPreset['cavity_type']>[];
         cycle_time_types: SelectOption<ProductPreset['cycle_time_type']>[];
         shelf_life_types: SelectOption<ProductPreset['shelf_life_type']>[];
-        statuses: SwitchOption<ProductPreset['status'], StatusLabel>[];
+        statuses: SwitchOption<ProductPreset['status'], StatusBadgeLabel>[];
     };
 }>();
 
@@ -120,9 +120,9 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
         accessorKey: 'status',
         header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
-            const { status_label } = row.original;
+            const { status_badge } = row.original;
 
-            return h(StatusBadge, { statusLabel: status_label });
+            return h(StatusBadge, { statusBadge: status_badge });
         },
     },
     {
@@ -213,7 +213,7 @@ const defaultStatus = computed<ProductPresetWithMachine['status']>(
     () => props.options.statuses.find((status) => status.is_default)?.value ?? 'ACTIVE',
 );
 
-const statusDisplay = computed<StatusLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
+const statusDisplay = computed<StatusBadgeLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
 
 const form = useForm<{
     machine_id: Machine['id'] | '';

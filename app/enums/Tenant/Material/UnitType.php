@@ -16,4 +16,13 @@ enum UnitType: string
             self::KILOGRAM => 'Kilogram',
         };
     }
+
+    public static function options(): array
+    {
+        return collect(UnitType::cases())
+            ->map(fn(UnitType $type) => [
+                'name' => $type->label(),
+                'value' => $type->value,
+            ])->toArray();
+    }
 }

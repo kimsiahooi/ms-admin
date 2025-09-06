@@ -36,14 +36,7 @@ class CompanyBranchController extends Controller
             'company' => $company,
             'branches' => $branches,
             'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(function (Status $status) {
-                        return [
-                            'name' => $status->label(),
-                            'value' => $status->value,
-                            'is_default' => $status->value === Status::ACTIVE->value,
-                        ];
-                    }),
+                'statuses' => Status::options(),
             ]
         ]);
     }
@@ -100,13 +93,7 @@ class CompanyBranchController extends Controller
             'company' => $company,
             'branch' => $branch,
             'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(function ($status) {
-                        return [
-                            'name' => $status->label(),
-                            'value' => $status->value,
-                        ];
-                    }),
+                'statuses' => Status::options(),
             ]
         ]);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Tenant\Product\Bom;
 
+use App\enums\Tenant\Material\Status as MaterialStatus;
 use App\enums\Tenant\Material\UnitType;
 use App\enums\Tenant\Product\Bom\Status;
 use App\Models\Tenant\Material;
@@ -44,6 +45,7 @@ class StoreBomRequest extends FormRequest
                 'required',
                 'distinct',
                 Rule::exists('materials')
+                    ->where('status', MaterialStatus::ACTIVE->value)
                     ->where('tenant_id', $this->product->tenant_id)
                     ->where('tenant_id', tenant('id'))
 

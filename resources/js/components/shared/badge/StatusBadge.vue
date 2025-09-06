@@ -2,13 +2,13 @@
 import { Badge, type BadgeVariants } from '@/components/shared/badge';
 
 defineProps<{
-    statusLabel?: {
+    statusBadge?: {
         name: string | null;
         variant: BadgeVariants['variant'];
-    };
+    } | null;
 }>();
 </script>
 
 <template>
-    <Badge v-if="statusLabel?.name" :variant="statusLabel.variant">{{ statusLabel.name }}</Badge>
+    <Badge v-if="statusBadge?.name" :variant="statusBadge.variant">{{ statusBadge.name }}</Badge>
 </template>

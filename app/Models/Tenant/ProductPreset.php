@@ -6,23 +6,23 @@ use App\enums\Tenant\Product\Preset\CavityType;
 use App\enums\Tenant\Product\Preset\CycleTimeType;
 use App\enums\Tenant\Product\Preset\ShelfLifeType;
 use App\enums\Tenant\Product\Preset\Status;
-use App\Traits\Tenant\StatusBadgeTrait;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class ProductPreset extends Model
 {
-    use HasFactory, SoftDeletes, BelongsToTenant, HasUlids, StatusBadgeTrait;
+    use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
     protected $fillable = ['product_id', 'machine_id', 'name', 'code', 'description', 'cavity_quantity', 'cavity_type', 'cycle_time', 'cycle_time_type', 'shelf_life_duration', 'shelf_life_type', 'status', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
-    protected $appends = ['status_label', 'cavity_type_label', 'cycle_time_type_label', 'shelf_life_type_label'];
+    protected $appends = ['status_badge', 'cavity_type_label', 'cycle_time_type_label', 'shelf_life_type_label'];
 
     protected function cavityTypeLabel(): Attribute
     {
@@ -38,10 +38,10 @@ class ProductPreset extends Model
         );
     }
 
-    protected function statusLabel(): Attribute
+    protected function statusBadge(): Attribute
     {
         return Attribute::make(
-            get: fn($value, $attributes) => $this->formatStatus($attributes['status'], Status::class),
+            get: fn($value, $attributes) => Status::tryFrom($attributes['status'] ?? null)?->badge(),
         );
     }
 
@@ -52,12 +52,12 @@ class ProductPreset extends Model
         );
     }
 
-    public function product()
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
-    public function machine()
+    public function machine(): BelongsTo
     {
         return $this->belongsTo(Machine::class);
     }

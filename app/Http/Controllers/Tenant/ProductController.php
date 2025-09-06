@@ -34,12 +34,7 @@ class ProductController extends Controller
         return inertia('Tenant/Products/Index', [
             'products' => $products,
             'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(fn($status) => [
-                        'name' => $status->label(),
-                        'value' => $status->value,
-                        'is_default' => $status->value === Status::ACTIVE->value,
-                    ]),
+                'statuses' => Status::options(),
             ],
         ]);
     }
@@ -92,11 +87,7 @@ class ProductController extends Controller
         return inertia('Tenant/Products/Edit', [
             'product' => $product,
             'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(fn($status) => [
-                        'name' => $status->label(),
-                        'value' => $status->value,
-                    ]),
+                'statuses' => Status::options(),
             ],
         ]);
     }

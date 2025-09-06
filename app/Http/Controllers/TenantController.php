@@ -33,14 +33,7 @@ class TenantController extends Controller
         return inertia('Admin/Tenants/Index', [
             'tenants' => $tenants,
             'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(function (Status $status) {
-                        return [
-                            'name' => $status->label(),
-                            'value' => $status->value,
-                            'is_default' => $status->value === Status::ACTIVE->value,
-                        ];
-                    }),
+                'statuses' => Status::options(),
             ]
         ]);
     }
@@ -83,13 +76,7 @@ class TenantController extends Controller
         return inertia('Admin/Tenants/Edit', [
             'tenant' => $tenant,
             'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(function ($status) {
-                        return [
-                            'name' => $status->label(),
-                            'value' => $status->value,
-                        ];
-                    }),
+                'statuses' => Status::options(),
             ]
         ]);
     }

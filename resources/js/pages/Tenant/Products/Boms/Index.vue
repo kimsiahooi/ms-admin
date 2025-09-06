@@ -16,7 +16,7 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Product } from '@/types/Tenant/products';
-import type { ProductBom, StatusLabel } from '@/types/Tenant/products/boms';
+import type { ProductBom, StatusBadgeLabel } from '@/types/Tenant/products/boms';
 import { Head, Link, router } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
@@ -31,7 +31,7 @@ const props = defineProps<{
     product: Product;
     boms: PaginateData<ProductBom[]>;
     options: {
-        statuses: SwitchOption<ProductBom['status'], StatusLabel>[];
+        statuses: SwitchOption<ProductBom['status'], StatusBadgeLabel>[];
     };
 }>();
 
@@ -107,9 +107,9 @@ const columns: ColumnDef<ProductBom>[] = [
         accessorKey: 'status',
         header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
-            const { status_label } = row.original;
+            const { status_badge } = row.original;
 
-            return h(StatusBadge, { statusLabel: status_label });
+            return h(StatusBadge, { statusBadge: status_badge });
         },
     },
     {

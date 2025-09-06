@@ -3,41 +3,42 @@
 namespace App\Models\Tenant;
 
 use App\enums\Tenant\Product\Bom\Status;
-use App\Traits\Tenant\StatusBadgeTrait;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class Bom extends Model
 {
     /** @use HasFactory<\Database\Factories\Tenant\BomFactory> */
-    use HasFactory, BelongsToTenant, SoftDeletes, HasUlids, StatusBadgeTrait;
+    use HasFactory, BelongsToTenant, SoftDeletes, HasUlids;
 
     protected $fillable = ['name', 'code', 'description', 'status', 'product_id', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
-    protected $appends = ['status_label'];
+    protected $appends = ['status_badge'];
 
-    protected function statusLabel(): Attribute
+    protected function statusBadge(): Attribute
     {
         return Attribute::make(
-            get: fn($value, $attributes) => $this->formatStatus($attributes['status'], Status::class),
+            get: fn($value, $attributes) => Status::tryFrom($attributes['status'] ?? null)?->badge(),
         );
     }
 
-    public function product()
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
-    public function materials()
+    public function materials(): BelongsToMany
     {
         return $this->belongsToMany(Material::class)
-            ->withPivot(['id', 'quantity', 'unit_type'])
+            ->withPivot(['id', 'quantity', 'unit_type', 'tenant_id'])
             ->wherePivotNull('deleted_at')
             ->withTimestamps()
             ->using(BomMaterial::class);

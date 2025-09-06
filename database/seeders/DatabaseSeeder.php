@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             CompanySeeder::class,
             CompanyBranchSeeder::class,
             PlantSeeder::class,
+            PlantTenantUserSeeder::class,
         ]);
     }
 }

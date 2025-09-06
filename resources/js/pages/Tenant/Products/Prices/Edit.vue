@@ -9,7 +9,7 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Product } from '@/types/Tenant/products';
-import type { ProductPrice, StatusLabel } from '@/types/Tenant/products/prices';
+import type { ProductPrice, StatusBadgeLabel } from '@/types/Tenant/products/prices';
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed, reactive, watch } from 'vue';
 
@@ -21,7 +21,7 @@ const props = defineProps<{
     product: Product;
     price: ProductPrice;
     options: {
-        statuses: SwitchOption<ProductPrice['status'], StatusLabel>[];
+        statuses: SwitchOption<ProductPrice['status'], StatusBadgeLabel>[];
         currencies: SelectOption<ProductPrice['currency']>[];
     };
 }>();
@@ -55,7 +55,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const statusDisplay = computed<StatusLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
+const statusDisplay = computed<StatusBadgeLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
 
 const form = useForm<{
     currency: string;

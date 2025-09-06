@@ -3,7 +3,6 @@
 namespace App\Models\Tenant;
 
 use App\Enums\Tenant\Company\Branch\Status;
-use App\Traits\Tenant\StatusBadgeTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -15,18 +14,18 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class CompanyBranch extends Model
 {
     /** @use HasFactory<\Database\Factories\Tenant\CompanyBranchFactory> */
-    use HasFactory, SoftDeletes, BelongsToTenant, HasUlids, StatusBadgeTrait;
+    use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
     protected $fillable = ['name', 'code', 'description', 'address', 'status', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
-    protected $appends = ['status_label'];
+    protected $appends = ['status_badge'];
 
-    protected function statusLabel(): Attribute
+    protected function statusBadge(): Attribute
     {
         return Attribute::make(
-            get: fn($value, $attributes) => $this->formatStatus($attributes['status'], Status::class),
+            get: fn($value, $attributes) => Status::tryFrom($attributes['status'] ?? null)?->badge(),
         );
     }
 

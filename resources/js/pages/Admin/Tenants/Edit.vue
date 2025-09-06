@@ -7,7 +7,7 @@ import type { SwitchOption } from '@/components/shared/switch/types';
 import AppLayout from '@/layouts/Admin/AppLayout.vue';
 import AppMainLayout from '@/layouts/Admin/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import type { StatusLabel, Tenant } from '@/types/Admin/tenants';
+import type { StatusBadgeLabel, Tenant } from '@/types/Admin/tenants';
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed, reactive, watch } from 'vue';
 
@@ -18,7 +18,7 @@ defineOptions({
 const props = defineProps<{
     tenant: Tenant;
     options: {
-        statuses: SwitchOption<Tenant['status'], StatusLabel>[];
+        statuses: SwitchOption<Tenant['status'], StatusBadgeLabel>[];
     };
 }>();
 
@@ -41,7 +41,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const statusDisplay = computed<StatusLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
+const statusDisplay = computed<StatusBadgeLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
 
 const form = useForm({
     name: props.tenant.name,

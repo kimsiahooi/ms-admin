@@ -23,4 +23,22 @@ enum Status: string
             default => 'default',
         };
     }
+
+    public function badge(): array
+    {
+        return [
+            'name' => $this?->label(),
+            'variant' => $this?->variant(),
+        ];
+    }
+
+    public static function options(): array
+    {
+        return collect(Status::cases())
+            ->map(fn(Status $status) => [
+                'name' => $status->label(),
+                'value' => $status->value,
+                'is_default' => $status->value === Status::ACTIVE->value,
+            ])->toArray();
+    }
 }

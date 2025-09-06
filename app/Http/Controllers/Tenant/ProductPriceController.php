@@ -37,17 +37,8 @@ class ProductPriceController extends Controller
             'product' => $product,
             'prices' => $prices,
             'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(fn($status) => [
-                        'name' => $status->label(),
-                        'value' => $status->value,
-                        'is_default' => $status->value === Status::ACTIVE->value,
-                    ]),
-                'currencies' => collect(Currency::cases())
-                    ->map(fn(Currency $currency) => [
-                        'name' => $currency->value,
-                        'value' => $currency->value
-                    ]),
+                'statuses' => Status::options(),
+                'currencies' => Currency::options(),
             ],
         ]);
     }
@@ -100,16 +91,8 @@ class ProductPriceController extends Controller
             'product' => $product,
             'price' => $price,
             'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(fn($status) => [
-                        'name' => $status->label(),
-                        'value' => $status->value,
-                    ]),
-                'currencies' => collect(Currency::cases())
-                    ->map(fn(Currency $currency) => [
-                        'name' => $currency->value,
-                        'value' => $currency->value
-                    ]),
+                'statuses' => Status::options(),
+                'currencies' => Currency::options(),
             ],
         ]);
     }

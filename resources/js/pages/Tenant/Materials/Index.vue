@@ -16,7 +16,7 @@ import { entryOptions } from '@/constants/entries/options';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import type { Material, StatusLabel } from '@/types/Tenant/materials';
+import type { Material, StatusBadgeLabel } from '@/types/Tenant/materials';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
@@ -31,7 +31,7 @@ defineOptions({
 const props = defineProps<{
     materials: PaginateData<Material[]>;
     options: {
-        statuses: SwitchOption<Material['status'], StatusLabel>[];
+        statuses: SwitchOption<Material['status'], StatusBadgeLabel>[];
         unit_types: SelectOption<Material['unit_type']>[];
     };
 }>();
@@ -106,9 +106,9 @@ const columns: ColumnDef<Material>[] = [
         accessorKey: 'status',
         header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
-            const { status_label } = row.original;
+            const { status_badge } = row.original;
 
-            return h(StatusBadge, { statusLabel: status_label });
+            return h(StatusBadge, { statusBadge: status_badge });
         },
     },
     {
@@ -150,7 +150,7 @@ const columns: ColumnDef<Material>[] = [
 
 const defaultStatus = computed<Material['status']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? 'ACTIVE');
 
-const statusDisplay = computed<StatusLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
+const statusDisplay = computed<StatusBadgeLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
 
 const form = useForm<{
     name: string;

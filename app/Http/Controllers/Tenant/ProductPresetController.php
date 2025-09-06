@@ -41,37 +41,20 @@ class ProductPresetController extends Controller
             'presets' => $presets,
             'options' => [
                 'machines' => Machine::active()
-                    ->get()
+                    ->get(['id', 'name'])
                     ->map(fn(Machine $machine) => [
                         'name' => $machine->name,
-                        'value' => $machine->id
+                        'value' => $machine->id,
                     ]),
-                'cavity_types' => collect(CavityType::cases())
-                    ->map(fn(CavityType $type) => [
-                        'name' => $type->label(),
-                        'value' => $type->value,
-                    ]),
-                'cycle_time_types' => collect(CycleTimeType::cases())
-                    ->map(fn(CycleTimeType $type) => [
-                        'name' => $type->label(),
-                        'value' => $type->value,
-                    ]),
-                'statuses' => collect(Status::cases())
-                    ->map(fn($status) => [
-                        'name' => $status->label(),
-                        'value' => $status->value,
-                        'is_default' => $status->value === Status::ACTIVE->value,
-                    ]),
+                'cavity_types' => CavityType::options(),
+                'cycle_time_types' => CycleTimeType::options(),
+                'statuses' => Status::options(),
                 'shelf_life_types' => [
                     [
                         'name' => 'None',
                         'value' => null,
                     ],
-                    ...collect(ShelfLifeType::cases())
-                        ->map(fn(ShelfLifeType $shelfLifeType) => [
-                            'name' => $shelfLifeType->label(),
-                            'value' => $shelfLifeType->value,
-                        ])
+                    ...ShelfLifeType::options(),
                 ],
             ],
         ]);
@@ -146,37 +129,21 @@ class ProductPresetController extends Controller
             'preset' => $preset->load(['machine']),
             'options' => [
                 'machines' => Machine::active()
-                    ->get()
+                    ->get(['id', 'name'])
                     ->map(fn(Machine $machine) => [
                         'name' => $machine->name,
                         'value' => $machine->id,
                     ]),
-                'cavity_types' => collect(CavityType::cases())
-                    ->map(fn(CavityType $type) => [
-                        'name' => $type->label(),
-                        'value' => $type->value,
-                    ]),
-                'cycle_time_types' => collect(CycleTimeType::cases())
-                    ->map(fn(CycleTimeType $type) => [
-                        'name' => $type->label(),
-                        'value' => $type->value,
-                    ]),
+                'cavity_types' => CavityType::options(),
+                'cycle_time_types' => CycleTimeType::options(),
+                'statuses' => Status::options(),
                 'shelf_life_types' => [
                     [
                         'name' => 'None',
                         'value' => null,
                     ],
-                    ...collect(ShelfLifeType::cases())
-                        ->map(fn(ShelfLifeType $shelfLifeType) => [
-                            'name' => $shelfLifeType->label(),
-                            'value' => $shelfLifeType->value,
-                        ])
+                    ...ShelfLifeType::options(),
                 ],
-                'statuses' => collect(Status::cases())
-                    ->map(fn($status) => [
-                        'name' => $status->label(),
-                        'value' => $status->value,
-                    ]),
             ],
         ]);
     }

@@ -10,7 +10,7 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Machine } from '@/types/Tenant/machines';
 import type { Product } from '@/types/Tenant/products';
-import type { ProductPresetWithMachine, StatusLabel } from '@/types/Tenant/products/presets';
+import type { ProductPresetWithMachine, StatusBadgeLabel } from '@/types/Tenant/products/presets';
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed, reactive, watch } from 'vue';
 
@@ -26,7 +26,7 @@ const props = defineProps<{
         cavity_types: SelectOption<ProductPresetWithMachine['cavity_type']>[];
         cycle_time_types: SelectOption<ProductPresetWithMachine['cycle_time_type']>[];
         shelf_life_types: SelectOption<ProductPresetWithMachine['shelf_life_type']>[];
-        statuses: SwitchOption<ProductPresetWithMachine['status'], StatusLabel>[];
+        statuses: SwitchOption<ProductPresetWithMachine['status'], StatusBadgeLabel>[];
     };
 }>();
 
@@ -55,7 +55,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const statusDisplay = computed<StatusLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
+const statusDisplay = computed<StatusBadgeLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
 
 const form = useForm<{
     machine_id: Machine['id'] | '';

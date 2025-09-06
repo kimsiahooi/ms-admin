@@ -34,14 +34,7 @@ class PlantController extends Controller
         return inertia('Tenant/Plants/Index', [
             'plants' => $plants,
             'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(function ($status) {
-                        return [
-                            'name' => $status->label(),
-                            'value' => $status->value,
-                            'is_default' => $status->value === Status::ACTIVE->value,
-                        ];
-                    }),
+                'statuses' => Status::options(),
             ]
         ]);
     }
@@ -95,13 +88,7 @@ class PlantController extends Controller
         return inertia('Tenant/Plants/Edit', [
             'plant' => $plant,
             'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(function ($status) {
-                        return [
-                            'name' => $status->label(),
-                            'value' => $status->value,
-                        ];
-                    }),
+                'statuses' => Status::options(),
             ]
         ]);
     }

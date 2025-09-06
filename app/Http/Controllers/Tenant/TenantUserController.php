@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
+use App\Models\Tenant\Plant;
+use App\Models\Tenant\PlantTenantUser;
 use App\Models\Tenant\TenantUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -17,7 +19,7 @@ class TenantUserController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $users = TenantUser::when(
+        $users = TenantUser::with(['plants'])->when(
             $request->search,
             fn(Builder $query, $search) =>
             $query->whereAny(['id', 'name', 'email'], 'like', "%{$search}%")
@@ -28,6 +30,14 @@ class TenantUserController extends Controller
 
         return inertia('Tenant/Users/Index', [
             'users' => $users,
+            'options' => [
+                'plants' => Plant::all(['id', 'name'])
+                    ->map(fn(Plant $plant) =>
+                    [
+                        'name' => $plant->name,
+                        'value' => $plant->id
+                    ]),
+            ],
         ]);
     }
 
@@ -54,9 +64,18 @@ class TenantUserController extends Controller
                     ->where('tenant_id', tenant('id'))
             ],
             'password' => ['required', 'string', 'min:8', 'max:20', 'confirmed'],
+            'plants' => ['nullable', 'array'],
+            'plants.*' => [
+                'required',
+                Rule::exists('plants', 'id')
+                    ->withoutTrashed()
+                    ->where('tenant_id', tenant('id'))
+            ],
         ]);
 
-        TenantUser::create($validated);
+        $user = TenantUser::create($validated);
+
+        $user->plants()->sync($validated['plants']);
 
         return back()->with('success', 'User created successfully.');
     }
@@ -75,7 +94,15 @@ class TenantUserController extends Controller
     public function edit(TenantUser $user)
     {
         return inertia('Tenant/Users/Edit', [
-            'user' => $user,
+            'user' => $user->load(['plants']),
+            'options' => [
+                'plants' => Plant::all(['id', 'name'])
+                    ->map(fn(Plant $plant) =>
+                    [
+                        'name' => $plant->name,
+                        'value' => $plant->id,
+                    ]),
+            ],
         ]);
     }
 
@@ -95,6 +122,13 @@ class TenantUserController extends Controller
                     ->where('tenant_id', tenant('id'))
             ],
             'password' => ['nullable', 'string', 'min:8', 'max:20', 'confirmed'],
+            'plants' => ['nullable', 'array'],
+            'plants.*' => [
+                'required',
+                Rule::exists('plants', 'id')
+                    ->withoutTrashed()
+                    ->where('tenant_id', tenant('id'))
+            ],
         ]);
 
         if (!$validated['password']) {
@@ -102,6 +136,13 @@ class TenantUserController extends Controller
         }
 
         $user->update($validated);
+
+        PlantTenantUser::onlyTrashed()
+            ->where('tenant_user_id', $user->id)
+            ->whereIn('plant_id', $validated['plants'])
+            ->restore();
+
+        $user->plants()->sync($validated['plants']);
 
         return to_route('users.index', ['tenant' => tenant('id')])->with('success', 'User updated successfully.');
     }

@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enums\Admin\Tenant\Status;
-use App\Traits\Tenant\StatusBadgeTrait;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,14 +13,14 @@ use Stancl\Tenancy\Database\Concerns\HasDomains;
 
 class Tenant extends BaseTenant implements TenantWithDatabase
 {
-    use HasDatabase, HasDomains, HasFactory, SoftDeletes, StatusBadgeTrait;
+    use HasDatabase, HasDomains, HasFactory, SoftDeletes;
 
-    protected $appends = ['status_label'];
+    protected $appends = ['status_badge'];
 
-    protected function statusLabel(): Attribute
+    protected function statusBadge(): Attribute
     {
         return Attribute::make(
-            get: fn($value, $attributes) => $this->formatStatus($attributes['status'], Status::class),
+            get: fn($value, $attributes) => Status::tryFrom($attributes['status'] ?? null)?->badge(),
         );
     }
 

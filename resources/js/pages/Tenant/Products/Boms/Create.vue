@@ -13,11 +13,13 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Material } from '@/types/Tenant/materials';
 import type { Product } from '@/types/Tenant/products';
-import type { ProductBom, StatusLabel } from '@/types/Tenant/products/boms';
+import type { ProductBom, StatusBadgeLabel } from '@/types/Tenant/products/boms';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Plus } from 'lucide-vue-next';
 import slug from 'slug';
 import { computed, reactive, ref, watch } from 'vue';
+
+type PartialMaterial = Pick<Material, 'id' | 'name' | 'unit_type' | 'unit_type_label'>;
 
 defineOptions({
     layout: AppMainLayout,
@@ -25,9 +27,9 @@ defineOptions({
 
 const props = defineProps<{
     product: Product;
-    materials: Material[];
+    materials: PartialMaterial[];
     options: {
-        statuses: SwitchOption<ProductBom['status'], StatusLabel>[];
+        statuses: SwitchOption<ProductBom['status'], StatusBadgeLabel>[];
         unit_types: SelectOption<Material['unit_type']>[];
     };
 }>();
@@ -58,19 +60,21 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const materialConfig: Omit<MaterialConfig, 'key'> = {
+const materialConfig: Omit<MaterialConfig<PartialMaterial>, 'key'> = {
     data: null,
     quantity: '',
     unit_type: '',
 };
 
-const selectedMaterials = ref<MaterialConfig[]>([{ ...materialConfig, key: uuid() }]);
+const selectedMaterials = ref<MaterialConfig<PartialMaterial>[]>([{ ...materialConfig, key: uuid() }]);
 
 const defaultStatus = computed<ProductBom['status']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? 'ACTIVE');
 
-const statusDisplay = computed<StatusLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
+const statusDisplay = computed<StatusBadgeLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
 
-const materialOptions = computed<SelectOption<Material>[]>(() => props.materials.map((material) => ({ name: material.name, value: material })));
+const materialOptions = computed<SelectOption<PartialMaterial>[]>(() =>
+    props.materials.map((material) => ({ name: material.name, value: material })),
+);
 
 const form = useForm<{
     name: string;

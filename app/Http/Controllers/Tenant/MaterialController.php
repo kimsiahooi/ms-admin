@@ -35,17 +35,8 @@ class MaterialController extends Controller
         return inertia('Tenant/Materials/Index', [
             'materials' => $materials,
             'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(fn(Status $status) => [
-                        'name' => $status->label(),
-                        'value' => $status->value,
-                        'is_default' => $status->value === Status::ACTIVE->value,
-                    ]),
-                'unit_types' => collect(UnitType::cases())
-                    ->map(fn(UnitType $unitType) => [
-                        'name' => $unitType->label(),
-                        'value' => $unitType->value,
-                    ]),
+                'statuses' => Status::options(),
+                'unit_types' => UnitType::options(),
             ]
         ]);
     }
@@ -99,16 +90,8 @@ class MaterialController extends Controller
         return inertia('Tenant/Materials/Edit', [
             'material' => $material,
             'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(fn(Status $status) => [
-                        'name' => $status->label(),
-                        'value' => $status->value,
-                    ]),
-                'unit_types' => collect(UnitType::cases())
-                    ->map(fn(UnitType $unitType) => [
-                        'name' => $unitType->label(),
-                        'value' => $unitType->value,
-                    ]),
+                'statuses' => Status::options(),
+                'unit_types' => UnitType::options(),
             ]
         ]);
     }

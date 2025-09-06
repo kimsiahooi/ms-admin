@@ -35,14 +35,7 @@ class CompanyController extends Controller
         return inertia('Tenant/Companies/Index', [
             'companies' => $companies,
             'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(function (Status $status) {
-                        return [
-                            'name' => $status->label(),
-                            'value' => $status->value,
-                            'is_default' => $status->value === Status::ACTIVE->value,
-                        ];
-                    }),
+                'statuses' => Status::options(),
             ]
         ]);
     }
@@ -95,13 +88,7 @@ class CompanyController extends Controller
         return inertia('Tenant/Companies/Edit', [
             'company' => $company,
             'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(function ($status) {
-                        return [
-                            'name' => $status->label(),
-                            'value' => $status->value,
-                        ];
-                    }),
+                'statuses' => Status::options(),
             ]
         ]);
     }

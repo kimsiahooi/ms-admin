@@ -13,7 +13,7 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Material } from '@/types/Tenant/materials';
 import type { Product } from '@/types/Tenant/products';
-import type { ProductBomWithMaterials, StatusLabel } from '@/types/Tenant/products/boms';
+import type { ProductBomWithMaterials, StatusBadgeLabel } from '@/types/Tenant/products/boms';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Plus } from 'lucide-vue-next';
 import slug from 'slug';
@@ -28,7 +28,7 @@ const props = defineProps<{
     bom: ProductBomWithMaterials;
     materials: Material[];
     options: {
-        statuses: SwitchOption<ProductBomWithMaterials['status'], StatusLabel>[];
+        statuses: SwitchOption<ProductBomWithMaterials['status'], StatusBadgeLabel>[];
         unit_types: SelectOption<Material['unit_type']>[];
     };
 }>();
@@ -80,7 +80,7 @@ const selectedMaterials = ref<MaterialConfig[]>(
         : [{ ...materialConfig, key: uuid() }],
 );
 
-const statusDisplay = computed<StatusLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
+const statusDisplay = computed<StatusBadgeLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
 
 const materialOptions = computed<SelectOption<Material>[]>(() => props.materials.map((material) => ({ name: material.name, value: material })));
 

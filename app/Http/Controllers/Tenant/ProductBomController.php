@@ -40,12 +40,7 @@ class ProductBomController extends Controller
             'product' => $product,
             'boms' => $boms,
             'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(fn(Status $status) => [
-                        'name' => $status->label(),
-                        'value' => $status->value,
-                        'is_default' => $status->value === Status::ACTIVE->value,
-                    ]),
+                'statuses' => Status::options(),
             ]
         ]);
     }
@@ -55,23 +50,14 @@ class ProductBomController extends Controller
      */
     public function create(Request $request, Product $product)
     {
-        $materials = Material::all();
+        $materials = Material::all(['id', 'name', 'unit_type']);
 
         return inertia('Tenant/Products/Boms/Create', [
             'product' => $product,
             'materials' => $materials,
             'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(fn(Status $status) => [
-                        'name' => $status->label(),
-                        'value' => $status->value,
-                        'is_default' => $status->value === Status::ACTIVE->value,
-                    ]),
-                'unit_types' => collect(UnitType::cases())
-                    ->map(fn(UnitType $type) => [
-                        'name' => $type->label(),
-                        'value' => $type->value,
-                    ]),
+                'statuses' => Status::options(),
+                'unit_types' => UnitType::options(),
             ]
         ]);
     }
@@ -114,23 +100,15 @@ class ProductBomController extends Controller
      */
     public function edit(Request $request, Product $product, Bom $bom)
     {
-        $materials = Material::all();
+        $materials = Material::all(['id', 'name', 'unit_type']);
 
         return inertia('Tenant/Products/Boms/Edit', [
             'product' => $product,
             'bom' => $bom->load(['materials']),
             'materials' => $materials,
             'options' => [
-                'statuses' => collect(Status::cases())
-                    ->map(fn(Status $status) => [
-                        'name' => $status->label(),
-                        'value' => $status->value,
-                    ]),
-                'unit_types' => collect(UnitType::cases())
-                    ->map(fn(UnitType $type) => [
-                        'name' => $type->label(),
-                        'value' => $type->value,
-                    ]),
+                'statuses' => Status::options(),
+                'unit_types' => UnitType::options(),
             ]
         ]);
     }

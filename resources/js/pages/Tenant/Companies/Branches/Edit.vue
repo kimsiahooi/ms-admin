@@ -8,7 +8,7 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Company } from '@/types/Tenant/companies';
-import type { CompanyBranch, StatusLabel } from '@/types/Tenant/companies/branches';
+import type { CompanyBranch, StatusBadgeLabel } from '@/types/Tenant/companies/branches';
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed, reactive, watch } from 'vue';
 
@@ -20,7 +20,7 @@ const props = defineProps<{
     company: Company;
     branch: CompanyBranch;
     options: {
-        statuses: SwitchOption<CompanyBranch['status'], StatusLabel>[];
+        statuses: SwitchOption<CompanyBranch['status'], StatusBadgeLabel>[];
     };
 }>();
 
@@ -49,7 +49,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const statusDisplay = computed<StatusLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
+const statusDisplay = computed<StatusBadgeLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
 
 const form = useForm({
     name: props.branch.name,

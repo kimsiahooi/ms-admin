@@ -16,4 +16,13 @@ enum CavityType: string
             self::KILOGRAM => 'Kilogram',
         };
     }
+
+    public static function options(): array
+    {
+        return collect(CavityType::cases())
+            ->map(fn(CavityType $type) => [
+                'name' => $type->label(),
+                'value' => $type->value,
+            ])->toArray();
+    }
 }

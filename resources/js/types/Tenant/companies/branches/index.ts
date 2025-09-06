@@ -1,7 +1,7 @@
 import type { BadgeVariants } from '@/components/shared/badge';
 import type { Company } from '@/types/Tenant/companies';
 
-export type StatusLabel = 'Active' | 'Inactive';
+export type StatusBadgeLabel = 'Active' | 'Inactive';
 
 export interface CompanyBranch {
     readonly id: string;
@@ -10,10 +10,10 @@ export interface CompanyBranch {
     description: string | null;
     address: string;
     status: 'ACTIVE' | 'INACTIVE';
-    status_label?: {
-        name: StatusLabel | null;
+    status_badge?: {
+        name: StatusBadgeLabel | null;
         variant: BadgeVariants['variant'];
-    };
+    } | null;
     company_id: Company['id'];
     created_at: Date | null;
     updated_at: Date | null;

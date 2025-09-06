@@ -24,4 +24,13 @@ enum CycleTimeType: string
             self::YEAR => 'Year(s)',
         };
     }
+
+    public static function options(): array
+    {
+        return collect(CycleTimeType::cases())
+            ->map(fn(CycleTimeType $type) => [
+                'name' => $type->label(),
+                'value' => $type->value,
+            ])->toArray();
+    }
 }

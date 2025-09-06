@@ -16,7 +16,7 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Company } from '@/types/Tenant/companies';
-import type { CompanyBranch, StatusLabel } from '@/types/Tenant/companies/branches';
+import type { CompanyBranch, StatusBadgeLabel } from '@/types/Tenant/companies/branches';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
@@ -32,7 +32,7 @@ const props = defineProps<{
     company: Company;
     branches: PaginateData<CompanyBranch[]>;
     options: {
-        statuses: SwitchOption<CompanyBranch['status'], StatusLabel>[];
+        statuses: SwitchOption<CompanyBranch['status'], StatusBadgeLabel>[];
     };
 }>();
 
@@ -115,9 +115,9 @@ const columns: ColumnDef<CompanyBranch>[] = [
         accessorKey: 'status',
         header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
-            const { status_label } = row.original;
+            const { status_badge } = row.original;
 
-            return h(StatusBadge, { statusLabel: status_label });
+            return h(StatusBadge, { statusBadge: status_badge });
         },
     },
     {
@@ -159,7 +159,7 @@ const columns: ColumnDef<CompanyBranch>[] = [
 
 const defaultStatus = computed<CompanyBranch['status']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? 'ACTIVE');
 
-const statusDisplay = computed<StatusLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
+const statusDisplay = computed<StatusBadgeLabel>(() => props.options.statuses.find((status) => status.value === form.status)?.name ?? 'Active');
 
 const form = useForm({
     name: '',
@@ -222,7 +222,7 @@ watch(
                             <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
                             <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
                             <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
-                            <FormTextarea label="Address" :error="form.errors.address" v-model:model-value="form.description" />
+                            <FormTextarea label="Address" :error="form.errors.address" v-model:model-value="form.address" />
                             <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="config.status" />
                             <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
                         </form>

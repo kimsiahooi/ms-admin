@@ -165,4 +165,13 @@ enum Currency: string
     case ZAR = 'ZAR'; // South African Rand
     case ZMW = 'ZMW'; // Zambian Kwacha
     case ZWL = 'ZWL'; // Zimbabwean Dollar
+
+    public static function options(): array
+    {
+        return collect(Currency::cases())
+            ->map(fn(Currency $currency) => [
+                'name' => $currency->value,
+                'value' => $currency->value,
+            ])->toArray();
+    }
 }

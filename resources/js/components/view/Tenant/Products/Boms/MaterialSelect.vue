@@ -8,14 +8,16 @@ import { Minus } from 'lucide-vue-next';
 import { computed, reactive, ref, watch } from 'vue';
 import type { MaterialConfig } from '.';
 
+type PartialMaterial = Pick<Material, 'id' | 'name' | 'unit_type' | 'unit_type_label'>;
+
 const props = defineProps<{
-    materialOptions: SelectOption<Material>[];
+    materialOptions: SelectOption<PartialMaterial>[];
     unitTypeOptions: SelectOption<Material['unit_type']>[];
     totalSelected: number;
     currIndex: number;
 }>();
 
-const model = defineModel<MaterialConfig>();
+const model = defineModel<MaterialConfig<PartialMaterial>>();
 const emits = defineEmits<{
     remove: [value: string];
 }>();
@@ -28,7 +30,7 @@ const filteredOptions = computed<SelectOption<Material['id']>[]>(() =>
     props.materialOptions.map((material) => ({ ...material, value: material.value.id })),
 );
 
-const form = reactive<MaterialConfig>({
+const form = reactive<MaterialConfig<PartialMaterial>>({
     key: model.value?.key || uuid(),
     data: model.value?.data || null,
     quantity: model.value?.quantity || '',

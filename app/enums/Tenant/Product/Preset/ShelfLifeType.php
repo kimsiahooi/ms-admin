@@ -24,4 +24,13 @@ enum ShelfLifeType: string
             self::YEAR => 'Year(s)',
         };
     }
+
+    public static function options(): array
+    {
+        return collect(ShelfLifeType::cases())
+            ->map(fn(ShelfLifeType $type) => [
+                'name' => $type->label(),
+                'value' => $type->value,
+            ])->toArray();
+    }
 }

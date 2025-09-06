@@ -1,15 +1,15 @@
 import type { BadgeVariants } from '@/components/shared/badge';
 
-export type StatusLabel = 'Active' | 'Inactive';
+export type StatusBadgeLabel = 'Active' | 'Inactive';
 
 export interface Tenant {
     readonly id: string;
     name: string;
     status: 'ACTIVE' | 'INACTIVE';
-    status_label?: {
-        name: StatusLabel | null;
+    status_badge?: {
+        name: StatusBadgeLabel | null;
         variant: BadgeVariants['variant'];
-    };
+    } | null;
     created_at: Date | null;
     updated_at: Date | null;
     data: string | null;

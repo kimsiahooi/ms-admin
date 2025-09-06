@@ -3,44 +3,44 @@
 namespace App\Models\Tenant;
 
 use App\enums\Tenant\Product\Status;
-use App\Traits\Tenant\StatusBadgeTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class Product extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
-    use HasFactory, SoftDeletes, BelongsToTenant, HasUlids, StatusBadgeTrait;
+    use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
     protected $fillable = ['name', 'code', 'description', 'status', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
-    protected $appends = ['status_label'];
+    protected $appends = ['status_badge'];
 
-    protected function statusLabel(): Attribute
+    protected function statusBadge(): Attribute
     {
         return Attribute::make(
-            get: fn($value, $attributes) => $this->formatStatus($attributes['status'], Status::class),
+            get: fn($value, $attributes) => Status::tryFrom($attributes['status'] ?? null)?->badge(),
         );
     }
 
-    public function prices()
+    public function prices(): HasMany
     {
         return $this->hasMany(ProductPrice::class);
     }
 
-    public function presets()
+    public function presets(): HasMany
     {
         return $this->hasMany(ProductPreset::class);
     }
 
-    public function boms()
+    public function boms(): HasMany
     {
         return $this->hasMany(Bom::class);
     }
