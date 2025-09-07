@@ -20,7 +20,7 @@ const props = defineProps<{
     company: Company;
     branch: CompanyBranch;
     options: {
-        statuses: SwitchOption<CompanyBranch['status'], StatusBadgeLabel>[];
+        statuses: SwitchOption<CompanyBranch['status']['value'], StatusBadgeLabel>[];
     };
 }>();
 
@@ -58,7 +58,7 @@ const form = useForm({
     code: props.branch.code,
     description: props.branch.description || '',
     address: props.branch.address,
-    status: props.branch.status,
+    status: props.branch.status.value,
 });
 
 const config = reactive({

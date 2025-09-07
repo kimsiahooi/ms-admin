@@ -26,7 +26,7 @@ const props = defineProps<{
         cavity_types: SelectOption<ProductPresetWithMachine['cavity_type']>[];
         cycle_time_types: SelectOption<ProductPresetWithMachine['cycle_time_type']>[];
         shelf_life_types: SelectOption<ProductPresetWithMachine['shelf_life_type']>[];
-        statuses: SwitchOption<ProductPresetWithMachine['status'], StatusBadgeLabel>[];
+        statuses: SwitchOption<ProductPresetWithMachine['status']['value'], StatusBadgeLabel>[];
     };
 }>();
 
@@ -70,7 +70,7 @@ const form = useForm<{
     cycle_time_type: ProductPresetWithMachine['cycle_time_type'] | '';
     shelf_life_duration: string;
     shelf_life_type: ProductPresetWithMachine['shelf_life_type'] | '';
-    status: ProductPresetWithMachine['status'];
+    status: ProductPresetWithMachine['status']['value'];
 }>({
     machine_id: props.preset.machine?.id || '',
     name: props.preset.name,
@@ -82,7 +82,7 @@ const form = useForm<{
     cycle_time_type: props.preset.cycle_time_type,
     shelf_life_duration: props.preset.shelf_life_duration || '',
     shelf_life_type: props.preset.shelf_life_type || '',
-    status: props.preset.status,
+    status: props.preset.status.value,
 });
 
 const config = reactive({

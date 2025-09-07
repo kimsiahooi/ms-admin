@@ -178,12 +178,14 @@ export interface ProductPrice {
         | 'ZMW'
         | 'ZWL';
     amount: string;
-    status: Status;
-    status_badge?: {
-        name: StatusBadgeLabel | null;
-        variant: BadgeVariants['variant'];
-    } | null;
-    status_switch?: boolean | null;
+    status: {
+        value: Status;
+        badge?: {
+            name: StatusBadgeLabel | null;
+            variant: BadgeVariants['variant'];
+        } | null;
+        switch?: boolean | null;
+    };
     product_id: Product['id'];
     created_at: Date | null;
     updated_at: Date | null;

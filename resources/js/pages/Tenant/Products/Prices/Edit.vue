@@ -21,7 +21,7 @@ const props = defineProps<{
     product: Product;
     price: ProductPrice;
     options: {
-        statuses: SwitchOption<ProductPrice['status'], StatusBadgeLabel>[];
+        statuses: SwitchOption<ProductPrice['status']['value'], StatusBadgeLabel>[];
         currencies: SelectOption<ProductPrice['currency']>[];
     };
 }>();
@@ -62,11 +62,11 @@ const statusDisplay = computed<StatusBadgeLabel>(
 const form = useForm<{
     currency: string;
     amount: number | '';
-    status: ProductPrice['status'];
+    status: ProductPrice['status']['value'];
 }>({
     currency: props.price.currency,
     amount: +props.price.amount,
-    status: props.price.status,
+    status: props.price.status.value,
 });
 
 const config = reactive({

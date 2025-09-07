@@ -22,19 +22,16 @@ class Material extends Model
 
     protected $hidden = ['tenant_id'];
 
-    protected $appends = ['unit_type_label', 'status_badge', 'status_switch'];
+    protected $appends = ['unit_type_label'];
 
-    protected function statusBadge(): Attribute
+    protected function status(): Attribute
     {
         return Attribute::make(
-            get: fn($value, $attributes) => Status::tryFrom($attributes['status'] ?? null)?->badge(),
-        );
-    }
-
-    protected function statusSwitch(): Attribute
-    {
-        return Attribute::make(
-            get: fn($value, $attributes) => Status::tryFrom($attributes['status'] ?? null)?->switch(),
+            get: fn($value) => [
+                'value' => $value,
+                'badge' => Status::tryFrom($value ?? null)?->badge(),
+                'switch' => Status::tryFrom($value ?? null)?->switch(),
+            ],
         );
     }
 

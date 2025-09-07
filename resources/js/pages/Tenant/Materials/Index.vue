@@ -7,7 +7,7 @@ import { FormButton, FormInput, FormSelect, FormSwitch, FormTextarea } from '@/c
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
 import type { SelectOption } from '@/components/shared/select';
-import { ToggleStatus, type SwitchOption } from '@/components/shared/switch';
+import { StatusSwitch, type SwitchOption } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
@@ -32,7 +32,7 @@ defineOptions({
 const props = defineProps<{
     materials: PaginateData<Material[]>;
     options: {
-        statuses: SwitchOption<Material['status'], StatusBadgeLabel>[];
+        statuses: SwitchOption<Material['status']['value'], StatusBadgeLabel>[];
         unit_types: SelectOption<Material['unit_type']>[];
     };
 }>();
@@ -85,8 +85,8 @@ const columns: ColumnDef<Material>[] = [
             const material = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(ToggleStatus, {
-                    value: material.status_switch,
+                h(StatusSwitch, {
+                    value: material.status.switch,
                     method: 'put',
                     href: route('materials.toggleStatus', { tenant: tenant?.id || '', material: material.id }),
                 }),
@@ -116,9 +116,9 @@ const columns: ColumnDef<Material>[] = [
         accessorKey: 'status',
         header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
-            const { status_badge } = row.original;
+            const { status } = row.original;
 
-            return h(StatusBadge, { statusBadge: status_badge });
+            return h(StatusBadge, { statusBadge: status.badge });
         },
     },
     {
@@ -158,7 +158,7 @@ const columns: ColumnDef<Material>[] = [
     },
 ];
 
-const defaultStatus = computed<Material['status']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE);
+const defaultStatus = computed<Material['status']['value']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE);
 
 const statusDisplay = computed<StatusBadgeLabel>(
     () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],
@@ -169,7 +169,7 @@ const form = useForm<{
     code: string;
     description: string;
     unit_type: Material['unit_type'] | '';
-    status: Material['status'];
+    status: Material['status']['value'];
 }>({
     name: '',
     code: '',

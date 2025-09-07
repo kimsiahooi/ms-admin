@@ -29,7 +29,7 @@ const props = defineProps<{
     product: Product;
     materials: PartialMaterial[];
     options: {
-        statuses: SwitchOption<ProductBom['status'], StatusBadgeLabel>[];
+        statuses: SwitchOption<ProductBom['status']['value'], StatusBadgeLabel>[];
         unit_types: SelectOption<Material['unit_type']>[];
     };
 }>();
@@ -68,7 +68,9 @@ const materialConfig: Omit<MaterialConfig<PartialMaterial>, 'key'> = {
 
 const selectedMaterials = ref<MaterialConfig<PartialMaterial>[]>([{ ...materialConfig, key: uuid() }]);
 
-const defaultStatus = computed<ProductBom['status']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE);
+const defaultStatus = computed<ProductBom['status']['value']>(
+    () => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE,
+);
 
 const statusDisplay = computed<StatusBadgeLabel>(
     () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],
@@ -88,7 +90,7 @@ const form = useForm<{
         quantity: number | '';
         unit_type: Material['unit_type'] | '';
     }[];
-    status: ProductBom['status'];
+    status: ProductBom['status']['value'];
 }>({
     name: '',
     code: '',

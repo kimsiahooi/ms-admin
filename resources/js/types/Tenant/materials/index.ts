@@ -19,12 +19,14 @@ export interface Material {
     description: string | null;
     unit_type: number;
     unit_type_label?: 'Pcs' | 'Kilogram' | 'Gram' | null;
-    status: Status;
-    status_badge?: {
-        name: StatusBadgeLabel | null;
-        variant: BadgeVariants['variant'];
-    } | null;
-    status_switch?: boolean | null;
+    status: {
+        value: Status;
+        badge?: {
+            name: StatusBadgeLabel | null;
+            variant: BadgeVariants['variant'];
+        } | null;
+        switch?: boolean | null;
+    };
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;

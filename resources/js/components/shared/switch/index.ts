@@ -1,4 +1,4 @@
-export { default as ToggleStatus } from './ToggleStatus.vue';
+export { default as StatusSwitch } from './StatusSwitch.vue';
 import type { AcceptableValue } from 'reka-ui';
 
 export interface SwitchOption<T extends AcceptableValue = AcceptableValue, U extends AcceptableValue = AcceptableValue> {

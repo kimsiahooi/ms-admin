@@ -7,7 +7,7 @@ import { FormButton, FormInput, FormSelect, FormSwitch } from '@/components/shar
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
 import type { SelectOption } from '@/components/shared/select';
-import { ToggleStatus, type SwitchOption } from '@/components/shared/switch';
+import { StatusSwitch, type SwitchOption } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
@@ -33,7 +33,7 @@ const props = defineProps<{
     product: Product;
     prices: PaginateData<ProductPrice[]>;
     options: {
-        statuses: SwitchOption<ProductPrice['status'], StatusBadgeLabel>[];
+        statuses: SwitchOption<ProductPrice['status']['value'], StatusBadgeLabel>[];
         currencies: SelectOption<ProductPrice['currency']>[];
     };
 }>();
@@ -93,8 +93,8 @@ const columns: ColumnDef<ProductPrice>[] = [
             const price = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(ToggleStatus, {
-                    value: price.status_switch,
+                h(StatusSwitch, {
+                    value: price.status.switch,
                     method: 'put',
                     href: route('products.prices.toggleStatus', { tenant: tenant?.id || '', product: props.product.id, price: price.id }),
                 }),
@@ -124,9 +124,9 @@ const columns: ColumnDef<ProductPrice>[] = [
         accessorKey: 'status',
         header: () => h('div', null, 'Active'),
         cell: ({ row }) => {
-            const { status_badge } = row.original;
+            const { status } = row.original;
 
-            return h(StatusBadge, { statusBadge: status_badge });
+            return h(StatusBadge, { statusBadge: status.badge });
         },
     },
     {
@@ -156,7 +156,9 @@ const columns: ColumnDef<ProductPrice>[] = [
     },
 ];
 
-const defaultStatus = computed<ProductPrice['status']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE);
+const defaultStatus = computed<ProductPrice['status']['value']>(
+    () => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE,
+);
 
 const statusDisplay = computed<StatusBadgeLabel>(
     () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],
@@ -165,7 +167,7 @@ const statusDisplay = computed<StatusBadgeLabel>(
 const form = useForm<{
     currency: string;
     amount: number | '';
-    status: ProductPrice['status'];
+    status: ProductPrice['status']['value'];
 }>({
     currency: '',
     amount: '',

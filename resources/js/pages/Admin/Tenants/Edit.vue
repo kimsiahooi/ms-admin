@@ -18,7 +18,7 @@ defineOptions({
 const props = defineProps<{
     tenant: Tenant;
     options: {
-        statuses: SwitchOption<Tenant['status'], StatusBadgeLabel>[];
+        statuses: SwitchOption<Tenant['status']['value'], StatusBadgeLabel>[];
     };
 }>();
 
@@ -47,7 +47,7 @@ const statusDisplay = computed<StatusBadgeLabel>(
 
 const form = useForm({
     name: props.tenant.name,
-    status: props.tenant.status,
+    status: props.tenant.status.value,
 });
 
 const config = reactive({

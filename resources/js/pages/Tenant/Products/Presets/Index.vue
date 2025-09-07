@@ -7,7 +7,7 @@ import { FormButton, FormInput, FormSelect, FormSwitch, FormTextarea } from '@/c
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
 import type { SelectOption } from '@/components/shared/select';
-import { ToggleStatus, type SwitchOption } from '@/components/shared/switch';
+import { StatusSwitch, type SwitchOption } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
 import { Button } from '@/components/ui/button';
@@ -40,7 +40,7 @@ const props = defineProps<{
         cavity_types: SelectOption<ProductPreset['cavity_type']>[];
         cycle_time_types: SelectOption<ProductPreset['cycle_time_type']>[];
         shelf_life_types: SelectOption<ProductPreset['shelf_life_type']>[];
-        statuses: SwitchOption<ProductPreset['status'], StatusBadgeLabel>[];
+        statuses: SwitchOption<ProductPreset['status']['value'], StatusBadgeLabel>[];
     };
 }>();
 
@@ -99,8 +99,8 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
         cell: ({ row }) => {
             const preset = row.original;
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(ToggleStatus, {
-                    value: preset.status_switch,
+                h(StatusSwitch, {
+                    value: preset.status.switch,
                     method: 'put',
                     href: route('products.presets.toggleStatus', { tenant: tenant?.id || '', product: props.product.id, preset: preset.id }),
                 }),
@@ -130,9 +130,9 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
         accessorKey: 'status',
         header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
-            const { status_badge } = row.original;
+            const { status } = row.original;
 
-            return h(StatusBadge, { statusBadge: status_badge });
+            return h(StatusBadge, { statusBadge: status.badge });
         },
     },
     {
@@ -219,7 +219,7 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
     },
 ];
 
-const defaultStatus = computed<ProductPresetWithMachine['status']>(
+const defaultStatus = computed<ProductPresetWithMachine['status']['value']>(
     () => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE,
 );
 
@@ -238,7 +238,7 @@ const form = useForm<{
     cycle_time_type: ProductPreset['cycle_time_type'] | '';
     shelf_life_duration: string;
     shelf_life_type: ProductPreset['shelf_life_type'] | '';
-    status: ProductPreset['status'];
+    status: ProductPreset['status']['value'];
 }>({
     machine_id: '',
     name: '',

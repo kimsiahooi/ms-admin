@@ -18,7 +18,7 @@ defineOptions({
 const props = defineProps<{
     product: Product;
     options: {
-        statuses: SwitchOption<Product['status'], StatusBadgeLabel>[];
+        statuses: SwitchOption<Product['status']['value'], StatusBadgeLabel>[];
     };
 }>();
 
@@ -51,12 +51,12 @@ const form = useForm<{
     name: string;
     code: string;
     description: string;
-    status: Product['status'];
+    status: Product['status']['value'];
 }>({
     name: props.product.name,
     code: props.product.code,
     description: props.product.description || '',
-    status: props.product.status,
+    status: props.product.status.value,
 });
 
 const config = reactive({

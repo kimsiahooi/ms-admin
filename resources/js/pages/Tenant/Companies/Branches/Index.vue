@@ -6,7 +6,7 @@ import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custo
 import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
-import { ToggleStatus, type SwitchOption } from '@/components/shared/switch';
+import { StatusSwitch, type SwitchOption } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
@@ -33,7 +33,7 @@ const props = defineProps<{
     company: Company;
     branches: PaginateData<CompanyBranch[]>;
     options: {
-        statuses: SwitchOption<CompanyBranch['status'], StatusBadgeLabel>[];
+        statuses: SwitchOption<CompanyBranch['status']['value'], StatusBadgeLabel>[];
     };
 }>();
 
@@ -94,8 +94,8 @@ const columns: ColumnDef<CompanyBranch>[] = [
             const branch = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(ToggleStatus, {
-                    value: branch.status_switch,
+                h(StatusSwitch, {
+                    value: branch.status.switch,
                     method: 'put',
                     href: route('companies.branches.toggleStatus', { tenant: tenant?.id || '', company: props.company.id, branch: branch.id }),
                 }),
@@ -125,9 +125,9 @@ const columns: ColumnDef<CompanyBranch>[] = [
         accessorKey: 'status',
         header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
-            const { status_badge } = row.original;
+            const { status } = row.original;
 
-            return h(StatusBadge, { statusBadge: status_badge });
+            return h(StatusBadge, { statusBadge: status.badge });
         },
     },
     {
@@ -167,7 +167,9 @@ const columns: ColumnDef<CompanyBranch>[] = [
     },
 ];
 
-const defaultStatus = computed<CompanyBranch['status']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE);
+const defaultStatus = computed<CompanyBranch['status']['value']>(
+    () => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE,
+);
 
 const statusDisplay = computed<StatusBadgeLabel>(
     () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],

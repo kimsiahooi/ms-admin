@@ -18,7 +18,7 @@ defineOptions({
 const props = defineProps<{
     plant: Plant;
     options: {
-        statuses: SwitchOption<Plant['status'], StatusBadgeLabel>[];
+        statuses: SwitchOption<Plant['status']['value'], StatusBadgeLabel>[];
     };
 }>();
 
@@ -52,7 +52,7 @@ const form = useForm({
     code: props.plant.code,
     description: props.plant.description || '',
     address: props.plant.address,
-    status: props.plant.status,
+    status: props.plant.status.value,
 });
 
 const config = reactive({

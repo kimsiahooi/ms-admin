@@ -30,12 +30,14 @@ export interface ProductPreset {
     shelf_life_duration: string | null;
     shelf_life_type: number | null;
     shelf_life_type_label?: string | null;
-    status: Status;
-    status_badge?: {
-        name: StatusBadgeLabel | null;
-        variant: BadgeVariants['variant'];
-    } | null;
-    status_switch?: boolean | null;
+    status: {
+        value: Status;
+        badge?: {
+            name: StatusBadgeLabel | null;
+            variant: BadgeVariants['variant'];
+        } | null;
+        switch?: boolean | null;
+    };
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;

@@ -28,7 +28,7 @@ const props = defineProps<{
     bom: ProductBomWithMaterials;
     materials: Material[];
     options: {
-        statuses: SwitchOption<ProductBomWithMaterials['status'], StatusBadgeLabel>[];
+        statuses: SwitchOption<ProductBomWithMaterials['status']['value'], StatusBadgeLabel>[];
         unit_types: SelectOption<Material['unit_type']>[];
     };
 }>();
@@ -96,13 +96,13 @@ const form = useForm<{
         quantity: number | '';
         unit_type: Material['unit_type'] | '';
     }[];
-    status: ProductBomWithMaterials['status'];
+    status: ProductBomWithMaterials['status']['value'];
 }>({
     name: props.bom.name,
     code: props.bom.code,
     description: props.bom.description || '',
     materials: [],
-    status: props.bom.status,
+    status: props.bom.status.value,
 });
 
 const config = reactive({

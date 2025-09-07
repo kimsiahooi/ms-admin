@@ -7,7 +7,7 @@ import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/sh
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
 import type { SwitchOption } from '@/components/shared/switch';
-import { ToggleStatus } from '@/components/shared/switch';
+import { StatusSwitch } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
@@ -32,7 +32,7 @@ defineOptions({
 const props = defineProps<{
     plants: PaginateData<Plant[]>;
     options: {
-        statuses: SwitchOption<Plant['status'], StatusBadgeLabel>[];
+        statuses: SwitchOption<Plant['status']['value'], StatusBadgeLabel>[];
     };
 }>();
 
@@ -85,8 +85,8 @@ const columns: ColumnDef<Plant>[] = [
             const plant = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(ToggleStatus, {
-                    value: plant.status_switch,
+                h(StatusSwitch, {
+                    value: plant.status.switch,
                     method: 'put',
                     href: route('plants.toggleStatus', { tenant: tenant?.id || '', plant: plant.id }),
                 }),
@@ -116,9 +116,9 @@ const columns: ColumnDef<Plant>[] = [
         accessorKey: 'status',
         header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
-            const { status_badge } = row.original;
+            const { status } = row.original;
 
-            return h(StatusBadge, { statusBadge: status_badge });
+            return h(StatusBadge, { statusBadge: status.badge });
         },
     },
     {
@@ -158,7 +158,7 @@ const columns: ColumnDef<Plant>[] = [
     },
 ];
 
-const defaultStatus = computed<Plant['status']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE);
+const defaultStatus = computed<Plant['status']['value']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE);
 
 const statusDisplay = computed<StatusBadgeLabel>(
     () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],

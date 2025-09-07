@@ -6,7 +6,7 @@ import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custo
 import { FormButton, FormInput, FormSwitch } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
-import { ToggleStatus, type SwitchOption } from '@/components/shared/switch';
+import { StatusSwitch, type SwitchOption } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
 import { Button } from '@/components/ui/button';
@@ -31,7 +31,7 @@ defineOptions({
 const props = defineProps<{
     tenants: PaginateData<Tenant[]>;
     options: {
-        statuses: SwitchOption<Tenant['status'], StatusBadgeLabel>[];
+        statuses: SwitchOption<Tenant['status']['value'], StatusBadgeLabel>[];
     };
 }>();
 
@@ -79,8 +79,8 @@ const columns: ColumnDef<Tenant>[] = [
             const tenant = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(ToggleStatus, {
-                    value: tenant.status_switch,
+                h(StatusSwitch, {
+                    value: tenant.status.switch,
                     method: 'put',
                     href: route('admin.tenants.toggleStatus', { tenant: tenant.id }),
                 }),
@@ -110,9 +110,9 @@ const columns: ColumnDef<Tenant>[] = [
         accessorKey: 'status',
         header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
-            const { status_badge } = row.original;
+            const { status } = row.original;
 
-            return h(StatusBadge, { statusBadge: status_badge });
+            return h(StatusBadge, { statusBadge: status.badge });
         },
     },
     {
@@ -149,7 +149,7 @@ const columns: ColumnDef<Tenant>[] = [
     },
 ];
 
-const defaultStatus = computed<Tenant['status']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE);
+const defaultStatus = computed<Tenant['status']['value']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE);
 
 const statusDisplay = computed<StatusBadgeLabel>(
     () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],

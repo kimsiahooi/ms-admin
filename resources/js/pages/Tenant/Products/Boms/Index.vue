@@ -5,7 +5,7 @@ import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
 import { DeleteDialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
-import { ToggleStatus, type SwitchOption } from '@/components/shared/switch';
+import { StatusSwitch, type SwitchOption } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
 import { Button } from '@/components/ui/button';
@@ -32,7 +32,7 @@ const props = defineProps<{
     product: Product;
     boms: PaginateData<ProductBom[]>;
     options: {
-        statuses: SwitchOption<ProductBom['status'], StatusBadgeLabel>[];
+        statuses: SwitchOption<ProductBom['status']['value'], StatusBadgeLabel>[];
     };
 }>();
 
@@ -86,8 +86,8 @@ const columns: ColumnDef<ProductBom>[] = [
             const bom = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
-                h(ToggleStatus, {
-                    value: bom.status_switch,
+                h(StatusSwitch, {
+                    value: bom.status.switch,
                     method: 'put',
                     href: route('products.boms.toggleStatus', { tenant: tenant?.id || '', product: props.product.id, bom: bom.id }),
                 }),
@@ -117,9 +117,9 @@ const columns: ColumnDef<ProductBom>[] = [
         accessorKey: 'status',
         header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
-            const { status_badge } = row.original;
+            const { status } = row.original;
 
-            return h(StatusBadge, { statusBadge: status_badge });
+            return h(StatusBadge, { statusBadge: status.badge });
         },
     },
     {

@@ -19,7 +19,7 @@ defineOptions({
 const props = defineProps<{
     material: Material;
     options: {
-        statuses: SwitchOption<Material['status'], StatusBadgeLabel>[];
+        statuses: SwitchOption<Material['status']['value'], StatusBadgeLabel>[];
         unit_types: SelectOption<Material['unit_type']>[];
     };
 }>();
@@ -54,13 +54,13 @@ const form = useForm<{
     code: string;
     description: string;
     unit_type: Material['unit_type'];
-    status: Material['status'];
+    status: Material['status']['value'];
 }>({
     name: props.material.name,
     code: props.material.code,
     description: props.material.description || '',
     unit_type: props.material.unit_type,
-    status: props.material.status,
+    status: props.material.status.value,
 });
 
 const config = reactive({

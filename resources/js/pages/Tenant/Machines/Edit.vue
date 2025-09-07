@@ -18,7 +18,7 @@ defineOptions({
 const props = defineProps<{
     machine: Machine;
     options: {
-        statuses: SwitchOption<Machine['status'], StatusBadgeLabel>[];
+        statuses: SwitchOption<Machine['status']['value'], StatusBadgeLabel>[];
     };
 }>();
 
@@ -51,7 +51,7 @@ const form = useForm({
     name: props.machine.name,
     code: props.machine.code,
     description: props.machine.description || '',
-    status: props.machine.status,
+    status: props.machine.status.value,
 });
 
 const config = reactive({
