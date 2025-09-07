@@ -11,7 +11,7 @@ import type { Filter } from '@/types/shared';
 import type { ColumnDef, SortingState } from '@tanstack/vue-table';
 import { FlexRender, getCoreRowModel, getSortedRowModel, useVueTable } from '@tanstack/vue-table';
 import { ChevronDown } from 'lucide-vue-next';
-import { reactive, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 
 const props = withDefaults(
     defineProps<{
@@ -34,7 +34,7 @@ const emits = defineEmits<{
     search: [];
 }>();
 
-const filter = reactive<Filter>(filterModel.value || {});
+const filter = ref<Filter>(filterModel.value || {});
 
 const table = useVueTable({
     get data() {

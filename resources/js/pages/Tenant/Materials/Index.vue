@@ -23,7 +23,7 @@ import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
 import { Pencil, Trash2 } from 'lucide-vue-next';
 import slug from 'slug';
-import { computed, h, reactive, watch } from 'vue';
+import { computed, h, reactive, ref, watch } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -43,7 +43,7 @@ const { formatDateTime } = useFormatDateTime();
 
 const routeParams = computed(() => route().params);
 
-const filter = reactive<Filter>({
+const filter = ref<Filter>({
     search: routeParams.value.search,
     entries: routeParams.value.entries || '10',
     status: routeParams.value.status,
@@ -67,7 +67,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const search = () =>
-    router.visit(route('materials.index', { ...pickBy(filter), tenant: tenant?.id || '' }), {
+    router.visit(route('materials.index', { ...pickBy(filter.value), tenant: tenant?.id || '' }), {
         preserveScroll: true,
         preserveState: true,
     });
