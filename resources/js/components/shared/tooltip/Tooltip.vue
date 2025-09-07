@@ -3,13 +3,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 
 defineProps<{
     text: string | number;
+    asChild?: boolean;
 }>();
 </script>
 
 <template>
     <TooltipProvider>
         <Tooltip>
-            <TooltipTrigger as-child>
+            <TooltipTrigger :as-child="asChild">
                 <slot />
             </TooltipTrigger>
             <TooltipContent>
