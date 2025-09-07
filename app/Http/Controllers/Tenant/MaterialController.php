@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Tenant;
 
-use App\enums\Tenant\Material\Status;
-use App\enums\Tenant\Material\UnitType;
+use App\Enums\Tenant\Material\Status;
+use App\Enums\Tenant\Material\UnitType;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Material;
 use Illuminate\Database\Eloquent\Builder;
