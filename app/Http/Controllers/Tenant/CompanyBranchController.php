@@ -37,6 +37,7 @@ class CompanyBranchController extends Controller
             'branches' => $branches,
             'options' => [
                 'statuses' => Status::options(),
+                'switch_statuses' => Status::switchOptions(),
             ]
         ]);
     }
@@ -68,8 +69,10 @@ class CompanyBranchController extends Controller
             ],
             'description' => ['nullable', 'string'],
             'address' => ['required', 'string'],
-            'status' => ['required', Rule::enum(Status::class)],
+            'status' => ['required', 'boolean'],
         ]);
+
+        $validated['status'] = Status::toggleStatus($validated['status']);
 
         $company->branches()->create($validated);
 
@@ -94,6 +97,7 @@ class CompanyBranchController extends Controller
             'branch' => $branch,
             'options' => [
                 'statuses' => Status::options(),
+                'switch_statuses' => Status::switchOptions(),
             ]
         ]);
     }
@@ -118,8 +122,12 @@ class CompanyBranchController extends Controller
             ],
             'description' => ['nullable', 'string'],
             'address' => ['required', 'string'],
-            'status' => ['required', Rule::enum(Status::class)],
+            'status' => ['sometimes', 'boolean'],
         ]);
+
+        if (isset($validated['status'])) {
+            $validated['status'] = Status::toggleStatus($validated['status']);
+        }
 
         $branch->update($validated);
 
@@ -142,7 +150,7 @@ class CompanyBranchController extends Controller
             'status' => ['required', 'boolean'],
         ]);
 
-        $validated['status'] = $validated['status'] ? Status::ACTIVE->value : Status::INACTIVE->value;
+        $validated['status'] = Status::toggleStatus($validated['status']);
 
         $branch->update($validated);
 

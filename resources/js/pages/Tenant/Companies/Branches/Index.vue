@@ -6,6 +6,7 @@ import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custo
 import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
+import type { SelectOption } from '@/components/shared/select';
 import { StatusSwitch, type SwitchOption } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
@@ -17,7 +18,7 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
 import type { Company } from '@/types/Tenant/companies';
-import { Status, StatusLabel, type CompanyBranch, type StatusBadgeLabel } from '@/types/Tenant/companies/branches';
+import { Status, StatusLabel, type CompanyBranch } from '@/types/Tenant/companies/branches';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
@@ -33,7 +34,8 @@ const props = defineProps<{
     company: Company;
     branches: PaginateData<CompanyBranch[]>;
     options: {
-        statuses: SwitchOption<CompanyBranch['status']['value'], StatusBadgeLabel>[];
+        statuses: SelectOption<CompanyBranch['status']['value']>[];
+        switch_statuses: SwitchOption[];
     };
 }>();
 
@@ -167,12 +169,12 @@ const columns: ColumnDef<CompanyBranch>[] = [
     },
 ];
 
-const defaultStatus = computed<CompanyBranch['status']['value']>(
-    () => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE,
+const defaultStatus = computed<(typeof props.options.switch_statuses)[number]['value']>(
+    () => !!props.options.switch_statuses.find((status) => status.is_default)?.value,
 );
 
-const statusDisplay = computed<StatusBadgeLabel>(
-    () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],
+const statusDisplay = computed(
+    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
 const form = useForm({
@@ -181,10 +183,6 @@ const form = useForm({
     description: '',
     address: '',
     status: defaultStatus.value,
-});
-
-const config = reactive({
-    status: form.status === Status.ACTIVE,
 });
 
 const submit = () =>
@@ -201,17 +199,6 @@ watch(
     () => form.name,
     (newName) => {
         form.code = slug(newName);
-    },
-);
-
-watch(
-    () => config.status,
-    (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === Status.ACTIVE : status.value === Status.INACTIVE))?.value;
-
-        if (value !== undefined) {
-            form.status = value;
-        }
     },
 );
 </script>
@@ -239,7 +226,7 @@ watch(
                             <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
                             <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
                             <FormTextarea label="Address" :error="form.errors.address" v-model:model-value="form.address" />
-                            <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="config.status" />
+                            <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
                             <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
                         </form>
                     </Dialog>

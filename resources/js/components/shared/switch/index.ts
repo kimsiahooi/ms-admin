@@ -1,8 +1,7 @@
 export { default as StatusSwitch } from './StatusSwitch.vue';
-import type { AcceptableValue } from 'reka-ui';
 
-export interface SwitchOption<T extends AcceptableValue = AcceptableValue, U extends AcceptableValue = AcceptableValue> {
-    name: U;
-    value: T;
+export interface SwitchOption {
+    name: string;
+    value: boolean;
     is_default?: boolean;
 }

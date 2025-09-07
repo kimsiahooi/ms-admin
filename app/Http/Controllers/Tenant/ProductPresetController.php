@@ -49,6 +49,7 @@ class ProductPresetController extends Controller
                 'cavity_types' => CavityType::options(),
                 'cycle_time_types' => CycleTimeType::options(),
                 'statuses' => Status::options(),
+                'switch_statuses' => Status::switchOptions(),
                 'shelf_life_types' => [
                     [
                         'name' => 'None',
@@ -103,8 +104,10 @@ class ProductPresetController extends Controller
                 'required_with:shelf_life_duration',
                 Rule::enum(ShelfLifeType::class)
             ],
-            'status' => ['required', Rule::enum(Status::class)],
+            'status' => ['required', 'boolean'],
         ]);
+
+        $validated['status'] = Status::toggleStatus($validated['status']);
 
         $product->presets()->create($validated);
 
@@ -137,6 +140,7 @@ class ProductPresetController extends Controller
                 'cavity_types' => CavityType::options(),
                 'cycle_time_types' => CycleTimeType::options(),
                 'statuses' => Status::options(),
+                'switch_statuses' => Status::switchOptions(),
                 'shelf_life_types' => [
                     [
                         'name' => 'None',
@@ -180,8 +184,12 @@ class ProductPresetController extends Controller
             'cycle_time_type' => ['required', Rule::enum(CycleTimeType::class)],
             'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type', 'numeric', 'decimal:0,2', 'min:0.01'],
             'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::enum(ShelfLifeType::class)],
-            'status' => ['required', Rule::enum(Status::class)],
+            'status' => ['sometimes', 'boolean'],
         ]);
+
+        if (isset($validated['status'])) {
+            $validated['status'] = Status::toggleStatus($validated['status']);
+        }
 
         $preset->update($validated);
 
@@ -204,7 +212,8 @@ class ProductPresetController extends Controller
             'status' => ['required', 'boolean'],
         ]);
 
-        $validated['status'] = $validated['status'] ? Status::ACTIVE->value : Status::INACTIVE->value;
+        $validated['status'] = Status::toggleStatus($validated['status']);
+
         $preset->update($validated);
 
         return back()->with('success', 'Preset status updated successfully.');

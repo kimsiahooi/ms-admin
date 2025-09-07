@@ -12,13 +12,25 @@ export const StatusLabel: Record<Status, string> = {
 
 export type StatusBadgeLabel = (typeof StatusLabel)[Status];
 
+export enum UnitType {
+    PCS = 'PCS',
+    KILOGRAM = 'KILOGRAM',
+    GRAM = 'GRAM',
+}
+
+export const UnitTypeLabel: Record<UnitType, string> = {
+    [UnitType.PCS]: 'Pcs',
+    [UnitType.KILOGRAM]: 'Kilogram',
+    [UnitType.GRAM]: 'Gram',
+};
+
 export interface Material {
     readonly id: string;
     name: string;
     code: string;
     description: string | null;
-    unit_type: number;
-    unit_type_label?: 'Pcs' | 'Kilogram' | 'Gram' | null;
+    unit_type: UnitType;
+    unit_type_label?: (typeof UnitTypeLabel)[UnitType] | null;
     status: {
         value: Status;
         badge?: {

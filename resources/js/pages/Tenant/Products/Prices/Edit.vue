@@ -9,9 +9,9 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Product } from '@/types/Tenant/products';
-import { Status, StatusLabel, type ProductPrice, type StatusBadgeLabel } from '@/types/Tenant/products/prices';
+import { Status, StatusLabel, type ProductPrice } from '@/types/Tenant/products/prices';
 import { Head, useForm } from '@inertiajs/vue3';
-import { computed, reactive, watch } from 'vue';
+import { computed } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -21,8 +21,9 @@ const props = defineProps<{
     product: Product;
     price: ProductPrice;
     options: {
-        statuses: SwitchOption<ProductPrice['status']['value'], StatusBadgeLabel>[];
         currencies: SelectOption<ProductPrice['currency']>[];
+        statuses: SelectOption<ProductPrice['status']['value']>[];
+        switch_statuses: SwitchOption[];
     };
 }>();
 
@@ -55,22 +56,14 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const statusDisplay = computed<StatusBadgeLabel>(
-    () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],
+const statusDisplay = computed(
+    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
-const form = useForm<{
-    currency: string;
-    amount: number | '';
-    status: ProductPrice['status']['value'];
-}>({
+const form = useForm({
     currency: props.price.currency,
-    amount: +props.price.amount,
-    status: props.price.status.value,
-});
-
-const config = reactive({
-    status: form.status === Status.ACTIVE,
+    amount: props.price.amount,
+    status: props.price.status.switch ?? undefined,
 });
 
 const submit = () =>
@@ -78,17 +71,6 @@ const submit = () =>
         preserveScroll: true,
         preserveState: true,
     });
-
-watch(
-    () => config.status,
-    (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === Status.ACTIVE : status.value === Status.INACTIVE))?.value;
-
-        if (value !== undefined) {
-            form.status = value;
-        }
-    },
-);
 </script>
 
 <template>
@@ -106,7 +88,7 @@ watch(
                             :error="form.errors.currency"
                         />
                         <FormInput label="Amount" type="number" :error="form.errors.amount" v-model:model-value="form.amount" step=".01" min="0.01" />
-                        <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="config.status" />
+                        <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
                         <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
                     </Card>
                 </form>

@@ -39,7 +39,7 @@ class StoreBomRequest extends FormRequest
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
-            'status' => ['required', Rule::enum(Status::class)],
+            'status' => ['required', 'boolean'],
             'materials' => ['required', 'array'],
             'materials.*.id' => [
                 'required',

@@ -35,6 +35,7 @@ class PlantController extends Controller
             'plants' => $plants,
             'options' => [
                 'statuses' => Status::options(),
+                'switch_statuses' => Status::switchOptions(),
             ]
         ]);
     }
@@ -64,8 +65,10 @@ class PlantController extends Controller
             ],
             'description' => ['nullable', 'string'],
             'address' => ['required', 'string'],
-            'status' => ['required', Rule::enum(Status::class)],
+            'status' => ['required', 'boolean'],
         ]);
+
+        $validated['status'] = Status::toggleStatus($validated['status']);
 
         Plant::create($validated);
 
@@ -89,6 +92,7 @@ class PlantController extends Controller
             'plant' => $plant,
             'options' => [
                 'statuses' => Status::options(),
+                'switch_statuses' => Status::switchOptions(),
             ]
         ]);
     }
@@ -111,8 +115,12 @@ class PlantController extends Controller
             ],
             'description' => ['nullable', 'string'],
             'address' => ['required', 'string'],
-            'status' => ['required', Rule::enum(Status::class)],
+            'status' => ['sometimes', 'boolean'],
         ]);
+
+        if (isset($validated['status'])) {
+            $validated['status'] = Status::toggleStatus($validated['status']);
+        }
 
         $plant->update($validated);
 
@@ -135,7 +143,7 @@ class PlantController extends Controller
             'status' => ['required', 'boolean'],
         ]);
 
-        $validated['status'] = $validated['status'] ? Status::ACTIVE->value : Status::INACTIVE->value;
+        $validated['status'] = Status::toggleStatus($validated['status']);
 
         $plant->update($validated);
 

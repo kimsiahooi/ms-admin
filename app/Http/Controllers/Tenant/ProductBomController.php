@@ -57,6 +57,7 @@ class ProductBomController extends Controller
             'materials' => $materials,
             'options' => [
                 'statuses' => Status::options(),
+                'switch_statuses' => Status::switchOptions(),
                 'unit_types' => UnitType::options(),
             ]
         ]);
@@ -68,6 +69,8 @@ class ProductBomController extends Controller
     public function store(StoreBomRequest $request, Product $product)
     {
         $validated = $request->validated();
+
+        $validated['status'] = Status::toggleStatus($validated['status']);
 
         $bom = $product->boms()->create($validated);
 
@@ -105,6 +108,7 @@ class ProductBomController extends Controller
             'materials' => $materials,
             'options' => [
                 'statuses' => Status::options(),
+                'switch_statuses' => Status::switchOptions(),
                 'unit_types' => UnitType::options(),
             ]
         ]);
@@ -116,6 +120,10 @@ class ProductBomController extends Controller
     public function update(UpdateBomRequest $request, Product $product, Bom $bom)
     {
         $validated = $request->validated();
+
+        if (isset($validated['status'])) {
+            $validated['status'] = Status::toggleStatus($validated['status']);
+        }
 
         $bom->update($validated);
 
@@ -153,7 +161,7 @@ class ProductBomController extends Controller
             'status' => ['required', 'boolean'],
         ]);
 
-        $validated['status'] = $validated['status'] ? Status::ACTIVE->value : Status::INACTIVE->value;
+        $validated['status'] = Status::toggleStatus($validated['status']);
 
         $bom->update($validated);
 

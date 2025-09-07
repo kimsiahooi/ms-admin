@@ -38,6 +38,7 @@ class ProductPriceController extends Controller
             'prices' => $prices,
             'options' => [
                 'statuses' => Status::options(),
+                'switch_statuses' => Status::switchOptions(),
                 'currencies' => Currency::options(),
             ],
         ]);
@@ -66,8 +67,10 @@ class ProductPriceController extends Controller
                     ->where('tenant_id', tenant('id'))
             ],
             'amount' => ['required', 'min:0.01', 'decimal:0,2', 'numeric'],
-            'status' => ['required', Rule::enum(Status::class)],
+            'status' => ['required', 'boolean'],
         ]);
+
+        $validated['status'] = Status::toggleStatus($validated['status']);
 
         $product->prices()->create($validated);
 
@@ -92,6 +95,7 @@ class ProductPriceController extends Controller
             'price' => $price,
             'options' => [
                 'statuses' => Status::options(),
+                'switch_statuses' => Status::switchOptions(),
                 'currencies' => Currency::options(),
             ],
         ]);
@@ -113,8 +117,12 @@ class ProductPriceController extends Controller
                     ->where('tenant_id', tenant('id'))
             ],
             'amount' => ['required', 'min:0.01', 'decimal:0,2', 'numeric'],
-            'status' => ['required', Rule::enum(Status::class)],
+            'status' => ['sometimes', 'boolean'],
         ]);
+
+        if (isset($validated['status'])) {
+            $validated['status'] = Status::toggleStatus($validated['status']);
+        }
 
         $price->update($validated);
 
@@ -137,7 +145,7 @@ class ProductPriceController extends Controller
             'status' => ['required', 'boolean'],
         ]);
 
-        $validated['status'] = $validated['status'] ? Status::ACTIVE->value : Status::INACTIVE->value;
+        $validated['status'] = Status::toggleStatus($validated['status']);
 
         $price->update($validated);
 

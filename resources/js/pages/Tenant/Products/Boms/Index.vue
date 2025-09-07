@@ -5,7 +5,8 @@ import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
 import { DeleteDialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
-import { StatusSwitch, type SwitchOption } from '@/components/shared/switch';
+import type { SelectOption } from '@/components/shared/select';
+import { StatusSwitch } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,7 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
 import type { Product } from '@/types/Tenant/products';
-import type { ProductBom, StatusBadgeLabel } from '@/types/Tenant/products/boms';
+import type { ProductBom } from '@/types/Tenant/products/boms';
 import { Head, Link, router } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
@@ -32,7 +33,7 @@ const props = defineProps<{
     product: Product;
     boms: PaginateData<ProductBom[]>;
     options: {
-        statuses: SwitchOption<ProductBom['status']['value'], StatusBadgeLabel>[];
+        statuses: SelectOption<ProductBom['status']['value']>[];
     };
 }>();
 

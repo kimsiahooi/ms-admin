@@ -6,7 +6,6 @@ use App\Enums\Admin\Tenant\Status;
 use App\Models\Tenant;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class TenantController extends Controller
 {
@@ -34,6 +33,7 @@ class TenantController extends Controller
             'tenants' => $tenants,
             'options' => [
                 'statuses' => Status::options(),
+                'switch_statuses' => Status::switchOptions(),
             ]
         ]);
     }
@@ -51,11 +51,15 @@ class TenantController extends Controller
      */
     public function store(Request $request)
     {
-        Tenant::create($request->validate([
+        $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'id' => ['required', 'string', 'max:255', 'alpha_dash', 'unique:tenants,id'],
-            'status' => ['required', Rule::enum(Status::class)],
-        ]));
+            'status' => ['required', 'boolean'],
+        ]);
+
+        $validated['status'] = Status::toggleStatus($validated['status']);
+
+        Tenant::create($validated);
 
         return back()->with('success', 'Tenant created successfully.');
     }
@@ -77,6 +81,7 @@ class TenantController extends Controller
             'tenant' => $tenant,
             'options' => [
                 'statuses' => Status::options(),
+                'switch_statuses' => Status::switchOptions(),
             ]
         ]);
     }
@@ -86,10 +91,16 @@ class TenantController extends Controller
      */
     public function update(Request $request, Tenant $tenant)
     {
-        $tenant->update(($request->validate([
+        $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'status' => ['required', Rule::enum(Status::class)],
-        ])));
+            'status' => ['sometimes', 'boolean'],
+        ]);
+
+        if (isset($validated['status'])) {
+            $validated['status'] = Status::toggleStatus($validated['status']);
+        }
+
+        $tenant->update($validated);
 
         return back()->with('success', 'Tenant updated successfully.');
     }
@@ -110,7 +121,7 @@ class TenantController extends Controller
             'status' => ['required', 'boolean'],
         ]);
 
-        $validated['status'] = $validated['status'] ? Status::ACTIVE->value : Status::INACTIVE->value;
+        $validated['status'] = Status::toggleStatus($validated['status']);
 
         $tenant->update($validated);
 

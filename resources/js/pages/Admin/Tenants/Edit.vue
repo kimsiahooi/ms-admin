@@ -2,14 +2,15 @@
 import { Card } from '@/components/shared/card';
 import { Layout } from '@/components/shared/custom/container';
 import { FormButton, FormInput, FormSwitch } from '@/components/shared/custom/form';
+import type { SelectOption } from '@/components/shared/select';
 import type { SwitchOption } from '@/components/shared/switch';
 
 import AppLayout from '@/layouts/Admin/AppLayout.vue';
 import AppMainLayout from '@/layouts/Admin/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import { Status, StatusLabel, type StatusBadgeLabel, type Tenant } from '@/types/Admin/tenants';
+import { Status, StatusLabel, type Tenant } from '@/types/Admin/tenants';
 import { Head, useForm } from '@inertiajs/vue3';
-import { computed, reactive, watch } from 'vue';
+import { computed } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -18,7 +19,8 @@ defineOptions({
 const props = defineProps<{
     tenant: Tenant;
     options: {
-        statuses: SwitchOption<Tenant['status']['value'], StatusBadgeLabel>[];
+        statuses: SelectOption<Tenant['status']['value']>[];
+        switch_statuses: SwitchOption[];
     };
 }>();
 
@@ -41,17 +43,13 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const statusDisplay = computed<StatusBadgeLabel>(
-    () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],
+const statusDisplay = computed(
+    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
 const form = useForm({
     name: props.tenant.name,
-    status: props.tenant.status.value,
-});
-
-const config = reactive({
-    status: form.status === Status.ACTIVE,
+    status: props.tenant.status.switch ?? undefined,
 });
 
 const submit = () =>
@@ -59,17 +57,6 @@ const submit = () =>
         preserveScroll: true,
         preserveState: true,
     });
-
-watch(
-    () => config.status,
-    (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === Status.ACTIVE : status.value === Status.INACTIVE))?.value;
-
-        if (value !== undefined) {
-            form.status = value;
-        }
-    },
-);
 </script>
 
 <template>
@@ -80,7 +67,12 @@ watch(
             <form @submit.prevent="submit">
                 <Card :title="`Edit ${tenant.name}`">
                     <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
-                    <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="config.status" />
+                    <FormSwitch
+                        v-if="form.status !== undefined"
+                        :label="statusDisplay"
+                        :error="form.errors.status"
+                        v-model:model-value="form.status"
+                    />
                     <FormButton type="submit" :disabled="form.processing" label="Update" :loading="form.processing" />
                 </Card>
             </form>

@@ -2,14 +2,15 @@
 import { Card } from '@/components/shared/card';
 import { Layout } from '@/components/shared/custom/container';
 import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
+import type { SelectOption } from '@/components/shared/select';
 import type { SwitchOption } from '@/components/shared/switch';
 import { useTenant } from '@/composables/useTenant';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import { Status, StatusLabel, type Machine, type StatusBadgeLabel } from '@/types/Tenant/machines';
+import { Status, StatusLabel, type Machine } from '@/types/Tenant/machines';
 import { Head, useForm } from '@inertiajs/vue3';
-import { computed, reactive, watch } from 'vue';
+import { computed } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -18,7 +19,8 @@ defineOptions({
 const props = defineProps<{
     machine: Machine;
     options: {
-        statuses: SwitchOption<Machine['status']['value'], StatusBadgeLabel>[];
+        statuses: SelectOption<Machine['status']['value']>[];
+        switch_statuses: SwitchOption[];
     };
 }>();
 
@@ -43,19 +45,15 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const statusDisplay = computed<StatusBadgeLabel>(
-    () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],
+const statusDisplay = computed(
+    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
 const form = useForm({
     name: props.machine.name,
     code: props.machine.code,
     description: props.machine.description || '',
-    status: props.machine.status.value,
-});
-
-const config = reactive({
-    status: form.status === Status.ACTIVE,
+    status: props.machine.status.switch ?? undefined,
 });
 
 const submit = () =>
@@ -63,17 +61,6 @@ const submit = () =>
         preserveScroll: true,
         preserveState: true,
     });
-
-watch(
-    () => config.status,
-    (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === Status.ACTIVE : status.value === Status.INACTIVE))?.value;
-
-        if (value !== undefined) {
-            form.status = value;
-        }
-    },
-);
 </script>
 
 <template>
@@ -86,7 +73,12 @@ watch(
                     <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
                     <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
                     <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
-                    <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="config.status" />
+                    <FormSwitch
+                        v-if="form.status !== undefined"
+                        :label="statusDisplay"
+                        :error="form.errors.status"
+                        v-model:model-value="form.status"
+                    />
                     <FormButton type="submit" :disabled="form.processing" label="Update" :loading="form.processing" />
                 </Card>
             </form>

@@ -10,9 +10,9 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Machine } from '@/types/Tenant/machines';
 import type { Product } from '@/types/Tenant/products';
-import { Status, StatusLabel, type ProductPresetWithMachine, type StatusBadgeLabel } from '@/types/Tenant/products/presets';
+import { Status, StatusLabel, type ProductPreset, type ProductPresetWithMachine } from '@/types/Tenant/products/presets';
 import { Head, useForm } from '@inertiajs/vue3';
-import { computed, reactive, watch } from 'vue';
+import { computed } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -23,10 +23,11 @@ const props = defineProps<{
     preset: ProductPresetWithMachine;
     options: {
         machines: SelectOption<Machine['id']>[];
-        cavity_types: SelectOption<ProductPresetWithMachine['cavity_type']>[];
-        cycle_time_types: SelectOption<ProductPresetWithMachine['cycle_time_type']>[];
-        shelf_life_types: SelectOption<ProductPresetWithMachine['shelf_life_type']>[];
-        statuses: SwitchOption<ProductPresetWithMachine['status']['value'], StatusBadgeLabel>[];
+        cavity_types: SelectOption<ProductPreset['cavity_type']>[];
+        cycle_time_types: SelectOption<ProductPreset['cycle_time_type']>[];
+        shelf_life_types: SelectOption<ProductPreset['shelf_life_type']>[];
+        statuses: SelectOption<ProductPreset['status']['value']>[];
+        switch_statuses: SwitchOption[];
     };
 }>();
 
@@ -55,23 +56,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const statusDisplay = computed<StatusBadgeLabel>(
-    () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],
+const statusDisplay = computed(
+    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
-const form = useForm<{
-    machine_id: Machine['id'] | '';
-    name: string;
-    code: string;
-    description: string;
-    cavity_quantity: number | '';
-    cavity_type: ProductPresetWithMachine['cavity_type'] | '';
-    cycle_time: number | '';
-    cycle_time_type: ProductPresetWithMachine['cycle_time_type'] | '';
-    shelf_life_duration: string;
-    shelf_life_type: ProductPresetWithMachine['shelf_life_type'] | '';
-    status: ProductPresetWithMachine['status']['value'];
-}>({
+const form = useForm({
     machine_id: props.preset.machine?.id || '',
     name: props.preset.name,
     code: props.preset.code,
@@ -82,11 +71,7 @@ const form = useForm<{
     cycle_time_type: props.preset.cycle_time_type,
     shelf_life_duration: props.preset.shelf_life_duration || '',
     shelf_life_type: props.preset.shelf_life_type || '',
-    status: props.preset.status.value,
-});
-
-const config = reactive({
-    status: form.status === Status.ACTIVE,
+    status: props.preset.status.switch ?? undefined,
 });
 
 const submit = () =>
@@ -94,17 +79,6 @@ const submit = () =>
         preserveScroll: true,
         preserveState: true,
     });
-
-watch(
-    () => config.status,
-    (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === Status.ACTIVE : status.value === Status.INACTIVE))?.value;
-
-        if (value !== undefined) {
-            form.status = value;
-        }
-    },
-);
 </script>
 
 <template>
@@ -166,7 +140,7 @@ watch(
                             v-model:model-value="form.shelf_life_type"
                             :error="form.errors.shelf_life_type"
                         />
-                        <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="config.status" />
+                        <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
                         <FormButton type="submit" label="Update" :disabled="form.processing" :loading="form.processing" />
                     </Card>
                 </form>

@@ -18,12 +18,12 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
 import type { Product } from '@/types/Tenant/products';
-import { Status, StatusLabel, type ProductPrice, type StatusBadgeLabel } from '@/types/Tenant/products/prices';
+import { Status, StatusLabel, type ProductPrice } from '@/types/Tenant/products/prices';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
 import { Pencil, Trash2 } from 'lucide-vue-next';
-import { computed, h, reactive, watch } from 'vue';
+import { computed, h, reactive } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -33,7 +33,8 @@ const props = defineProps<{
     product: Product;
     prices: PaginateData<ProductPrice[]>;
     options: {
-        statuses: SwitchOption<ProductPrice['status']['value'], StatusBadgeLabel>[];
+        statuses: SelectOption<ProductPrice['status']['value']>[];
+        switch_statuses: SwitchOption[];
         currencies: SelectOption<ProductPrice['currency']>[];
     };
 }>();
@@ -156,26 +157,18 @@ const columns: ColumnDef<ProductPrice>[] = [
     },
 ];
 
-const defaultStatus = computed<ProductPrice['status']['value']>(
-    () => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE,
+const defaultStatus = computed<(typeof props.options.switch_statuses)[number]['value']>(
+    () => !!props.options.switch_statuses.find((status) => status.is_default)?.value,
 );
 
-const statusDisplay = computed<StatusBadgeLabel>(
-    () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],
+const statusDisplay = computed(
+    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
-const form = useForm<{
-    currency: string;
-    amount: number | '';
-    status: ProductPrice['status']['value'];
-}>({
+const form = useForm({
     currency: '',
     amount: '',
     status: defaultStatus.value,
-});
-
-const config = reactive({
-    status: form.status === Status.ACTIVE,
 });
 
 const submit = () =>
@@ -187,17 +180,6 @@ const submit = () =>
             setting.create.dialogIsOpen = false;
         },
     });
-
-watch(
-    () => config.status,
-    (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === Status.ACTIVE : status.value === Status.INACTIVE))?.value;
-
-        if (value !== undefined) {
-            form.status = value;
-        }
-    },
-);
 </script>
 
 <template>
@@ -234,7 +216,7 @@ watch(
                                 step=".01"
                                 min="0.01"
                             />
-                            <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="config.status" />
+                            <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
                             <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
                         </form>
                     </Dialog>

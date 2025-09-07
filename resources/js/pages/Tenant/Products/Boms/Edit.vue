@@ -13,11 +13,11 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Material } from '@/types/Tenant/materials';
 import type { Product } from '@/types/Tenant/products';
-import { Status, StatusLabel, type ProductBomWithMaterials, type StatusBadgeLabel } from '@/types/Tenant/products/boms';
+import { Status, StatusLabel, type ProductBom, type ProductBomWithMaterials } from '@/types/Tenant/products/boms';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Plus } from 'lucide-vue-next';
 import slug from 'slug';
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -28,7 +28,8 @@ const props = defineProps<{
     bom: ProductBomWithMaterials;
     materials: Material[];
     options: {
-        statuses: SwitchOption<ProductBomWithMaterials['status']['value'], StatusBadgeLabel>[];
+        statuses: SelectOption<ProductBom['status']['value']>[];
+        switch_statuses: SwitchOption[];
         unit_types: SelectOption<Material['unit_type']>[];
     };
 }>();
@@ -80,10 +81,9 @@ const selectedMaterials = ref<MaterialConfig[]>(
         : [{ ...materialConfig, key: uuid() }],
 );
 
-const statusDisplay = computed<StatusBadgeLabel>(
-    () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],
+const statusDisplay = computed(
+    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
-
 const materialOptions = computed<SelectOption<Material>[]>(() => props.materials.map((material) => ({ name: material.name, value: material })));
 
 const form = useForm<{
@@ -96,17 +96,13 @@ const form = useForm<{
         quantity: number | '';
         unit_type: Material['unit_type'] | '';
     }[];
-    status: ProductBomWithMaterials['status']['value'];
+    status: Exclude<ProductBomWithMaterials['status']['switch'], null>;
 }>({
     name: props.bom.name,
     code: props.bom.code,
     description: props.bom.description || '',
     materials: [],
-    status: props.bom.status.value,
-});
-
-const config = reactive({
-    status: form.status === Status.ACTIVE,
+    status: props.bom.status.switch ?? undefined,
 });
 
 const addMeterial = () => {
@@ -142,17 +138,6 @@ watch(
         form.code = slug(newVal);
     },
 );
-
-watch(
-    () => config.status,
-    (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === Status.ACTIVE : status.value === Status.INACTIVE))?.value;
-
-        if (value !== undefined) {
-            form.status = value;
-        }
-    },
-);
 </script>
 
 <template>
@@ -185,7 +170,7 @@ watch(
                             <Button type="button" class="cursor-pointer" variant="outline" @click="addMeterial"><Plus /> Add Material</Button>
                         </div>
                     </div>
-                    <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="config.status" />
+                    <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
                     <FormButton type="submit" label="Update" :disabled="form.processing" :loading="form.processing" />
                 </form>
             </div>

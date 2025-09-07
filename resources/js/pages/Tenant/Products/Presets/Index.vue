@@ -20,7 +20,7 @@ import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
 import type { Machine } from '@/types/Tenant/machines';
 import type { Product } from '@/types/Tenant/products';
-import { Status, StatusLabel, type ProductPreset, type ProductPresetWithMachine, type StatusBadgeLabel } from '@/types/Tenant/products/presets';
+import { Status, StatusLabel, type ProductPreset, type ProductPresetWithMachine } from '@/types/Tenant/products/presets';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
@@ -40,7 +40,8 @@ const props = defineProps<{
         cavity_types: SelectOption<ProductPreset['cavity_type']>[];
         cycle_time_types: SelectOption<ProductPreset['cycle_time_type']>[];
         shelf_life_types: SelectOption<ProductPreset['shelf_life_type']>[];
-        statuses: SwitchOption<ProductPreset['status']['value'], StatusBadgeLabel>[];
+        statuses: SelectOption<ProductPreset['status']['value']>[];
+        switch_statuses: SwitchOption[];
     };
 }>();
 
@@ -219,27 +220,15 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
     },
 ];
 
-const defaultStatus = computed<ProductPresetWithMachine['status']['value']>(
-    () => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE,
+const defaultStatus = computed<(typeof props.options.switch_statuses)[number]['value']>(
+    () => !!props.options.switch_statuses.find((status) => status.is_default)?.value,
 );
 
-const statusDisplay = computed<StatusBadgeLabel>(
-    () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],
+const statusDisplay = computed(
+    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
-const form = useForm<{
-    machine_id: Machine['id'] | '';
-    name: string;
-    code: string;
-    description: string;
-    cavity_quantity: number | '';
-    cavity_type: ProductPreset['cavity_type'] | '';
-    cycle_time: number | '';
-    cycle_time_type: ProductPreset['cycle_time_type'] | '';
-    shelf_life_duration: string;
-    shelf_life_type: ProductPreset['shelf_life_type'] | '';
-    status: ProductPreset['status']['value'];
-}>({
+const form = useForm({
     machine_id: '',
     name: '',
     code: '',
@@ -251,10 +240,6 @@ const form = useForm<{
     shelf_life_duration: '',
     shelf_life_type: '',
     status: defaultStatus.value,
-});
-
-const config = reactive({
-    status: form.status === Status.ACTIVE,
 });
 
 const submit = () =>
@@ -271,17 +256,6 @@ watch(
     () => form.name,
     (newName) => {
         form.code = slug(newName);
-    },
-);
-
-watch(
-    () => config.status,
-    (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === Status.ACTIVE : status.value === Status.INACTIVE))?.value;
-
-        if (value !== undefined) {
-            form.status = value;
-        }
     },
 );
 </script>
@@ -357,7 +331,7 @@ watch(
                                 v-model:model-value="form.shelf_life_type"
                                 :error="form.errors.shelf_life_type"
                             />
-                            <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="config.status" />
+                            <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
                             <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
                         </form>
                     </Dialog>

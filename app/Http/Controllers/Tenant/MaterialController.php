@@ -36,6 +36,7 @@ class MaterialController extends Controller
             'materials' => $materials,
             'options' => [
                 'statuses' => Status::options(),
+                'switch_statuses' => Status::switchOptions(),
                 'unit_types' => UnitType::options(),
             ]
         ]);
@@ -66,8 +67,10 @@ class MaterialController extends Controller
             ],
             'description' => ['nullable', 'string'],
             'unit_type' => ['required', Rule::enum(UnitType::class)],
-            'status' => ['required', Rule::enum(Status::class)],
+            'status' => ['required', 'boolean'],
         ]);
+
+        $validated['status'] = Status::toggleStatus($validated['status']);
 
         Material::create($validated);
 
@@ -91,6 +94,7 @@ class MaterialController extends Controller
             'material' => $material,
             'options' => [
                 'statuses' => Status::options(),
+                'switch_statuses' => Status::switchOptions(),
                 'unit_types' => UnitType::options(),
             ]
         ]);
@@ -114,8 +118,12 @@ class MaterialController extends Controller
             ],
             'description' => ['nullable', 'string'],
             'unit_type' => ['required', Rule::enum(UnitType::class)],
-            'status' => ['required', Rule::enum(Status::class)],
+            'status' => ['sometimes', 'boolean'],
         ]);
+
+        if (isset($validated['status'])) {
+            $validated['status'] = Status::toggleStatus($validated['status']);
+        }
 
         $material->update($validated);
 
@@ -138,7 +146,7 @@ class MaterialController extends Controller
             'status' => ['required', 'boolean'],
         ]);
 
-        $validated['status'] = $validated['status'] ? Status::ACTIVE->value : Status::INACTIVE->value;
+        $validated['status'] = Status::toggleStatus($validated['status']);
 
         $material->update($validated);
 

@@ -2,15 +2,16 @@
 import { Card } from '@/components/shared/card';
 import { Layout } from '@/components/shared/custom/container';
 import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
+import type { SelectOption } from '@/components/shared/select';
 import type { SwitchOption } from '@/components/shared/switch';
 import { useTenant } from '@/composables/useTenant';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Company } from '@/types/Tenant/companies';
-import { Status, StatusLabel, type CompanyBranch, type StatusBadgeLabel } from '@/types/Tenant/companies/branches';
+import { Status, StatusLabel, type CompanyBranch } from '@/types/Tenant/companies/branches';
 import { Head, useForm } from '@inertiajs/vue3';
-import { computed, reactive, watch } from 'vue';
+import { computed } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -20,7 +21,8 @@ const props = defineProps<{
     company: Company;
     branch: CompanyBranch;
     options: {
-        statuses: SwitchOption<CompanyBranch['status']['value'], StatusBadgeLabel>[];
+        statuses: SelectOption<CompanyBranch['status']['value']>[];
+        switch_statuses: SwitchOption[];
     };
 }>();
 
@@ -49,8 +51,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const statusDisplay = computed<StatusBadgeLabel>(
-    () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],
+const statusDisplay = computed(
+    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
 const form = useForm({
@@ -58,25 +60,10 @@ const form = useForm({
     code: props.branch.code,
     description: props.branch.description || '',
     address: props.branch.address,
-    status: props.branch.status.value,
-});
-
-const config = reactive({
-    status: form.status === Status.ACTIVE,
+    status: props.branch.status.switch ?? undefined,
 });
 
 const submit = () => form.put(route('companies.branches.update', { tenant: tenant?.id || '', company: props.company.id, branch: props.branch.id }));
-
-watch(
-    () => config.status,
-    (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === Status.ACTIVE : status.value === Status.INACTIVE))?.value;
-
-        if (value !== undefined) {
-            form.status = value;
-        }
-    },
-);
 </script>
 
 <template>
@@ -90,7 +77,12 @@ watch(
                     <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
                     <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
                     <FormTextarea label="Address" :error="form.errors.address" v-model:model-value="form.address" />
-                    <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="config.status" />
+                    <FormSwitch
+                        v-if="form.status !== undefined"
+                        :label="statusDisplay"
+                        :error="form.errors.status"
+                        v-model:model-value="form.status"
+                    />
                     <FormButton type="submit" :disabled="form.processing" label="Update" :loading="form.processing" />
                 </Card>
             </form>

@@ -40,7 +40,7 @@ class UpdateBomRequest extends FormRequest
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
-            'status' => ['required', Rule::enum(Status::class)],
+            'status' => ['sometimes', 'boolean'],
             'materials' => ['required', 'array'],
             'materials.*.id' => [
                 'required',

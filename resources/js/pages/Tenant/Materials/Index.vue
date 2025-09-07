@@ -17,7 +17,7 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
-import { Status, StatusLabel, type Material, type StatusBadgeLabel } from '@/types/Tenant/materials';
+import { Status, StatusLabel, type Material } from '@/types/Tenant/materials';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
@@ -32,7 +32,8 @@ defineOptions({
 const props = defineProps<{
     materials: PaginateData<Material[]>;
     options: {
-        statuses: SwitchOption<Material['status']['value'], StatusBadgeLabel>[];
+        statuses: SelectOption<Material['status']['value']>[];
+        switch_statuses: SwitchOption[];
         unit_types: SelectOption<Material['unit_type']>[];
     };
 }>();
@@ -158,10 +159,12 @@ const columns: ColumnDef<Material>[] = [
     },
 ];
 
-const defaultStatus = computed<Material['status']['value']>(() => props.options.statuses.find((status) => status.is_default)?.value ?? Status.ACTIVE);
+const defaultStatus = computed<(typeof props.options.switch_statuses)[number]['value']>(
+    () => !!props.options.switch_statuses.find((status) => status.is_default)?.value,
+);
 
-const statusDisplay = computed<StatusBadgeLabel>(
-    () => props.options.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.ACTIVE],
+const statusDisplay = computed(
+    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
 const form = useForm<{
@@ -169,17 +172,13 @@ const form = useForm<{
     code: string;
     description: string;
     unit_type: Material['unit_type'] | '';
-    status: Material['status']['value'];
+    status: (typeof props.options.switch_statuses)[number]['value'];
 }>({
     name: '',
     code: '',
     description: '',
     unit_type: '',
     status: defaultStatus.value,
-});
-
-const config = reactive({
-    status: form.status === Status.ACTIVE,
 });
 
 const submit = () =>
@@ -196,17 +195,6 @@ watch(
     () => form.name,
     (newName) => {
         form.code = slug(newName);
-    },
-);
-
-watch(
-    () => config.status,
-    (newVal) => {
-        const value = props.options.statuses.find((status) => (newVal ? status.value === Status.ACTIVE : status.value === Status.INACTIVE))?.value;
-
-        if (value !== undefined) {
-            form.status = value;
-        }
     },
 );
 </script>
@@ -240,7 +228,7 @@ watch(
                                 v-model:model-value="form.unit_type"
                                 :error="form.errors.unit_type"
                             />
-                            <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="config.status" />
+                            <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
                             <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
                         </form>
                     </Dialog>

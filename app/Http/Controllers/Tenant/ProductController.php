@@ -35,6 +35,7 @@ class ProductController extends Controller
             'products' => $products,
             'options' => [
                 'statuses' => Status::options(),
+                'switch_statuses' => Status::switchOptions(),
             ],
         ]);
     }
@@ -63,8 +64,10 @@ class ProductController extends Controller
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
-            'status' => ['required', Rule::enum(Status::class)],
+            'status' => ['required', 'boolean'],
         ]);
+
+        $validated['status'] = Status::toggleStatus($validated['status']);
 
         Product::create($validated);
 
@@ -88,6 +91,7 @@ class ProductController extends Controller
             'product' => $product,
             'options' => [
                 'statuses' => Status::options(),
+                'switch_statuses' => Status::switchOptions(),
             ],
         ]);
     }
@@ -109,8 +113,12 @@ class ProductController extends Controller
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
-            'status' => ['required', Rule::enum(Status::class)],
+            'status' => ['sometimes', 'boolean'],
         ]);
+
+        if (isset($validated['status'])) {
+            $validated['status'] = Status::toggleStatus($validated['status']);
+        }
 
         $product->update($validated);
 
@@ -133,7 +141,7 @@ class ProductController extends Controller
             'status' => ['required', 'boolean'],
         ]);
 
-        $validated['status'] = $validated['status'] ? Status::ACTIVE->value : Status::INACTIVE->value;
+        $validated['status'] = Status::toggleStatus($validated['status']);
 
         $product->update($validated);
 

@@ -32,12 +32,17 @@ enum Status: string
         ];
     }
 
-    public function switch(): bool
+    public function defaultValue(): bool
     {
         return match ($this) {
             self::ACTIVE => true,
             default => false,
         };
+    }
+
+    public function switch(): bool
+    {
+        return $this?->defaultValue();
     }
 
     public static function options(): array
@@ -46,7 +51,25 @@ enum Status: string
             ->map(fn(Status $status) => [
                 'name' => $status->label(),
                 'value' => $status->value,
-                'is_default' => $status->value === Status::ACTIVE->value,
+                'is_default' => $status->defaultValue(),
             ])->toArray();
+    }
+
+    public static function switchOptions(): array
+    {
+        return collect(Status::cases())
+            ->map(fn(Status $status) => [
+                'name' => $status->label(),
+                'value' => $status->defaultValue(),
+                'is_default' => $status->defaultValue(),
+            ])->toArray();
+    }
+
+    public static function toggleStatus(bool $value): string
+    {
+        return match ($value) {
+            true => Status::ACTIVE->value,
+            default => Status::INACTIVE->value,
+        };
     }
 }
