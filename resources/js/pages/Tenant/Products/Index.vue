@@ -23,7 +23,7 @@ import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
 import { CircleDollarSign, Pencil, ScrollText, Settings2, Trash2 } from 'lucide-vue-next';
 import slug from 'slug';
-import { computed, h, reactive, ref, watch } from 'vue';
+import { computed, h, reactive, watch } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -46,7 +46,7 @@ const { formatDateTime } = useFormatDateTime();
 
 const routeParams = computed(() => route().params);
 
-const filter = ref<Filter>({
+const filter = useForm<Filter>({
     search: routeParams.value.search,
     entries: routeParams.value.entries || '10',
     status: routeParams.value.status,
@@ -70,11 +70,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const search = () =>
-    router.visit(route('products.index', { ...pickBy(filter.value), tenant: tenant?.id || '' }), {
+    router.visit(route('products.index', { ...pickBy(filter.data()), tenant: tenant?.id || '' }), {
         preserveScroll: true,
         preserveState: true,
     });
-const reset = () => router.visit(route('products.index', { tenant: tenant?.id || '' }));
+const reset = () => {
+    filter.reset();
+    search();
+};
 
 const columnVisibility = <VisibilityState<Partial<Product>>>{
     id: false,

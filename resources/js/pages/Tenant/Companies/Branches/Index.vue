@@ -24,7 +24,7 @@ import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
 import { Pencil, Trash2 } from 'lucide-vue-next';
 import slug from 'slug';
-import { computed, h, reactive, ref, watch } from 'vue';
+import { computed, h, reactive, watch } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -48,7 +48,7 @@ const { formatDateTime } = useFormatDateTime();
 
 const routeParams = computed(() => route().params);
 
-const filter = ref<Filter>({
+const filter = useForm<Filter>({
     search: routeParams.value.search,
     entries: routeParams.value.entries || '10',
     status: routeParams.value.status,
@@ -80,11 +80,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const search = () =>
-    router.visit(route('companies.branches.index', { ...pickBy(filter.value), tenant: tenant?.id || '', company: props.company.id }), {
+    router.visit(route('companies.branches.index', { ...pickBy(filter.data()), tenant: tenant?.id || '', company: props.company.id }), {
         preserveScroll: true,
         preserveState: true,
     });
-const reset = () => router.visit(route('companies.branches.index', { tenant: tenant?.id || '', company: props.company.id }));
+const reset = () => {
+    filter.reset();
+    search();
+};
 
 const columnVisibility = <VisibilityState<Partial<CompanyBranch>>>{
     id: false,

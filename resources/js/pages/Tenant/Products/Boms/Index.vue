@@ -19,11 +19,11 @@ import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
 import type { Product } from '@/types/Tenant/products';
 import type { ProductBom } from '@/types/Tenant/products/boms';
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
 import { Pencil, Trash2 } from 'lucide-vue-next';
-import { computed, h, ref } from 'vue';
+import { computed, h } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -44,7 +44,7 @@ const { formatDateTime } = useFormatDateTime();
 
 const routeParams = computed(() => route().params);
 
-const filter = ref<Filter>({
+const filter = useForm<Filter>({
     search: routeParams.value.search,
     entries: routeParams.value.entries || '10',
     status: routeParams.value.status,
@@ -70,11 +70,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const search = () =>
-    router.visit(route('products.boms.index', { ...pickBy(filter.value), tenant: tenant?.id || '', product: props.product.id }), {
+    router.visit(route('products.boms.index', { ...pickBy(filter.data()), tenant: tenant?.id || '', product: props.product.id }), {
         preserveScroll: true,
         preserveState: true,
     });
-const reset = () => router.visit(route('products.boms.index', { tenant: tenant?.id || '', product: props.product.id }));
+const reset = () => {
+    filter.reset();
+    search();
+};
 
 const columnVisibility = <VisibilityState<Partial<ProductBom>>>{
     id: false,

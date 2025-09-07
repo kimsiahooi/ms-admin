@@ -23,7 +23,7 @@ import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
 import { Pencil, Trash2 } from 'lucide-vue-next';
-import { computed, h, reactive, ref } from 'vue';
+import { computed, h, reactive } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -48,7 +48,7 @@ const { formatDateTime } = useFormatDateTime();
 
 const routeParams = computed(() => route().params);
 
-const filter = ref<Filter>({
+const filter = useForm<Filter>({
     search: routeParams.value.search,
     entries: routeParams.value.entries || '10',
     status: routeParams.value.status,
@@ -80,11 +80,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const search = () =>
-    router.visit(route('products.prices.index', { ...pickBy(filter.value), tenant: tenant?.id || '', product: props.product.id }), {
+    router.visit(route('products.prices.index', { ...pickBy(filter.data()), tenant: tenant?.id || '', product: props.product.id }), {
         preserveScroll: true,
         preserveState: true,
     });
-const reset = () => router.visit(route('products.prices.index', { tenant: tenant?.id || '', product: props.product.id }));
+const reset = () => {
+    filter.reset();
+    search();
+};
 
 const columnVisibility = <VisibilityState<Partial<ProductPrice>>>{
     id: false,

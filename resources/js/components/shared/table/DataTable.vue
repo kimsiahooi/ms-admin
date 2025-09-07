@@ -70,6 +70,12 @@ watch(filter, (newFilter) => {
         filterModel.value = newFilter;
     }
 });
+
+watch(filterModel, (newFilter) => {
+    if (newFilter) {
+        filter.value = newFilter;
+    }
+});
 </script>
 
 <template>
