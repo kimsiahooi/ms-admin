@@ -35,9 +35,13 @@ class MaterialController extends Controller
         return inertia('Tenant/Materials/Index', [
             'materials' => $materials,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
-                'unit_types' => UnitType::options(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                    'unit_types' => UnitType::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ],
             ]
         ]);
     }
@@ -93,9 +97,13 @@ class MaterialController extends Controller
         return inertia('Tenant/Materials/Edit', [
             'material' => $material,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
-                'unit_types' => UnitType::options(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                    'unit_types' => UnitType::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ],
             ]
         ]);
     }

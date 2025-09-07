@@ -34,8 +34,12 @@ class PlantController extends Controller
         return inertia('Tenant/Plants/Index', [
             'plants' => $plants,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ],
             ]
         ]);
     }
@@ -91,8 +95,12 @@ class PlantController extends Controller
         return inertia('Tenant/Plants/Edit', [
             'plant' => $plant,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ],
             ]
         ]);
     }

@@ -37,9 +37,13 @@ class ProductPriceController extends Controller
             'product' => $product,
             'prices' => $prices,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
-                'currencies' => Currency::options(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                    'currencies' => Currency::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ]
             ],
         ]);
     }
@@ -94,9 +98,13 @@ class ProductPriceController extends Controller
             'product' => $product,
             'price' => $price,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
-                'currencies' => Currency::options(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                    'currencies' => Currency::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ]
             ],
         ]);
     }

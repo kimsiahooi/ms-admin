@@ -25,7 +25,7 @@ enum ShelfLifeType: string
         };
     }
 
-    public static function options(): array
+    public static function selectOptions(): array
     {
         return collect(ShelfLifeType::cases())
             ->map(fn(ShelfLifeType $type) => [

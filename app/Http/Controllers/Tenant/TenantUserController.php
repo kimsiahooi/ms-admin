@@ -31,12 +31,14 @@ class TenantUserController extends Controller
         return inertia('Tenant/Users/Index', [
             'users' => $users,
             'options' => [
-                'plants' => Plant::all(['id', 'name'])
-                    ->map(fn(Plant $plant) =>
-                    [
-                        'name' => $plant->name,
-                        'value' => $plant->id
-                    ]),
+                'select' => [
+                    'plants' => Plant::all(['id', 'name'])
+                        ->map(fn(Plant $plant) =>
+                        [
+                            'name' => $plant->name,
+                            'value' => $plant->id
+                        ])
+                ]
             ],
         ]);
     }
@@ -96,12 +98,14 @@ class TenantUserController extends Controller
         return inertia('Tenant/Users/Edit', [
             'user' => $user->load(['plants']),
             'options' => [
-                'plants' => Plant::all(['id', 'name'])
-                    ->map(fn(Plant $plant) =>
-                    [
-                        'name' => $plant->name,
-                        'value' => $plant->id,
-                    ]),
+                'select' => [
+                    'plants' => Plant::all(['id', 'name'])
+                        ->map(fn(Plant $plant) =>
+                        [
+                            'name' => $plant->name,
+                            'value' => $plant->id
+                        ])
+                ]
             ],
         ]);
     }

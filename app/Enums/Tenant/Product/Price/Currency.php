@@ -166,7 +166,7 @@ enum Currency: string
     case ZMW = 'ZMW'; // Zambian Kwacha
     case ZWL = 'ZWL'; // Zimbabwean Dollar
 
-    public static function options(): array
+    public static function selectOptions(): array
     {
         return collect(Currency::cases())
             ->map(fn(Currency $currency) => [

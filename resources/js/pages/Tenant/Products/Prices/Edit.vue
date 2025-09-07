@@ -21,9 +21,13 @@ const props = defineProps<{
     product: Product;
     price: ProductPrice;
     options: {
-        currencies: SelectOption<ProductPrice['currency']>[];
-        statuses: SelectOption<ProductPrice['status']['value']>[];
-        switch_statuses: SwitchOption[];
+        select: {
+            statuses: SelectOption<ProductPrice['status']['value']>[];
+            currencies: SelectOption<ProductPrice['currency']>[];
+        };
+        switch: {
+            statuses: SwitchOption[];
+        };
     };
 }>();
 
@@ -57,7 +61,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const statusDisplay = computed(
-    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
+    () => props.options.switch.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
 const form = useForm({
@@ -83,7 +87,7 @@ const submit = () =>
                     <Card :title="`Edit ${price.currency}`">
                         <FormSelect
                             label="Currency"
-                            :options="options.currencies"
+                            :options="options.select.currencies"
                             v-model:model-value="form.currency"
                             :error="form.errors.currency"
                         />

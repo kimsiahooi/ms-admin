@@ -45,7 +45,7 @@ enum Status: string
         return $this?->defaultValue();
     }
 
-    public static function options(): array
+    public static function selectOptions(): array
     {
         return collect(Status::cases())
             ->map(fn(Status $status) => [

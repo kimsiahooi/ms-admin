@@ -22,12 +22,16 @@ const props = defineProps<{
     product: Product;
     preset: ProductPresetWithMachine;
     options: {
-        machines: SelectOption<Machine['id']>[];
-        cavity_types: SelectOption<ProductPreset['cavity_type']>[];
-        cycle_time_types: SelectOption<ProductPreset['cycle_time_type']>[];
-        shelf_life_types: SelectOption<ProductPreset['shelf_life_type']>[];
-        statuses: SelectOption<ProductPreset['status']['value']>[];
-        switch_statuses: SwitchOption[];
+        select: {
+            machines: SelectOption<Machine['id']>[];
+            cavity_types: SelectOption<ProductPreset['cavity_type']>[];
+            cycle_time_types: SelectOption<ProductPreset['cycle_time_type']>[];
+            shelf_life_types: SelectOption<ProductPreset['shelf_life_type']>[];
+            statuses: SelectOption<ProductPreset['status']['value']>[];
+        };
+        switch: {
+            statuses: SwitchOption[];
+        };
     };
 }>();
 
@@ -57,7 +61,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const statusDisplay = computed(
-    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
+    () => props.options.switch.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
 const form = useForm({
@@ -94,7 +98,7 @@ const submit = () =>
                         <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
                         <FormSelect
                             label="Machine"
-                            :options="options.machines"
+                            :options="options.select.machines"
                             v-model:model-value="form.machine_id"
                             :error="form.errors.machine_id"
                         />
@@ -108,7 +112,7 @@ const submit = () =>
                         />
                         <FormSelect
                             label="Cavity Type"
-                            :options="options.cavity_types"
+                            :options="options.select.cavity_types"
                             v-model:model-value="form.cavity_type"
                             :error="form.errors.cavity_type"
                         />
@@ -122,7 +126,7 @@ const submit = () =>
                         />
                         <FormSelect
                             label="Cycle Time Type"
-                            :options="options.cycle_time_types"
+                            :options="options.select.cycle_time_types"
                             v-model:model-value="form.cycle_time_type"
                             :error="form.errors.cycle_time_type"
                         />
@@ -136,7 +140,7 @@ const submit = () =>
                         />
                         <FormSelect
                             label="Shelf Life Type"
-                            :options="options.shelf_life_types"
+                            :options="options.select.shelf_life_types"
                             v-model:model-value="form.shelf_life_type"
                             :error="form.errors.shelf_life_type"
                         />

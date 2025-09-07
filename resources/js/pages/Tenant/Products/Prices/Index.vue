@@ -33,9 +33,13 @@ const props = defineProps<{
     product: Product;
     prices: PaginateData<ProductPrice[]>;
     options: {
-        statuses: SelectOption<ProductPrice['status']['value']>[];
-        switch_statuses: SwitchOption[];
-        currencies: SelectOption<ProductPrice['currency']>[];
+        select: {
+            statuses: SelectOption<ProductPrice['status']['value']>[];
+            currencies: SelectOption<ProductPrice['currency']>[];
+        };
+        switch: {
+            statuses: SwitchOption[];
+        };
     };
 }>();
 
@@ -157,12 +161,12 @@ const columns: ColumnDef<ProductPrice>[] = [
     },
 ];
 
-const defaultStatus = computed<(typeof props.options.switch_statuses)[number]['value']>(
-    () => !!props.options.switch_statuses.find((status) => status.is_default)?.value,
+const defaultStatus = computed<(typeof props.options.switch.statuses)[number]['value']>(
+    () => !!props.options.switch.statuses.find((status) => status.is_default)?.value,
 );
 
 const statusDisplay = computed(
-    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
+    () => props.options.switch.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
 const form = useForm({
@@ -193,7 +197,7 @@ const submit = () =>
                     <FilterSelect
                         label="Status"
                         placeholder="Select Status"
-                        :options="options.statuses"
+                        :options="options.select.statuses"
                         multiple
                         v-model:model-value="filter.status"
                     />
@@ -204,7 +208,7 @@ const submit = () =>
                         <form @submit.prevent="submit" class="space-y-4">
                             <FormSelect
                                 label="Currency"
-                                :options="options.currencies"
+                                :options="options.select.currencies"
                                 v-model:model-value="form.currency"
                                 :error="form.errors.currency"
                             />

@@ -40,23 +40,27 @@ class ProductPresetController extends Controller
             'product' => $product,
             'presets' => $presets,
             'options' => [
-                'machines' => Machine::active()
-                    ->get(['id', 'name'])
-                    ->map(fn(Machine $machine) => [
-                        'name' => $machine->name,
-                        'value' => $machine->id,
-                    ]),
-                'cavity_types' => CavityType::options(),
-                'cycle_time_types' => CycleTimeType::options(),
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
-                'shelf_life_types' => [
-                    [
-                        'name' => 'None',
-                        'value' => null,
+                'select' => [
+                    'machines' => Machine::active()
+                        ->get(['id', 'name'])
+                        ->map(fn(Machine $machine) => [
+                            'name' => $machine->name,
+                            'value' => $machine->id,
+                        ]),
+                    'cavity_types' => CavityType::selectOptions(),
+                    'cycle_time_types' => CycleTimeType::selectOptions(),
+                    'statuses' => Status::selectOptions(),
+                    'shelf_life_types' => [
+                        [
+                            'name' => 'None',
+                            'value' => null,
+                        ],
+                        ...ShelfLifeType::selectOptions(),
                     ],
-                    ...ShelfLifeType::options(),
                 ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ]
             ],
         ]);
     }
@@ -131,23 +135,27 @@ class ProductPresetController extends Controller
             'product' => $product,
             'preset' => $preset->load(['machine']),
             'options' => [
-                'machines' => Machine::active()
-                    ->get(['id', 'name'])
-                    ->map(fn(Machine $machine) => [
-                        'name' => $machine->name,
-                        'value' => $machine->id,
-                    ]),
-                'cavity_types' => CavityType::options(),
-                'cycle_time_types' => CycleTimeType::options(),
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
-                'shelf_life_types' => [
-                    [
-                        'name' => 'None',
-                        'value' => null,
+                'select' => [
+                    'machines' => Machine::active()
+                        ->get(['id', 'name'])
+                        ->map(fn(Machine $machine) => [
+                            'name' => $machine->name,
+                            'value' => $machine->id,
+                        ]),
+                    'cavity_types' => CavityType::selectOptions(),
+                    'cycle_time_types' => CycleTimeType::selectOptions(),
+                    'statuses' => Status::selectOptions(),
+                    'shelf_life_types' => [
+                        [
+                            'name' => 'None',
+                            'value' => null,
+                        ],
+                        ...ShelfLifeType::selectOptions(),
                     ],
-                    ...ShelfLifeType::options(),
                 ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ]
             ],
         ]);
     }

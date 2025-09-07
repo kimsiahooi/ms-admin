@@ -34,8 +34,12 @@ class ProductController extends Controller
         return inertia('Tenant/Products/Index', [
             'products' => $products,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ]
             ],
         ]);
     }
@@ -90,8 +94,12 @@ class ProductController extends Controller
         return inertia('Tenant/Products/Edit', [
             'product' => $product,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ]
             ],
         ]);
     }

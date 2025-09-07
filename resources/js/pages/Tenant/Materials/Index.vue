@@ -32,9 +32,13 @@ defineOptions({
 const props = defineProps<{
     materials: PaginateData<Material[]>;
     options: {
-        statuses: SelectOption<Material['status']['value']>[];
-        switch_statuses: SwitchOption[];
-        unit_types: SelectOption<Material['unit_type']>[];
+        select: {
+            statuses: SelectOption<Material['status']['value']>[];
+            unit_types: SelectOption<Material['unit_type']>[];
+        };
+        switch: {
+            statuses: SwitchOption[];
+        };
     };
 }>();
 
@@ -159,12 +163,12 @@ const columns: ColumnDef<Material>[] = [
     },
 ];
 
-const defaultStatus = computed<(typeof props.options.switch_statuses)[number]['value']>(
-    () => !!props.options.switch_statuses.find((status) => status.is_default)?.value,
+const defaultStatus = computed<(typeof props.options.switch.statuses)[number]['value']>(
+    () => !!props.options.switch.statuses.find((status) => status.is_default)?.value,
 );
 
 const statusDisplay = computed(
-    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
+    () => props.options.switch.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
 const form = useForm<{
@@ -172,7 +176,7 @@ const form = useForm<{
     code: string;
     description: string;
     unit_type: Material['unit_type'] | '';
-    status: (typeof props.options.switch_statuses)[number]['value'];
+    status: (typeof props.options.switch.statuses)[number]['value'];
 }>({
     name: '',
     code: '',
@@ -210,7 +214,7 @@ watch(
                     <FilterSelect
                         label="Status"
                         placeholder="Select Status"
-                        :options="options.statuses"
+                        :options="options.select.statuses"
                         multiple
                         v-model:model-value="filter.status"
                     />
@@ -224,7 +228,7 @@ watch(
                             <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
                             <FormSelect
                                 label="Unit Type"
-                                :options="options.unit_types"
+                                :options="options.select.unit_types"
                                 v-model:model-value="form.unit_type"
                                 :error="form.errors.unit_type"
                             />

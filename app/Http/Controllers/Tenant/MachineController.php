@@ -34,8 +34,12 @@ class MachineController extends Controller
         return inertia('Tenant/Machines/Index', [
             'machines' => $machines,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ],
             ]
         ]);
     }
@@ -90,8 +94,12 @@ class MachineController extends Controller
         return inertia('Tenant/Machines/Edit', [
             'machine' => $machine,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ],
             ]
         ]);
     }

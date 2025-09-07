@@ -28,9 +28,13 @@ const props = defineProps<{
     bom: ProductBomWithMaterials;
     materials: Material[];
     options: {
-        statuses: SelectOption<ProductBom['status']['value']>[];
-        switch_statuses: SwitchOption[];
-        unit_types: SelectOption<Material['unit_type']>[];
+        select: {
+            statuses: SelectOption<ProductBom['status']['value']>[];
+            unit_types: SelectOption<Material['unit_type']>[];
+        };
+        switch: {
+            statuses: SwitchOption[];
+        };
     };
 }>();
 
@@ -82,7 +86,7 @@ const selectedMaterials = ref<MaterialConfig[]>(
 );
 
 const statusDisplay = computed(
-    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
+    () => props.options.switch.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 const materialOptions = computed<SelectOption<Material>[]>(() => props.materials.map((material) => ({ name: material.name, value: material })));
 
@@ -158,7 +162,7 @@ watch(
                             <div v-for="(material, index) in selectedMaterials" :key="material.key" class="space-y-1">
                                 <MaterialSelect
                                     :material-options="materialOptions"
-                                    :unit-type-options="options.unit_types"
+                                    :unit-type-options="options.select.unit_types"
                                     :total-selected="selectedMaterials.length"
                                     v-model:model-value="selectedMaterials[index]"
                                     :curr-index="index"

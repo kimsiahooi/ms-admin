@@ -30,7 +30,9 @@ defineOptions({
 defineProps<{
     users: PaginateData<TenantUser[]>;
     options: {
-        plants: SelectOption<Plant['id']>[];
+        select: {
+            plants: SelectOption<Plant['id']>[];
+        };
     };
 }>();
 
@@ -179,7 +181,7 @@ const submit = () =>
                             />
                             <FormSelect
                                 label="Plants"
-                                :options="options.plants"
+                                :options="options.select.plants"
                                 error-key="form.errors.plants"
                                 multiple
                                 v-model:model-value="form.plants"

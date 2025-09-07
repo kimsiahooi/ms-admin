@@ -29,9 +29,13 @@ const props = defineProps<{
     product: Product;
     materials: PartialMaterial[];
     options: {
-        statuses: SelectOption<ProductBom['status']['value']>[];
-        switch_statuses: SwitchOption[];
-        unit_types: SelectOption<Material['unit_type']>[];
+        select: {
+            statuses: SelectOption<ProductBom['status']['value']>[];
+            unit_types: SelectOption<Material['unit_type']>[];
+        };
+        switch: {
+            statuses: SwitchOption[];
+        };
     };
 }>();
 
@@ -69,12 +73,12 @@ const materialConfig: Omit<MaterialConfig<PartialMaterial>, 'key'> = {
 
 const selectedMaterials = ref<MaterialConfig<PartialMaterial>[]>([{ ...materialConfig, key: uuid() }]);
 
-const defaultStatus = computed<(typeof props.options.switch_statuses)[number]['value']>(
-    () => !!props.options.switch_statuses.find((status) => status.is_default)?.value,
+const defaultStatus = computed<(typeof props.options.switch.statuses)[number]['value']>(
+    () => !!props.options.switch.statuses.find((status) => status.is_default)?.value,
 );
 
 const statusDisplay = computed(
-    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
+    () => props.options.switch.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
 const materialOptions = computed<SelectOption<PartialMaterial>[]>(() =>
@@ -91,7 +95,7 @@ const form = useForm<{
         quantity: number | '';
         unit_type: Material['unit_type'] | '';
     }[];
-    status: (typeof props.options.switch_statuses)[number]['value'];
+    status: (typeof props.options.switch.statuses)[number]['value'];
 }>({
     name: '',
     code: '',
@@ -153,7 +157,7 @@ watch(
                             <div v-for="(material, index) in selectedMaterials" :key="material.key" class="space-y-1">
                                 <MaterialSelect
                                     :material-options="materialOptions"
-                                    :unit-type-options="options.unit_types"
+                                    :unit-type-options="options.select.unit_types"
                                     :total-selected="selectedMaterials.length"
                                     v-model:model-value="selectedMaterials[index]"
                                     :curr-index="index"

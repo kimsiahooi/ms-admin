@@ -36,8 +36,12 @@ class CompanyBranchController extends Controller
             'company' => $company,
             'branches' => $branches,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ],
             ]
         ]);
     }
@@ -96,8 +100,12 @@ class CompanyBranchController extends Controller
             'company' => $company,
             'branch' => $branch,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ],
             ]
         ]);
     }

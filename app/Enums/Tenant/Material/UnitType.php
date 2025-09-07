@@ -17,7 +17,7 @@ enum UnitType: string
         };
     }
 
-    public static function options(): array
+    public static function selectOptions(): array
     {
         return collect(UnitType::cases())
             ->map(fn(UnitType $type) => [

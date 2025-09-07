@@ -25,7 +25,7 @@ enum CycleTimeType: string
         };
     }
 
-    public static function options(): array
+    public static function selectOptions(): array
     {
         return collect(CycleTimeType::cases())
             ->map(fn(CycleTimeType $type) => [

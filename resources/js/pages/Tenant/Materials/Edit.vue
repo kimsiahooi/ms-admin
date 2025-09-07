@@ -19,9 +19,13 @@ defineOptions({
 const props = defineProps<{
     material: Material;
     options: {
-        statuses: SelectOption<Material['status']['value']>[];
-        switch_statuses: SwitchOption[];
-        unit_types: SelectOption<Material['unit_type']>[];
+        select: {
+            statuses: SelectOption<Material['status']['value']>[];
+            unit_types: SelectOption<Material['unit_type']>[];
+        };
+        switch: {
+            statuses: SwitchOption[];
+        };
     };
 }>();
 
@@ -47,7 +51,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const statusDisplay = computed(
-    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
+    () => props.options.switch.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
 const form = useForm({
@@ -75,7 +79,12 @@ const submit = () =>
                     <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
                     <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
                     <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
-                    <FormSelect label="Unit Type" :options="options.unit_types" v-model:model-value="form.unit_type" :error="form.errors.unit_type" />
+                    <FormSelect
+                        label="Unit Type"
+                        :options="options.select.unit_types"
+                        v-model:model-value="form.unit_type"
+                        :error="form.errors.unit_type"
+                    />
                     <FormSwitch
                         v-if="form.status !== undefined"
                         :label="statusDisplay"

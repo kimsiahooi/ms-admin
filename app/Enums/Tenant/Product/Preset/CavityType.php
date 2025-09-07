@@ -17,7 +17,7 @@ enum CavityType: string
         };
     }
 
-    public static function options(): array
+    public static function selectOptions(): array
     {
         return collect(CavityType::cases())
             ->map(fn(CavityType $type) => [

@@ -18,7 +18,9 @@ defineOptions({
 const props = defineProps<{
     user: TenantUserWithPlants;
     options: {
-        plants: SelectOption<Plant['id']>[];
+        select: {
+            plants: SelectOption<Plant['id']>[];
+        };
     };
 }>();
 
@@ -80,7 +82,13 @@ const submit = () =>
                         v-model:model-value="form.password_confirmation"
                         type="password"
                     />
-                    <FormSelect label="Plants" :options="options.plants" error-key="form.errors.plants" multiple v-model:model-value="form.plants" />
+                    <FormSelect
+                        label="Plants"
+                        :options="options.select.plants"
+                        error-key="form.errors.plants"
+                        multiple
+                        v-model:model-value="form.plants"
+                    />
                     <FormButton type="submit" :disabled="form.processing" label="Update" :loading="form.processing" />
                 </Card>
             </form>

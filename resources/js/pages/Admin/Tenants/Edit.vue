@@ -19,8 +19,12 @@ defineOptions({
 const props = defineProps<{
     tenant: Tenant;
     options: {
-        statuses: SelectOption<Tenant['status']['value']>[];
-        switch_statuses: SwitchOption[];
+        select: {
+            statuses: SelectOption<Tenant['status']['value']>[];
+        };
+        switch: {
+            statuses: SwitchOption[];
+        };
     };
 }>();
 
@@ -44,7 +48,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const statusDisplay = computed(
-    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
+    () => props.options.switch.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
 const form = useForm({

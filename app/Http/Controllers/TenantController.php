@@ -32,8 +32,12 @@ class TenantController extends Controller
         return inertia('Admin/Tenants/Index', [
             'tenants' => $tenants,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ]
             ]
         ]);
     }
@@ -80,8 +84,12 @@ class TenantController extends Controller
         return inertia('Admin/Tenants/Edit', [
             'tenant' => $tenant,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ]
             ]
         ]);
     }

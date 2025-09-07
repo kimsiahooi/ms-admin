@@ -33,7 +33,9 @@ const props = defineProps<{
     product: Product;
     boms: PaginateData<ProductBom[]>;
     options: {
-        statuses: SelectOption<ProductBom['status']['value']>[];
+        select: {
+            statuses: SelectOption<ProductBom['status']['value']>[];
+        };
     };
 }>();
 
@@ -167,7 +169,7 @@ const columns: ColumnDef<ProductBom>[] = [
                     <FilterSelect
                         label="Status"
                         placeholder="Select Status"
-                        :options="options.statuses"
+                        :options="options.select.statuses"
                         multiple
                         v-model:model-value="filter.status"
                     />

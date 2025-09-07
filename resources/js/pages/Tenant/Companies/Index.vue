@@ -32,8 +32,12 @@ defineOptions({
 const props = defineProps<{
     companies: PaginateData<Company[]>;
     options: {
-        statuses: SelectOption<Company['status']['value']>[];
-        switch_statuses: SwitchOption[];
+        select: {
+            statuses: SelectOption<Company['status']['value']>[];
+        };
+        switch: {
+            statuses: SwitchOption[];
+        };
     };
 }>();
 
@@ -158,12 +162,12 @@ const columns: ColumnDef<Company>[] = [
     },
 ];
 
-const defaultStatus = computed<(typeof props.options.switch_statuses)[number]['value']>(
-    () => !!props.options.switch_statuses.find((status) => status.is_default)?.value,
+const defaultStatus = computed<(typeof props.options.switch.statuses)[number]['value']>(
+    () => !!props.options.switch.statuses.find((status) => status.is_default)?.value,
 );
 
 const statusDisplay = computed(
-    () => props.options.switch_statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
+    () => props.options.switch.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
 const form = useForm({
@@ -202,7 +206,7 @@ watch(
                     <FilterSelect
                         label="Status"
                         placeholder="Select Status"
-                        :options="options.statuses"
+                        :options="options.select.statuses"
                         multiple
                         v-model:model-value="filter.status"
                     />

@@ -40,7 +40,9 @@ class ProductBomController extends Controller
             'product' => $product,
             'boms' => $boms,
             'options' => [
-                'statuses' => Status::options(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                ],
             ]
         ]);
     }
@@ -56,9 +58,13 @@ class ProductBomController extends Controller
             'product' => $product,
             'materials' => $materials,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
-                'unit_types' => UnitType::options(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                    'unit_types' => UnitType::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ]
             ]
         ]);
     }
@@ -107,9 +113,13 @@ class ProductBomController extends Controller
             'bom' => $bom->load(['materials']),
             'materials' => $materials,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
-                'unit_types' => UnitType::options(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                    'unit_types' => UnitType::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ]
             ]
         ]);
     }

@@ -35,8 +35,12 @@ class CompanyController extends Controller
         return inertia('Tenant/Companies/Index', [
             'companies' => $companies,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ],
             ]
         ]);
     }
@@ -91,8 +95,12 @@ class CompanyController extends Controller
         return inertia('Tenant/Companies/Edit', [
             'company' => $company,
             'options' => [
-                'statuses' => Status::options(),
-                'switch_statuses' => Status::switchOptions(),
+                'select' => [
+                    'statuses' => Status::selectOptions(),
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ],
             ]
         ]);
     }
