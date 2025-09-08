@@ -30,10 +30,10 @@ const mainNavItems: NavItem[] = [
         isActive: route().current('plants.*', { tenant: tenant?.id || '' }),
     },
     {
-        title: 'Client Companies',
-        href: route('companies.index', { tenant: tenant?.id || '' }),
+        title: 'Customers',
+        href: route('customers.index', { tenant: tenant?.id || '' }),
         icon: Building2,
-        isActive: route().current('companies.*', { tenant: tenant?.id || '' }),
+        isActive: route().current('customers.*', { tenant: tenant?.id || '' }),
     },
     {
         title: 'Machines',

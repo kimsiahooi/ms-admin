@@ -3,21 +3,22 @@ import { StatusBadge } from '@/components/shared/badge';
 import { ActionButton } from '@/components/shared/custom/action';
 import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
-import { FormButton, FormInput, FormSwitch } from '@/components/shared/custom/form';
+import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
 import type { SelectOption } from '@/components/shared/select';
 import { StatusSwitch, type SwitchOption } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
-import { Button } from '@/components/ui/button';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
+import { useTenant } from '@/composables/useTenant';
 import { entryOptions } from '@/constants/entries/options';
-import AppLayout from '@/layouts/Admin/AppLayout.vue';
-import AppMainLayout from '@/layouts/Admin/AppMainLayout.vue';
+import AppLayout from '@/layouts/Tenant/AppLayout.vue';
+import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import { Status, StatusLabel, type Tenant } from '@/types/Admin/tenants';
 import type { Filter } from '@/types/shared';
+import type { Customer } from '@/types/Tenant/customers';
+import { Status, StatusLabel, type CustomerBranch } from '@/types/Tenant/customers/branches';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
@@ -30,10 +31,11 @@ defineOptions({
 });
 
 const props = defineProps<{
-    tenants: PaginateData<Tenant[]>;
+    customer: Customer;
+    branches: PaginateData<CustomerBranch[]>;
     options: {
         select: {
-            statuses: SelectOption<Tenant['status']['value']>[];
+            statuses: SelectOption<CustomerBranch['status']['value']>[];
         };
         switch: {
             statuses: SwitchOption[];
@@ -41,6 +43,7 @@ const props = defineProps<{
     };
 }>();
 
+const { tenant } = useTenant();
 const { formatDateTime } = useFormatDateTime();
 
 const routeParams = computed(() => route().params);
@@ -60,16 +63,24 @@ const setting = reactive({
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: route('admin.dashboard'),
+        href: route('dashboard', { tenant: tenant?.id || '' }),
     },
     {
-        title: 'Tenants',
-        href: route('admin.tenants.index'),
+        title: 'Customers',
+        href: route('customers.index', { tenant: tenant?.id || '' }),
+    },
+    {
+        title: props.customer.name,
+        href: '#',
+    },
+    {
+        title: 'Branches',
+        href: route('customers.branches.index', { tenant: tenant?.id || '', customer: props.customer.id }),
     },
 ];
 
 const search = () =>
-    router.visit(route('admin.tenants.index', { ...pickBy(filter.data()) }), {
+    router.visit(route('customers.branches.index', { ...pickBy(filter.data()), tenant: tenant?.id || '', customer: props.customer.id }), {
         preserveScroll: true,
         preserveState: true,
     });
@@ -78,31 +89,35 @@ const reset = () => {
     search();
 };
 
-const columnVisibility = <VisibilityState<Partial<Tenant>>>{};
+const columnVisibility = <VisibilityState<Partial<CustomerBranch>>>{
+    id: false,
+    description: false,
+    address: false,
+};
 
-const columns: ColumnDef<Tenant>[] = [
+const columns: ColumnDef<CustomerBranch>[] = [
     {
         accessorKey: 'actions',
         header: () => h('div', null, 'Actions'),
         cell: ({ row }) => {
-            const tenant = row.original;
+            const branch = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
                 h(StatusSwitch, {
-                    value: tenant.status.switch,
+                    value: branch.status.switch,
                     method: 'put',
-                    href: route('admin.tenants.toggleStatus', { tenant: tenant.id }),
+                    href: route('customers.branches.toggleStatus', { tenant: tenant?.id || '', customer: props.customer.id, branch: branch.id }),
                 }),
                 h(ActionButton, {
                     text: 'Edit',
-                    href: route('admin.tenants.edit', { tenant: tenant.id }),
+                    href: route('customers.branches.edit', { tenant: tenant?.id || '', customer: props.customer.id, branch: branch.id }),
                     icon: Pencil,
                 }),
                 h(
                     DeleteDialog,
                     {
-                        title: `Delete ${tenant.name}`,
-                        route: route('admin.tenants.destroy', { tenant: tenant.id }),
+                        title: `Delete ${branch.name}`,
+                        route: route('customers.branches.destroy', { tenant: tenant?.id || '', customer: props.customer.id, branch: branch.id }),
                         asChild: false,
                     },
                     () =>
@@ -126,25 +141,28 @@ const columns: ColumnDef<Tenant>[] = [
     },
     {
         accessorKey: 'id',
-        header: () => h('div', null, 'ID'),
-        cell: ({ row }) => {
-            const { id } = row.original;
-
-            return h(
-                'div',
-                null,
-                h(
-                    'a',
-                    { href: route('dashboard', { tenant: id }), target: '_blank' },
-                    h(Button, { variant: 'link', class: 'cursor-pointer' }, () => row.getValue('id')),
-                ),
-            );
-        },
+        header: () => h('div', null, 'Id'),
+        cell: ({ row }) => h('div', null, row.getValue('id')),
     },
     {
         accessorKey: 'name',
         header: () => h('div', null, 'Name'),
         cell: ({ row }) => h('div', null, row.getValue('name')),
+    },
+    {
+        accessorKey: 'code',
+        header: () => h('div', null, 'Code'),
+        cell: ({ row }) => h('div', null, row.getValue('code')),
+    },
+    {
+        accessorKey: 'description',
+        header: () => h('div', null, 'Description'),
+        cell: ({ row }) => h('div', null, row.getValue('description')),
+    },
+    {
+        accessorKey: 'address',
+        header: () => h('div', null, 'Address'),
+        cell: ({ row }) => h('div', null, row.getValue('address')),
     },
     {
         accessorKey: 'created_at',
@@ -167,15 +185,17 @@ const statusDisplay = computed(
 );
 
 const form = useForm({
-    id: '',
     name: '',
+    code: '',
+    description: '',
+    address: '',
     status: defaultStatus.value,
 });
 
 const submit = () =>
-    form.post(route('admin.tenants.store'), {
-        preserveState: true,
+    form.post(route('customers.branches.store', { tenant: tenant?.id || '', customer: props.customer.id }), {
         preserveScroll: true,
+        preserveState: true,
         onSuccess: () => {
             form.reset();
             setting.create.dialogIsOpen = false;
@@ -185,19 +205,19 @@ const submit = () =>
 watch(
     () => form.name,
     (newName) => {
-        form.id = slug(newName);
+        form.code = slug(newName);
     },
 );
 </script>
 
 <template>
-    <Head title="Tenants" />
+    <Head title="Customer Branches" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Layout>
             <div class="space-y-3">
                 <FilterCard @search="search" @reset="reset">
-                    <FilterInput label="Name" placeholder="Search ID, Name" v-model:model-value="filter.search" />
+                    <FilterInput label="Name" placeholder="Search ID, Name, Code" v-model:model-value="filter.search" />
                     <FilterSelect
                         label="Status"
                         placeholder="Select Status"
@@ -207,12 +227,14 @@ watch(
                     />
                 </FilterCard>
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Dialog title="Create Customer" v-model:open="setting.create.dialogIsOpen">
+                    <Dialog title="Create Branch" v-model:open="setting.create.dialogIsOpen">
                         <form @submit.prevent="submit" class="space-y-4">
                             <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
-                            <FormInput label="ID" :error="form.errors.id" v-model:model-value="form.id" />
+                            <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
+                            <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
+                            <FormTextarea label="Address" :error="form.errors.address" v-model:model-value="form.address" />
                             <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
-                            <FormButton type="submit" :disabled="form.processing" />
+                            <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
                         </form>
                     </Dialog>
                 </div>
@@ -220,7 +242,7 @@ watch(
                     <DataTable
                         v-model:model-value="filter"
                         :columns="columns"
-                        :paginate-data="tenants"
+                        :paginate-data="branches"
                         :column-visibility="columnVisibility"
                         :entry-options="entryOptions"
                         @search="search"

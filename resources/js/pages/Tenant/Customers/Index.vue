@@ -3,25 +3,25 @@ import { StatusBadge } from '@/components/shared/badge';
 import { ActionButton } from '@/components/shared/custom/action';
 import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
-import { FormButton, FormInput, FormSwitch } from '@/components/shared/custom/form';
+import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
 import type { SelectOption } from '@/components/shared/select';
 import { StatusSwitch, type SwitchOption } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
-import { Button } from '@/components/ui/button';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
+import { useTenant } from '@/composables/useTenant';
 import { entryOptions } from '@/constants/entries/options';
-import AppLayout from '@/layouts/Admin/AppLayout.vue';
-import AppMainLayout from '@/layouts/Admin/AppMainLayout.vue';
+import AppLayout from '@/layouts/Tenant/AppLayout.vue';
+import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import { Status, StatusLabel, type Tenant } from '@/types/Admin/tenants';
 import type { Filter } from '@/types/shared';
+import { Status, StatusLabel, type Customer } from '@/types/Tenant/customers';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { Pencil, Trash2 } from 'lucide-vue-next';
+import { Factory, Pencil, Trash2 } from 'lucide-vue-next';
 import slug from 'slug';
 import { computed, h, reactive, watch } from 'vue';
 
@@ -30,10 +30,10 @@ defineOptions({
 });
 
 const props = defineProps<{
-    tenants: PaginateData<Tenant[]>;
+    customers: PaginateData<Customer[]>;
     options: {
         select: {
-            statuses: SelectOption<Tenant['status']['value']>[];
+            statuses: SelectOption<Customer['status']['value']>[];
         };
         switch: {
             statuses: SwitchOption[];
@@ -41,6 +41,7 @@ const props = defineProps<{
     };
 }>();
 
+const { tenant } = useTenant();
 const { formatDateTime } = useFormatDateTime();
 
 const routeParams = computed(() => route().params);
@@ -60,16 +61,16 @@ const setting = reactive({
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: route('admin.dashboard'),
+        href: route('dashboard', { tenant: tenant?.id || '' }),
     },
     {
-        title: 'Tenants',
-        href: route('admin.tenants.index'),
+        title: 'Customers',
+        href: route('customers.index', { tenant: tenant?.id || '' }),
     },
 ];
 
 const search = () =>
-    router.visit(route('admin.tenants.index', { ...pickBy(filter.data()) }), {
+    router.visit(route('customers.index', { ...pickBy(filter.data()), tenant: tenant?.id || '' }), {
         preserveScroll: true,
         preserveState: true,
     });
@@ -78,31 +79,39 @@ const reset = () => {
     search();
 };
 
-const columnVisibility = <VisibilityState<Partial<Tenant>>>{};
+const columnVisibility = <VisibilityState<Partial<Customer>>>{
+    id: false,
+    description: false,
+};
 
-const columns: ColumnDef<Tenant>[] = [
+const columns: ColumnDef<Customer>[] = [
     {
         accessorKey: 'actions',
         header: () => h('div', null, 'Actions'),
         cell: ({ row }) => {
-            const tenant = row.original;
+            const customer = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
                 h(StatusSwitch, {
-                    value: tenant.status.switch,
+                    value: customer.status.switch,
                     method: 'put',
-                    href: route('admin.tenants.toggleStatus', { tenant: tenant.id }),
+                    href: route('customers.toggleStatus', { tenant: tenant?.id || '', customer: customer.id }),
                 }),
                 h(ActionButton, {
                     text: 'Edit',
-                    href: route('admin.tenants.edit', { tenant: tenant.id }),
+                    href: route('customers.edit', { tenant: tenant?.id || '', customer: customer.id }),
                     icon: Pencil,
+                }),
+                h(ActionButton, {
+                    text: 'Branches',
+                    href: route('customers.branches.index', { tenant: tenant?.id || '', customer: customer.id }),
+                    icon: Factory,
                 }),
                 h(
                     DeleteDialog,
                     {
-                        title: `Delete ${tenant.name}`,
-                        route: route('admin.tenants.destroy', { tenant: tenant.id }),
+                        title: `Delete ${customer.name}`,
+                        route: route('customers.destroy', { tenant: tenant?.id || '', customer: customer.id }),
                         asChild: false,
                     },
                     () =>
@@ -126,25 +135,23 @@ const columns: ColumnDef<Tenant>[] = [
     },
     {
         accessorKey: 'id',
-        header: () => h('div', null, 'ID'),
-        cell: ({ row }) => {
-            const { id } = row.original;
-
-            return h(
-                'div',
-                null,
-                h(
-                    'a',
-                    { href: route('dashboard', { tenant: id }), target: '_blank' },
-                    h(Button, { variant: 'link', class: 'cursor-pointer' }, () => row.getValue('id')),
-                ),
-            );
-        },
+        header: () => h('div', null, 'Id'),
+        cell: ({ row }) => h('div', null, row.getValue('id')),
     },
     {
         accessorKey: 'name',
         header: () => h('div', null, 'Name'),
         cell: ({ row }) => h('div', null, row.getValue('name')),
+    },
+    {
+        accessorKey: 'code',
+        header: () => h('div', null, 'Code'),
+        cell: ({ row }) => h('div', null, row.getValue('code')),
+    },
+    {
+        accessorKey: 'description',
+        header: () => h('div', null, 'Description'),
+        cell: ({ row }) => h('div', null, row.getValue('description')),
     },
     {
         accessorKey: 'created_at',
@@ -167,15 +174,16 @@ const statusDisplay = computed(
 );
 
 const form = useForm({
-    id: '',
     name: '',
+    code: '',
+    description: '',
     status: defaultStatus.value,
 });
 
 const submit = () =>
-    form.post(route('admin.tenants.store'), {
-        preserveState: true,
+    form.post(route('customers.store', { tenant: tenant?.id || '' }), {
         preserveScroll: true,
+        preserveState: true,
         onSuccess: () => {
             form.reset();
             setting.create.dialogIsOpen = false;
@@ -185,19 +193,19 @@ const submit = () =>
 watch(
     () => form.name,
     (newName) => {
-        form.id = slug(newName);
+        form.code = slug(newName);
     },
 );
 </script>
 
 <template>
-    <Head title="Tenants" />
+    <Head title="Customers" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Layout>
             <div class="space-y-3">
                 <FilterCard @search="search" @reset="reset">
-                    <FilterInput label="Name" placeholder="Search ID, Name" v-model:model-value="filter.search" />
+                    <FilterInput label="Name" placeholder="Search ID, Name, Code" v-model:model-value="filter.search" />
                     <FilterSelect
                         label="Status"
                         placeholder="Select Status"
@@ -206,13 +214,15 @@ watch(
                         v-model:model-value="filter.status"
                     />
                 </FilterCard>
+
                 <div class="flex flex-wrap items-center justify-end gap-2">
                     <Dialog title="Create Customer" v-model:open="setting.create.dialogIsOpen">
                         <form @submit.prevent="submit" class="space-y-4">
                             <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
-                            <FormInput label="ID" :error="form.errors.id" v-model:model-value="form.id" />
+                            <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
+                            <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
                             <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
-                            <FormButton type="submit" :disabled="form.processing" />
+                            <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
                         </form>
                     </Dialog>
                 </div>
@@ -220,7 +230,7 @@ watch(
                     <DataTable
                         v-model:model-value="filter"
                         :columns="columns"
-                        :paginate-data="tenants"
+                        :paginate-data="customers"
                         :column-visibility="columnVisibility"
                         :entry-options="entryOptions"
                         @search="search"
