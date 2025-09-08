@@ -212,7 +212,7 @@ watch(
                             <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
                             <FormInput label="ID" :error="form.errors.id" v-model:model-value="form.id" />
                             <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
-                            <FormButton type="submit" :disabled="form.processing" />
+                            <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
                         </form>
                     </Dialog>
                 </div>
