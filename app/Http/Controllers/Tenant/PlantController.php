@@ -117,7 +117,7 @@ class PlantController extends Controller
                 'string',
                 'alpha_dash',
                 'max:255',
-                Rule::unique('machines')
+                Rule::unique('plants')
                     ->ignore($plant->id)
                     ->where('tenant_id', tenant('id'))
             ],
