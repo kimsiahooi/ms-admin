@@ -91,7 +91,6 @@ watch(
                     label="Quantity"
                     type="number"
                     v-model:model-value="form.quantity"
-                    min="0.01"
                     step=".01"
                     :error-key="`materials.${currIndex}.quantity`"
                 >

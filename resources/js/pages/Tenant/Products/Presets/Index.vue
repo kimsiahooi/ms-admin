@@ -301,7 +301,6 @@ watch(
                                 :error="form.errors.cavity_quantity"
                                 v-model:model-value="form.cavity_quantity"
                                 type="number"
-                                min="0.01"
                                 step=".01"
                             />
                             <FormSelect
@@ -315,7 +314,6 @@ watch(
                                 :error="form.errors.cycle_time"
                                 v-model:model-value="form.cycle_time"
                                 type="number"
-                                min="0.01"
                                 step=".01"
                             />
                             <FormSelect
@@ -329,7 +327,6 @@ watch(
                                 :error="form.errors.shelf_life_duration"
                                 v-model:model-value="form.shelf_life_duration"
                                 type="number"
-                                min="0.01"
                                 step=".01"
                             />
                             <FormSelect
