@@ -15,6 +15,7 @@ use App\Http\Controllers\Tenant\CustomerBranchController;
 use App\Http\Controllers\Tenant\CustomerController;
 use App\Http\Controllers\Tenant\MachineController;
 use App\Http\Controllers\Tenant\MaterialController;
+use App\Http\Controllers\Tenant\OperationController;
 use App\Http\Controllers\Tenant\PlantController;
 use App\Http\Controllers\Tenant\ProductController;
 use App\Http\Controllers\Tenant\ProductPresetController;
@@ -110,8 +111,13 @@ Route::middleware([
 
         Route::prefix('plants/{plant}')->name('plants.')->group(function () {
             Route::match(['put', 'patch'], 'toggleStatus', [PlantController::class, 'toggleStatus'])->name('toggleStatus');
+
+            Route::prefix('operations/{operation}')->name('operations.')->group(function () {
+                Route::match(['put', 'patch'], 'toggleStatus', [OperationController::class, 'toggleStatus'])->name('toggleStatus');
+            });
         });
         Route::resource('plants', PlantController::class)->except(['create', 'show']);
+        Route::resource('plants.operations', OperationController::class)->except(['create', 'show']);
 
         Route::prefix('machines/{machine}')->name('machines.')->group(function () {
             Route::match(['put', 'patch'], 'toggleStatus', [MachineController::class, 'toggleStatus'])->name('toggleStatus');

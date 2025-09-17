@@ -2,23 +2,22 @@
 
 namespace App\Models\Tenant;
 
-use App\Enums\Tenant\Plant\Status;
+use App\Enums\Tenant\Plant\Operation\Status;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
-class Plant extends Model
+class Operation extends Model
 {
-    /** @use HasFactory<\Database\Factories\Tenant\PlantFactory> */
+    /** @use HasFactory<\Database\Factories\Tenant\OperationFactory> */
     use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
-    protected $fillable = ['name', 'code', 'description', 'address', 'status', 'tenant_id'];
+    protected $fillable = ['name', 'code', 'description', 'status', 'plant_id', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
@@ -38,17 +37,8 @@ class Plant extends Model
         $query->where('status', Status::ACTIVE->value);
     }
 
-    public function tenantUsers(): BelongsToMany
+    public function plant(): BelongsTo
     {
-        return $this->belongsToMany(TenantUser::class)
-            ->withPivot(['id', 'tenant_id'])
-            ->wherePivotNull('deleted_at')
-            ->withTimestamps()
-            ->using(PlantTenantUser::class);
-    }
-
-    public function operations(): HasMany
-    {
-        return $this->hasMany(Operation::class);
+        return $this->belongsTo(Plant::class);
     }
 }
