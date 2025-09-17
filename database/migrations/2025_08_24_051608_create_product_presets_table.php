@@ -1,10 +1,7 @@
 <?php
 
-use App\Enums\Tenant\Product\Preset\CavityType;
-use App\Enums\Tenant\Product\Preset\CycleTimeType;
 use App\Enums\Tenant\Product\Preset\Status;
 use App\Models\Tenant;
-use App\Models\Tenant\Machine;
 use App\Models\Tenant\Product;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -20,7 +17,6 @@ return new class extends Migration
         Schema::create('product_presets', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->foreignIdFor(Product::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(Machine::class)->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('code');
             $table->text('description')->nullable();

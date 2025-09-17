@@ -18,7 +18,7 @@ class ProductPreset extends Model
 {
     use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
-    protected $fillable = ['product_id', 'machine_id', 'name', 'code', 'description', 'cavity_quantity', 'cavity_type', 'cycle_time', 'cycle_time_type', 'shelf_life_duration', 'shelf_life_type', 'status', 'tenant_id'];
+    protected $fillable = ['product_id', 'name', 'code', 'description', 'cavity_quantity', 'cavity_type', 'cycle_time', 'cycle_time_type', 'shelf_life_duration', 'shelf_life_type', 'status', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
@@ -59,10 +59,5 @@ class ProductPreset extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
-    }
-
-    public function machine(): BelongsTo
-    {
-        return $this->belongsTo(Machine::class);
     }
 }

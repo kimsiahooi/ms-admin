@@ -10,7 +10,6 @@ import type { SelectOption } from '@/components/shared/select';
 import { StatusSwitch, type SwitchOption } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
-import { Button } from '@/components/ui/button';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
 import { useTenant } from '@/composables/useTenant';
 import { entryOptions } from '@/constants/entries/options';
@@ -18,10 +17,9 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
-import type { Machine } from '@/types/Tenant/machines';
 import type { Product } from '@/types/Tenant/products';
-import { Status, StatusLabel, type ProductPreset, type ProductPresetWithMachine } from '@/types/Tenant/products/presets';
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Status, StatusLabel, type ProductPreset } from '@/types/Tenant/products/presets';
+import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
 import { Pencil, Trash2 } from 'lucide-vue-next';
@@ -34,10 +32,9 @@ defineOptions({
 
 const props = defineProps<{
     product: Product;
-    presets: PaginateData<ProductPresetWithMachine[]>;
+    presets: PaginateData<ProductPreset[]>;
     options: {
         select: {
-            machines: SelectOption<Machine['id']>[];
             cavity_types: SelectOption<ProductPreset['cavity_type']>[];
             cycle_time_types: SelectOption<ProductPreset['cycle_time_type']>[];
             shelf_life_types: SelectOption<ProductPreset['shelf_life_type']>[];
@@ -95,7 +92,7 @@ const reset = () => {
     search();
 };
 
-const columns: ColumnDef<ProductPresetWithMachine>[] = [
+const columns: ColumnDef<ProductPreset>[] = [
     {
         accessorKey: 'actions',
         header: () => h('div', null, 'Actions'),
@@ -142,22 +139,6 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
         accessorKey: 'id',
         header: () => h('div', null, 'Id'),
         cell: ({ row }) => h('div', null, row.getValue('id')),
-    },
-    {
-        accessorKey: 'machine',
-        header: () => h('div', null, 'Machine'),
-        cell: ({ row }) => {
-            const { machine } = row.original;
-            return machine
-                ? h(
-                      Link,
-                      {
-                          href: route('machines.index', { tenant: tenant?.id || '', search: machine?.id || '' }),
-                      },
-                      () => h(Button, { class: 'cursor-pointer', variant: 'link' }, () => machine?.name),
-                  )
-                : null;
-        },
     },
     {
         accessorKey: 'name',
@@ -222,7 +203,7 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
     },
 ];
 
-const columnVisibility: VisibilityState<ProductPresetWithMachine> = {
+const columnVisibility: VisibilityState<ProductPreset> = {
     id: false,
     description: false,
 };
@@ -236,7 +217,6 @@ const statusDisplay = computed(
 );
 
 const form = useForm({
-    machine_id: '',
     name: '',
     code: '',
     description: '',
@@ -290,12 +270,6 @@ watch(
                             <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
                             <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
                             <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
-                            <FormSelect
-                                label="Machine"
-                                :options="options.select.machines"
-                                v-model:model-value="form.machine_id"
-                                :error="form.errors.machine_id"
-                            />
                             <FormInput
                                 label="Cavity Quantity"
                                 :error="form.errors.cavity_quantity"

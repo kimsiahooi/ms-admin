@@ -10,7 +10,7 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Machine } from '@/types/Tenant/machines';
 import type { Product } from '@/types/Tenant/products';
-import { Status, StatusLabel, type ProductPreset, type ProductPresetWithMachine } from '@/types/Tenant/products/presets';
+import { Status, StatusLabel, type ProductPreset } from '@/types/Tenant/products/presets';
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -20,7 +20,7 @@ defineOptions({
 
 const props = defineProps<{
     product: Product;
-    preset: ProductPresetWithMachine;
+    preset: ProductPreset;
     options: {
         select: {
             machines: SelectOption<Machine['id']>[];
@@ -65,7 +65,6 @@ const statusDisplay = computed(
 );
 
 const form = useForm({
-    machine_id: props.preset.machine?.id || '',
     name: props.preset.name,
     code: props.preset.code,
     description: props.preset.description || '',
@@ -96,12 +95,6 @@ const submit = () =>
                         <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
                         <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
                         <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
-                        <FormSelect
-                            label="Machine"
-                            :options="options.select.machines"
-                            v-model:model-value="form.machine_id"
-                            :error="form.errors.machine_id"
-                        />
                         <FormInput
                             label="Cavity Quantity"
                             :error="form.errors.cavity_quantity"

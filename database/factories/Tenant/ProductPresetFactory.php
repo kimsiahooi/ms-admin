@@ -24,13 +24,11 @@ class ProductPresetFactory extends Factory
     public function definition(): array
     {
         $product = Product::inRandomOrder()->first();
-        $machine = Machine::where('tenant_id', $product->tenant_id)->inRandomOrder()->first();
         $name = fake()->unique()->sentence(2);
         $shelfLifeDuration = fake()->optional(0.5)->randomFloat(2, 10, 100);
 
         return [
             'product_id' => $product->id,
-            'machine_id' => $machine->id,
             'name' => $name,
             'code' => Str::slug($name),
             'description' => fake()->sentence(),

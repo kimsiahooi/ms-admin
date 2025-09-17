@@ -23,7 +23,7 @@ class ProductPresetController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $presets = $product->presets()->with('machine')->when(
+        $presets = $product->presets()->when(
             $request->search,
             fn(Builder $query, $search) =>
             $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
@@ -41,12 +41,6 @@ class ProductPresetController extends Controller
             'presets' => $presets,
             'options' => [
                 'select' => [
-                    'machines' => Machine::active()
-                        ->get(['id', 'name'])
-                        ->map(fn(Machine $machine) => [
-                            'name' => $machine->name,
-                            'value' => $machine->id,
-                        ]),
                     'cavity_types' => CavityType::selectOptions(),
                     'cycle_time_types' => CycleTimeType::selectOptions(),
                     'statuses' => Status::selectOptions(),
@@ -79,13 +73,6 @@ class ProductPresetController extends Controller
     public function store(Request $request, Product $product)
     {
         $validated = $request->validate([
-            'machine_id' => [
-                'required',
-                Rule::exists('machines', 'id')
-                    ->where('status', Status::ACTIVE->value)
-                    ->where('tenant_id', $product->tenant_id)
-                    ->where('tenant_id', tenant('id'))
-            ],
             'name' => ['required', 'string', 'max:255'],
             'code' => [
                 'required',
@@ -133,15 +120,9 @@ class ProductPresetController extends Controller
     {
         return inertia('Tenant/Products/Presets/Edit', [
             'product' => $product,
-            'preset' => $preset->load(['machine']),
+            'preset' => $preset,
             'options' => [
                 'select' => [
-                    'machines' => Machine::active()
-                        ->get(['id', 'name'])
-                        ->map(fn(Machine $machine) => [
-                            'name' => $machine->name,
-                            'value' => $machine->id,
-                        ]),
                     'cavity_types' => CavityType::selectOptions(),
                     'cycle_time_types' => CycleTimeType::selectOptions(),
                     'statuses' => Status::selectOptions(),
@@ -166,13 +147,6 @@ class ProductPresetController extends Controller
     public function update(Request $request, Product $product, ProductPreset $preset)
     {
         $validated = $request->validate([
-            'machine_id' => [
-                'required',
-                Rule::exists('machines', 'id')
-                    ->where('status', Status::ACTIVE->value)
-                    ->where('tenant_id', $product->tenant_id)
-                    ->where('tenant_id', tenant('id'))
-            ],
             'name' => ['required', 'string', 'max:255'],
             'code' => [
                 'required',

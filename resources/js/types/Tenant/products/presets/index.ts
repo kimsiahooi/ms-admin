@@ -1,5 +1,4 @@
 import type { BadgeVariants } from '@/components/shared/badge';
-import type { Machine } from '@/types/Tenant/machines';
 import type { Product } from '@/types/Tenant/products';
 
 export enum Status {
@@ -17,7 +16,6 @@ export type StatusBadgeLabel = (typeof StatusLabel)[Status];
 export interface ProductPreset {
     readonly id: string;
     product_id: string;
-    machine_id: string;
     name: string;
     code: string;
     description: string | null;
@@ -45,13 +43,4 @@ export interface ProductPreset {
 
 export interface ProductPresetWithProduct extends ProductPreset {
     product: Product | null;
-}
-
-export interface ProductPresetWithMachine extends ProductPreset {
-    machine: Machine | null;
-}
-
-export interface ProductPresetWithProductAndMachine extends ProductPreset {
-    product: Product | null;
-    machine: Machine | null;
 }
