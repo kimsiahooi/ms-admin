@@ -162,7 +162,7 @@ class BomController extends Controller
     {
         $bom->delete();
 
-        return back()->with('success', 'Bom deleted successfully.');
+        return back()->with('success', 'Product Bom deleted successfully.');
     }
 
     public function toggleStatus(Request $request, Product $product, Bom $bom)
