@@ -14,7 +14,7 @@ use App\Models\Tenant\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
-class ProductBomController extends Controller
+class BomController extends Controller
 {
     /**
      * Display a listing of the resource.
