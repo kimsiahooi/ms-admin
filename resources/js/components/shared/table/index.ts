@@ -26,4 +26,4 @@ export interface DropdownHandler {
 
 export type DropdownAction = DropdownLink | DropdownHandler;
 
-export type VisibilityState<T extends object = object> = Record<keyof T, boolean>;
+export type VisibilityState<T extends object = object> = Partial<Record<keyof T, boolean>> & Record<string, boolean>;

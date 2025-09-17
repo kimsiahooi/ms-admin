@@ -79,11 +79,6 @@ const reset = () => {
     search();
 };
 
-const columnVisibility = <VisibilityState<Partial<ProductBom>>>{
-    id: false,
-    description: false,
-};
-
 const columns: ColumnDef<ProductBom>[] = [
     {
         accessorKey: 'actions',
@@ -159,6 +154,11 @@ const columns: ColumnDef<ProductBom>[] = [
         cell: ({ row }) => h('div', null, formatDateTime(row.getValue('updated_at')) || ''),
     },
 ];
+
+const columnVisibility: VisibilityState<ProductBom> = {
+    id: false,
+    description: false,
+};
 </script>
 
 <template>

@@ -89,10 +89,6 @@ const reset = () => {
     search();
 };
 
-const columnVisibility = <VisibilityState<Partial<ProductPrice>>>{
-    id: false,
-};
-
 const columns: ColumnDef<ProductPrice>[] = [
     {
         accessorKey: 'actions',
@@ -163,6 +159,10 @@ const columns: ColumnDef<ProductPrice>[] = [
         cell: ({ row }) => h('div', null, formatDateTime(row.getValue('updated_at')) || ''),
     },
 ];
+
+const columnVisibility: VisibilityState<ProductPrice> = {
+    id: false,
+};
 
 const defaultStatus = computed<(typeof props.options.switch.statuses)[number]['value']>(
     () => !!props.options.switch.statuses.find((status) => status.is_default)?.value,

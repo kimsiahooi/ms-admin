@@ -79,11 +79,6 @@ const reset = () => {
     search();
 };
 
-const columnVisibility = <VisibilityState<Partial<Machine>>>{
-    id: false,
-    description: false,
-};
-
 const columns: ColumnDef<Machine>[] = [
     {
         accessorKey: 'actions',
@@ -159,6 +154,11 @@ const columns: ColumnDef<Machine>[] = [
         cell: ({ row }) => h('div', null, formatDateTime(row.getValue('updated_at')) || ''),
     },
 ];
+
+const columnVisibility: VisibilityState<Machine> = {
+    id: false,
+    description: false,
+};
 
 const defaultStatus = computed<(typeof props.options.switch.statuses)[number]['value']>(
     () => !!props.options.switch.statuses.find((status) => status.is_default)?.value,

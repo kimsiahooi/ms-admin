@@ -74,10 +74,6 @@ const reset = () => {
     search();
 };
 
-const columnVisibility = <VisibilityState<Partial<TenantUser>>>{
-    id: false,
-};
-
 const columns: ColumnDef<TenantUser>[] = [
     {
         accessorKey: 'actions',
@@ -134,6 +130,11 @@ const columns: ColumnDef<TenantUser>[] = [
         cell: ({ row }) => h('div', null, formatDateTime(row.getValue('updated_at')) || ''),
     },
 ];
+
+const columnVisibility: VisibilityState<TenantUser> = {
+    id: false,
+    description: false,
+};
 
 const form = useForm<{
     name: string;

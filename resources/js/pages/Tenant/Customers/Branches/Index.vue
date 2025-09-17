@@ -89,12 +89,6 @@ const reset = () => {
     search();
 };
 
-const columnVisibility = <VisibilityState<Partial<CustomerBranch>>>{
-    id: false,
-    description: false,
-    address: false,
-};
-
 const columns: ColumnDef<CustomerBranch>[] = [
     {
         accessorKey: 'actions',
@@ -175,6 +169,12 @@ const columns: ColumnDef<CustomerBranch>[] = [
         cell: ({ row }) => h('div', null, formatDateTime(row.getValue('updated_at')) || ''),
     },
 ];
+
+const columnVisibility: VisibilityState<CustomerBranch> = {
+    id: false,
+    description: false,
+    address: false,
+};
 
 const defaultStatus = computed<(typeof props.options.switch.statuses)[number]['value']>(
     () => !!props.options.switch.statuses.find((status) => status.is_default)?.value,

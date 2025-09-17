@@ -95,11 +95,6 @@ const reset = () => {
     search();
 };
 
-const columnVisibility = <VisibilityState<Partial<ProductPresetWithMachine>>>{
-    id: false,
-    description: false,
-};
-
 const columns: ColumnDef<ProductPresetWithMachine>[] = [
     {
         accessorKey: 'actions',
@@ -226,6 +221,11 @@ const columns: ColumnDef<ProductPresetWithMachine>[] = [
         cell: ({ row }) => h('div', null, formatDateTime(row.getValue('updated_at')) || ''),
     },
 ];
+
+const columnVisibility: VisibilityState<ProductPresetWithMachine> = {
+    id: false,
+    description: false,
+};
 
 const defaultStatus = computed<(typeof props.options.switch.statuses)[number]['value']>(
     () => !!props.options.switch.statuses.find((status) => status.is_default)?.value,
