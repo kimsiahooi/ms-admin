@@ -73,4 +73,13 @@ class UpdateBomRequest extends FormRequest
             }
         });
     }
+
+    public function attributes(): array
+    {
+        return [
+            'materials.*.id' => 'material',
+            'materials.*.quantity' => 'quantity',
+            'materials.*.unit_type' => 'unit type'
+        ];
+    }
 }
