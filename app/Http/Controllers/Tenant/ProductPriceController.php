@@ -99,7 +99,6 @@ class ProductPriceController extends Controller
             'price' => $price,
             'options' => [
                 'select' => [
-                    'statuses' => Status::selectOptions(),
                     'currencies' => Currency::selectOptions(),
                 ],
                 'switch' => [

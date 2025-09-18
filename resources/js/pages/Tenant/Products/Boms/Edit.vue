@@ -13,7 +13,7 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Material } from '@/types/Tenant/materials';
 import type { Product } from '@/types/Tenant/products';
-import { Status, StatusLabel, type ProductBom, type ProductBomWithMaterials } from '@/types/Tenant/products/boms';
+import { Status, StatusLabel, type ProductBomWithMaterials } from '@/types/Tenant/products/boms';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Plus } from 'lucide-vue-next';
 import slug from 'slug';
@@ -29,7 +29,6 @@ const props = defineProps<{
     materials: Material[];
     options: {
         select: {
-            statuses: SelectOption<ProductBom['status']['value']>[];
             unit_types: SelectOption<Material['unit_type']>[];
         };
         switch: {

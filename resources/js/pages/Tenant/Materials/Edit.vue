@@ -20,7 +20,6 @@ const props = defineProps<{
     material: Material;
     options: {
         select: {
-            statuses: SelectOption<Material['status']['value']>[];
             unit_types: SelectOption<Material['unit_type']>[];
         };
         switch: {

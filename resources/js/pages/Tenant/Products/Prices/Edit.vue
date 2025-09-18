@@ -22,7 +22,6 @@ const props = defineProps<{
     price: ProductPrice;
     options: {
         select: {
-            statuses: SelectOption<ProductPrice['status']['value']>[];
             currencies: SelectOption<ProductPrice['currency']>[];
         };
         switch: {

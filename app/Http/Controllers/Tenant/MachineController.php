@@ -94,9 +94,6 @@ class MachineController extends Controller
         return inertia('Tenant/Machines/Edit', [
             'machine' => $machine,
             'options' => [
-                'select' => [
-                    'statuses' => Status::selectOptions(),
-                ],
                 'switch' => [
                     'statuses' => Status::switchOptions(),
                 ],

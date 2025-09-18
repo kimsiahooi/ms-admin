@@ -59,7 +59,6 @@ class BomController extends Controller
             'materials' => $materials,
             'options' => [
                 'select' => [
-                    'statuses' => Status::selectOptions(),
                     'unit_types' => UnitType::selectOptions(),
                 ],
                 'switch' => [
@@ -114,7 +113,6 @@ class BomController extends Controller
             'materials' => $materials,
             'options' => [
                 'select' => [
-                    'statuses' => Status::selectOptions(),
                     'unit_types' => UnitType::selectOptions(),
                 ],
                 'switch' => [

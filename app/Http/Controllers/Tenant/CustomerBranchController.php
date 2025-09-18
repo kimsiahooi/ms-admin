@@ -100,9 +100,6 @@ class CustomerBranchController extends Controller
             'customer' => $customer,
             'branch' => $branch,
             'options' => [
-                'select' => [
-                    'statuses' => Status::selectOptions(),
-                ],
                 'switch' => [
                     'statuses' => Status::switchOptions(),
                 ],

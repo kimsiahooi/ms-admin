@@ -2,7 +2,6 @@
 import { Card } from '@/components/shared/card';
 import { Layout } from '@/components/shared/custom/container';
 import { FormButton, FormInput, FormSwitch } from '@/components/shared/custom/form';
-import type { SelectOption } from '@/components/shared/select';
 import type { SwitchOption } from '@/components/shared/switch';
 
 import AppLayout from '@/layouts/Admin/AppLayout.vue';
@@ -19,9 +18,6 @@ defineOptions({
 const props = defineProps<{
     tenant: Tenant;
     options: {
-        select: {
-            statuses: SelectOption<Tenant['status']['value']>[];
-        };
         switch: {
             statuses: SwitchOption[];
         };

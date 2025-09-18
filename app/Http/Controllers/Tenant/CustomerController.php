@@ -95,9 +95,6 @@ class CustomerController extends Controller
         return inertia('Tenant/Customers/Edit', [
             'customer' => $customer,
             'options' => [
-                'select' => [
-                    'statuses' => Status::selectOptions(),
-                ],
                 'switch' => [
                     'statuses' => Status::switchOptions(),
                 ],

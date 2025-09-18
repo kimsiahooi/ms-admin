@@ -27,7 +27,6 @@ const props = defineProps<{
             cavity_types: SelectOption<ProductPreset['cavity_type']>[];
             cycle_time_types: SelectOption<ProductPreset['cycle_time_type']>[];
             shelf_life_types: SelectOption<ProductPreset['shelf_life_type']>[];
-            statuses: SelectOption<ProductPreset['status']['value']>[];
         };
         switch: {
             statuses: SwitchOption[];

@@ -98,7 +98,6 @@ class MaterialController extends Controller
             'material' => $material,
             'options' => [
                 'select' => [
-                    'statuses' => Status::selectOptions(),
                     'unit_types' => UnitType::selectOptions(),
                 ],
                 'switch' => [

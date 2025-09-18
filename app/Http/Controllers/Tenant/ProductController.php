@@ -94,9 +94,6 @@ class ProductController extends Controller
         return inertia('Tenant/Products/Edit', [
             'product' => $product,
             'options' => [
-                'select' => [
-                    'statuses' => Status::selectOptions(),
-                ],
                 'switch' => [
                     'statuses' => Status::switchOptions(),
                 ]

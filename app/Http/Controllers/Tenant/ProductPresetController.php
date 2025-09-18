@@ -125,7 +125,6 @@ class ProductPresetController extends Controller
                 'select' => [
                     'cavity_types' => CavityType::selectOptions(),
                     'cycle_time_types' => CycleTimeType::selectOptions(),
-                    'statuses' => Status::selectOptions(),
                     'shelf_life_types' => [
                         [
                             'name' => 'None',

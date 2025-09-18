@@ -84,9 +84,6 @@ class TenantController extends Controller
         return inertia('Admin/Tenants/Edit', [
             'tenant' => $tenant,
             'options' => [
-                'select' => [
-                    'statuses' => Status::selectOptions(),
-                ],
                 'switch' => [
                     'statuses' => Status::switchOptions(),
                 ]
