@@ -8,6 +8,7 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import { Status, StatusLabel, type Plant } from '@/types/Tenant/plants';
+import { Operation } from '@/types/Tenant/plants/operations';
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -17,6 +18,7 @@ defineOptions({
 
 const props = defineProps<{
     plant: Plant;
+    operation: Operation;
     options: {
         switch: {
             statuses: SwitchOption[];
@@ -40,8 +42,12 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '#',
     },
     {
+        title: 'Operations',
+        href: route('plants.operations.index', { tenant: tenant?.id || '', plant: props.plant.id }),
+    },
+    {
         title: 'Edit',
-        href: route('plants.edit', { tenant: tenant?.id || '', plant: props.plant.id }),
+        href: route('plants.operations.edit', { tenant: tenant?.id || '', plant: props.plant.id, operation: props.operation.id }),
     },
 ];
 
@@ -50,31 +56,29 @@ const statusDisplay = computed(
 );
 
 const form = useForm({
-    name: props.plant.name,
-    code: props.plant.code,
-    description: props.plant.description || '',
-    address: props.plant.address,
-    status: props.plant.status.switch ?? undefined,
+    name: props.operation.name,
+    code: props.operation.code,
+    description: props.operation.description || '',
+    status: props.operation.status.switch ?? undefined,
 });
 
 const submit = () =>
-    form.put(route('plants.update', { tenant: tenant?.id || '', plant: props.plant.id }), {
+    form.put(route('plants.operations.update', { tenant: tenant?.id || '', plant: props.plant.id, operation: props.operation.id }), {
         preserveScroll: true,
         preserveState: true,
     });
 </script>
 
 <template>
-    <Head :title="plant.name" />
+    <Head :title="operation.name" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Layout>
             <form @submit.prevent="submit">
-                <Card :title="`Edit ${plant.name}`">
+                <Card :title="`Edit ${operation.name}`">
                     <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
                     <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
                     <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
-                    <FormTextarea label="Address" :error="form.errors.address" v-model:model-value="form.address" />
                     <FormSwitch
                         v-if="form.status !== undefined"
                         :label="statusDisplay"

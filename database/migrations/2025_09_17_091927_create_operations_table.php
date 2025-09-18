@@ -24,6 +24,8 @@ return new class extends Migration
             $table->foreignIdFor(Tenant::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->unique(['code', 'plant_id', 'tenant_id']);
         });
     }
 

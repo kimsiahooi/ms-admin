@@ -5,7 +5,7 @@ import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
 import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
-import type { PaginateData } from '@/components/shared/pagination';
+import { PaginateData } from '@/components/shared/pagination';
 import type { SelectOption } from '@/components/shared/select';
 import type { SwitchOption } from '@/components/shared/switch';
 import { StatusSwitch } from '@/components/shared/switch';
@@ -18,11 +18,11 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
-import { Status, StatusLabel, type Plant } from '@/types/Tenant/plants';
+import { PlantWithOperations, Status, StatusLabel } from '@/types/Tenant/plants';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { Pencil, Trash2 } from 'lucide-vue-next';
+import { Pencil, Pickaxe, Trash2 } from 'lucide-vue-next';
 import slug from 'slug';
 import { computed, h, reactive, watch } from 'vue';
 
@@ -31,10 +31,10 @@ defineOptions({
 });
 
 const props = defineProps<{
-    plants: PaginateData<Plant[]>;
+    plants: PaginateData<PlantWithOperations[]>;
     options: {
         select: {
-            statuses: SelectOption<Plant['status']['value']>[];
+            statuses: SelectOption<PlantWithOperations['status']['value']>[];
         };
         switch: {
             statuses: SwitchOption[];
@@ -80,7 +80,7 @@ const reset = () => {
     search();
 };
 
-const columns: ColumnDef<Plant>[] = [
+const columns: ColumnDef<PlantWithOperations>[] = [
     {
         accessorKey: 'actions',
         header: () => h('div', null, 'Actions'),
@@ -97,6 +97,11 @@ const columns: ColumnDef<Plant>[] = [
                     text: 'Edit',
                     href: route('plants.edit', { tenant: tenant?.id || '', plant: plant.id }),
                     icon: Pencil,
+                }),
+                h(ActionButton, {
+                    text: 'Operations',
+                    href: route('plants.operations.index', { tenant: tenant?.id || '', plant: plant.id }),
+                    icon: Pickaxe,
                 }),
                 h(
                     DeleteDialog,
@@ -161,7 +166,7 @@ const columns: ColumnDef<Plant>[] = [
     },
 ];
 
-const columnVisibility: VisibilityState<Plant> = {
+const columnVisibility: VisibilityState<PlantWithOperations> = {
     id: false,
     description: false,
     address: false,

@@ -18,7 +18,7 @@ class PlantController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $plants = Plant::when(
+        $plants = Plant::with(['operations'])->when(
             $request->search,
             fn(Builder $query, $search) =>
             $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
@@ -95,9 +95,6 @@ class PlantController extends Controller
         return inertia('Tenant/Plants/Edit', [
             'plant' => $plant,
             'options' => [
-                'select' => [
-                    'statuses' => Status::selectOptions(),
-                ],
                 'switch' => [
                     'statuses' => Status::switchOptions(),
                 ],

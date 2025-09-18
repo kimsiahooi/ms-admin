@@ -1,4 +1,5 @@
 import type { BadgeVariants } from '@/components/shared/badge';
+import { Operation } from '@/types/Tenant/plants/operations';
 
 export enum Status {
     ACTIVE = 'ACTIVE',
@@ -29,4 +30,8 @@ export interface Plant {
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;
+}
+
+export interface PlantWithOperations extends Plant {
+    operations: Operation[];
 }

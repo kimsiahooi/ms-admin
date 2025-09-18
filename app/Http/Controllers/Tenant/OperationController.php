@@ -8,6 +8,7 @@ use App\Models\Tenant\Operation;
 use App\Models\Tenant\Plant;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class OperationController extends Controller
 {
@@ -18,7 +19,7 @@ class OperationController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $operations = Operation::when(
+        $operations = $plant->operations()->when(
             $request->search,
             fn(Builder $query, $search) =>
             $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
@@ -58,7 +59,26 @@ class OperationController extends Controller
      */
     public function store(Request $request, Plant $plant)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'code' => [
+                'required',
+                'string',
+                'alpha_dash',
+                'max:255',
+                Rule::unique('operations')
+                    ->where('tenant_id', $plant->tenant_id)
+                    ->where('tenant_id', tenant('id'))
+            ],
+            'description' => ['nullable', 'string'],
+            'status' => ['required', 'boolean'],
+        ]);
+
+        $validated['status'] = Status::toggleStatus($validated['status']);
+
+        $plant->operations()->create($validated);
+
+        return back()->with('success', 'Operation created successfully.');
     }
 
     /**
@@ -74,7 +94,15 @@ class OperationController extends Controller
      */
     public function edit(Plant $plant, Operation $operation)
     {
-        //
+        return inertia('Tenant/Plants/Operations/Edit', [
+            'plant' => $plant,
+            'operation' => $operation,
+            'options' => [
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ],
+            ]
+        ]);
     }
 
     /**
@@ -82,7 +110,29 @@ class OperationController extends Controller
      */
     public function update(Request $request, Plant $plant, Operation $operation)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'code' => [
+                'required',
+                'string',
+                'alpha_dash',
+                'max:255',
+                Rule::unique('operations')
+                    ->ignore($operation->id)
+                    ->where('tenant_id', $plant->tenant_id)
+                    ->where('tenant_id', tenant('id'))
+            ],
+            'description' => ['nullable', 'string'],
+            'status' => ['sometimes', 'boolean'],
+        ]);
+
+        if (isset($validated['status'])) {
+            $validated['status'] = Status::toggleStatus($validated['status']);
+        }
+
+        $operation->update($validated);
+
+        return back()->with('success', 'Operation updated successfully.');
     }
 
     /**
@@ -90,7 +140,9 @@ class OperationController extends Controller
      */
     public function destroy(Plant $plant, Operation $operation)
     {
-        //
+        $operation->delete();
+
+        return back()->with('success', 'Operation deleted successfully.');
     }
 
     public function toggleStatus(Request $request, Plant $plant, Operation $operation)
