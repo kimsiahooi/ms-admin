@@ -1,25 +1,25 @@
 <?php
 
-namespace App\Http\Controllers\Tenant;
+namespace App\Http\Controllers;
 
-use App\Enums\Tenant\Plant\Operation\Status;
-use App\Http\Controllers\Controller;
+use App\Enums\Tenant\Plant\Operation\Task\Status;
 use App\Models\Tenant\Operation;
 use App\Models\Tenant\Plant;
+use App\Models\Tenant\Task;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
-class OperationController extends Controller
+class TaskController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request, Plant $plant)
+    public function index(Request $request, Plant $plant, Operation $operation)
     {
         $entries = $request->input('entries', 10);
 
-        $operations = $plant->operations()->with(['tasks'])->when(
+        $tasks = $operation->tasks()->when(
             $request->search,
             fn(Builder $query, $search) =>
             $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
@@ -32,9 +32,10 @@ class OperationController extends Controller
             ->paginate($entries)
             ->withQueryString();
 
-        return inertia('Tenant/Plants/Operations/Index', [
-            'operations' => $operations,
+        return inertia('Tenant/Plants/Operations/Tasks/Index', [
             'plant' => $plant,
+            'operation' => $operation,
+            'tasks' => $tasks,
             'options' => [
                 'select' => [
                     'statuses' => Status::selectOptions(),
@@ -49,7 +50,7 @@ class OperationController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request, Plant $plant, Operation $operation)
     {
         //
     }
@@ -57,7 +58,7 @@ class OperationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Plant $plant)
+    public function store(Request $request, Plant $plant, Operation $operation)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -66,9 +67,10 @@ class OperationController extends Controller
                 'string',
                 'alpha_dash',
                 'max:255',
-                Rule::unique('operations')
-                    ->where('plant_id', $plant->id)
+                Rule::unique('tasks')
+                    ->where('operation_id', $operation->id)
                     ->where('tenant_id', $plant->tenant_id)
+                    ->where('tenant_id', $operation->tenant_id)
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
@@ -77,15 +79,15 @@ class OperationController extends Controller
 
         $validated['status'] = Status::toggleStatus($validated['status']);
 
-        $plant->operations()->create($validated);
+        $operation->tasks()->create($validated);
 
-        return back()->with('success', 'Operation created successfully.');
+        return back()->with('success', 'Task created successfully.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Plant $plant, Operation $operation)
+    public function show(Request $request, Plant $plant, Operation $operation, Task $task)
     {
         //
     }
@@ -93,11 +95,12 @@ class OperationController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Plant $plant, Operation $operation)
+    public function edit(Request $request, Plant $plant, Operation $operation, Task $task)
     {
-        return inertia('Tenant/Plants/Operations/Edit', [
+        return inertia('Tenant/Plants/Operations/Tasks/Edit', [
             'plant' => $plant,
             'operation' => $operation,
+            'task' => $task,
             'options' => [
                 'switch' => [
                     'statuses' => Status::switchOptions(),
@@ -109,7 +112,7 @@ class OperationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Plant $plant, Operation $operation)
+    public function update(Request $request, Plant $plant, Operation $operation, Task $task)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -118,11 +121,12 @@ class OperationController extends Controller
                 'string',
                 'alpha_dash',
                 'max:255',
-                Rule::unique('operations')
-                    ->ignore($operation->id)
-                    ->where('plant_id', $plant->id)
+                Rule::unique('tasks')
+                    ->ignore($task->id)
+                    ->where('operation_id', $operation->id)
                     ->where('tenant_id', $plant->tenant_id)
                     ->where('tenant_id', $operation->tenant_id)
+                    ->where('tenant_id', $task->tenant_id)
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
@@ -133,22 +137,22 @@ class OperationController extends Controller
             $validated['status'] = Status::toggleStatus($validated['status']);
         }
 
-        $operation->update($validated);
+        $task->update($validated);
 
-        return back()->with('success', 'Operation updated successfully.');
+        return back()->with('success', 'Task updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Plant $plant, Operation $operation)
+    public function destroy(Request $request, Plant $plant, Operation $operation, Task $task)
     {
-        $operation->delete();
+        $task->delete();
 
-        return back()->with('success', 'Operation deleted successfully.');
+        return back()->with('success', 'Task deleted successfully.');
     }
 
-    public function toggleStatus(Request $request, Plant $plant, Operation $operation)
+    public function toggleStatus(Request $request, Plant $plant, Operation $operation, Task $task)
     {
         $validated = $request->validate([
             'status' => ['required', 'boolean'],
@@ -156,8 +160,8 @@ class OperationController extends Controller
 
         $validated['status'] = Status::toggleStatus($validated['status']);
 
-        $operation->update($validated);
+        $task->update($validated);
 
-        return back()->with('success', 'Operation status updated successfully.');
+        return back()->with('success', 'Task status updated successfully.');
     }
 }

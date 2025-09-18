@@ -19,11 +19,12 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
 import type { Plant } from '@/types/Tenant/plants';
-import { OperationWithTasks, Status, StatusLabel } from '@/types/Tenant/plants/operations';
+import { Operation, Status, StatusLabel } from '@/types/Tenant/plants/operations';
+import { Task } from '@/types/Tenant/plants/operations/tasks';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { ListTodo, Pencil, Trash2 } from 'lucide-vue-next';
+import { Pencil, Trash2 } from 'lucide-vue-next';
 import slug from 'slug';
 import { computed, h, reactive, watch } from 'vue';
 
@@ -32,11 +33,12 @@ defineOptions({
 });
 
 const props = defineProps<{
-    operations: PaginateData<OperationWithTasks[]>;
     plant: Plant;
+    operation: Operation;
+    tasks: PaginateData<Task[]>;
     options: {
         select: {
-            statuses: SelectOption<OperationWithTasks['status']['value']>[];
+            statuses: SelectOption<Task['status']['value']>[];
         };
         switch: {
             statuses: SwitchOption[];
@@ -78,46 +80,72 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Operations',
         href: route('plants.operations.index', { tenant: tenant?.id || '', plant: props.plant.id }),
     },
+    {
+        title: props.operation.name,
+        href: '#',
+    },
+    {
+        title: 'Tasks',
+        href: route('plants.operations.tasks.index', { tenant: tenant?.id || '', plant: props.plant.id, operation: props.operation.id }),
+    },
 ];
 
 const search = () =>
-    router.visit(route('plants.operations.index', { ...pickBy(filter.data()), tenant: tenant?.id || '', plant: props.plant.id }), {
-        preserveScroll: true,
-        preserveState: true,
-    });
+    router.visit(
+        route('plants.operations.tasks.index', {
+            ...pickBy(filter.data()),
+            tenant: tenant?.id || '',
+            plant: props.plant.id,
+            operation: props.operation.id,
+        }),
+        {
+            preserveScroll: true,
+            preserveState: true,
+        },
+    );
 const reset = () => {
     filter.reset();
     search();
 };
 
-const columns: ColumnDef<OperationWithTasks>[] = [
+const columns: ColumnDef<Task>[] = [
     {
         accessorKey: 'actions',
         header: () => h('div', null, 'Actions'),
         cell: ({ row }) => {
-            const operation = row.original;
+            const task = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
                 h(StatusSwitch, {
-                    value: operation.status.switch,
+                    value: task.status.switch,
                     method: 'put',
-                    href: route('plants.operations.toggleStatus', { tenant: tenant?.id || '', plant: props.plant.id, operation: operation.id }),
+                    href: route('plants.operations.tasks.toggleStatus', {
+                        tenant: tenant?.id || '',
+                        plant: props.plant.id,
+                        operation: props.operation.id,
+                        task: task.id,
+                    }),
                 }),
                 h(ActionButton, {
                     text: 'Edit',
-                    href: route('plants.operations.edit', { tenant: tenant?.id || '', plant: props.plant.id, operation: operation.id }),
+                    href: route('plants.operations.tasks.edit', {
+                        tenant: tenant?.id || '',
+                        plant: props.plant.id,
+                        operation: props.operation.id,
+                        task: task.id,
+                    }),
                     icon: Pencil,
-                }),
-                h(ActionButton, {
-                    text: 'Tasks',
-                    href: route('plants.operations.tasks.index', { tenant: tenant?.id || '', plant: props.plant.id, operation: operation.id }),
-                    icon: ListTodo,
                 }),
                 h(
                     DeleteDialog,
                     {
-                        title: `Delete ${operation.name}`,
-                        route: route('plants.operations.destroy', { tenant: tenant?.id || '', plant: props.plant.id, operation: operation.id }),
+                        title: `Delete ${task.name}`,
+                        route: route('plants.operations.tasks.destroy', {
+                            tenant: tenant?.id || '',
+                            plant: props.plant.id,
+                            operation: props.operation.id,
+                            task: task.id,
+                        }),
                         asChild: false,
                     },
                     () =>
@@ -171,7 +199,7 @@ const columns: ColumnDef<OperationWithTasks>[] = [
     },
 ];
 
-const columnVisibility: VisibilityState<OperationWithTasks> = {
+const columnVisibility: VisibilityState<Task> = {
     id: false,
     description: false,
 };
@@ -192,7 +220,7 @@ const form = useForm({
 });
 
 const submit = () =>
-    form.post(route('plants.operations.store', { tenant: tenant?.id || '', plant: props.plant.id }), {
+    form.post(route('plants.operations.tasks.store', { tenant: tenant?.id || '', plant: props.plant.id, operation: props.operation.id }), {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => {
@@ -210,7 +238,7 @@ watch(
 </script>
 
 <template>
-    <Head title="Operations" />
+    <Head title="Tasks" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Layout>
@@ -227,7 +255,7 @@ watch(
                 </FilterCard>
 
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Dialog title="Create Operation" v-model:open="setting.create.dialogIsOpen">
+                    <Dialog title="Create Task" v-model:open="setting.create.dialogIsOpen">
                         <form @submit.prevent="submit" class="space-y-4">
                             <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
                             <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
@@ -241,7 +269,7 @@ watch(
                     <DataTable
                         v-model:model-value="filter"
                         :columns="columns"
-                        :paginate-data="operations"
+                        :paginate-data="tasks"
                         :column-visibility="columnVisibility"
                         :entry-options="entryOptions"
                         @search="search"

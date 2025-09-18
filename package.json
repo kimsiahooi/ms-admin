@@ -9,9 +9,9 @@
         "format:check": "prettier --check resources/",
         "lint": "eslint . --fix",
         "ziggy:generate": "concurrently \"php artisan ziggy:generate --types\"",
-        "tenants:migrate-fresh": "concurrently \"php artisan tenants:migrate-fresh\"",
-        "tenants:seed": "concurrently \"php artisan tenants:seed\"",
-        "seed": "bun run tenants:migrate-fresh && bun run tenants:seed"
+        "migrate:fresh": "concurrently \"php artisan migrate:fresh\"",
+        "db:seed": "concurrently \"php artisan db:seed\"",
+        "seed": "bun run migrate:fresh && bun run db:seed"
     },
     "devDependencies": {
         "@biomejs/biome": "1.9.4",

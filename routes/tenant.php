@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\Tenant\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Tenant\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Tenant\Auth\EmailVerificationNotificationController;
@@ -114,10 +115,15 @@ Route::middleware([
 
             Route::prefix('operations/{operation}')->name('operations.')->group(function () {
                 Route::match(['put', 'patch'], 'toggleStatus', [OperationController::class, 'toggleStatus'])->name('toggleStatus');
+
+                Route::prefix('tasks/{task}')->name('tasks.')->group(function () {
+                    Route::match(['put', 'patch'], 'toggleStatus', [TaskController::class, 'toggleStatus'])->name('toggleStatus');
+                });
             });
         });
         Route::resource('plants', PlantController::class)->except(['create', 'show']);
         Route::resource('plants.operations', OperationController::class)->except(['create', 'show']);
+        Route::resource('plants.operations.tasks', TaskController::class)->except(['create', 'show']);
 
         Route::prefix('machines/{machine}')->name('machines.')->group(function () {
             Route::match(['put', 'patch'], 'toggleStatus', [MachineController::class, 'toggleStatus'])->name('toggleStatus');
