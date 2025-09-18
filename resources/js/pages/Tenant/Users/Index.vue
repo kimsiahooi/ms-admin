@@ -2,10 +2,9 @@
 import { ActionButton } from '@/components/shared/custom/action';
 import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput } from '@/components/shared/custom/filter';
-import { FormButton, FormInput, FormSelect } from '@/components/shared/custom/form';
+import { FormButton, FormInput } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
-import type { SelectOption } from '@/components/shared/select';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
@@ -15,7 +14,6 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
-import type { Plant } from '@/types/Tenant/plants';
 import type { TenantUser } from '@/types/Tenant/tenant-users';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
@@ -29,11 +27,6 @@ defineOptions({
 
 defineProps<{
     users: PaginateData<TenantUser[]>;
-    options: {
-        select: {
-            plants: SelectOption<Plant['id']>[];
-        };
-    };
 }>();
 
 const { tenant } = useTenant();
@@ -136,18 +129,11 @@ const columnVisibility: VisibilityState<TenantUser> = {
     description: false,
 };
 
-const form = useForm<{
-    name: string;
-    email: string;
-    password: string;
-    password_confirmation: string;
-    plants: Plant['id'][];
-}>({
+const form = useForm({
     name: '',
     email: '',
     password: '',
     password_confirmation: '',
-    plants: [],
 });
 
 const submit = () =>
@@ -182,13 +168,6 @@ const submit = () =>
                                 :error="form.errors.password_confirmation"
                                 v-model:model-value="form.password_confirmation"
                                 type="password"
-                            />
-                            <FormSelect
-                                label="Plants"
-                                :options="options.select.plants"
-                                error-key="form.errors.plants"
-                                multiple
-                                v-model:model-value="form.plants"
                             />
                             <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
                         </form>

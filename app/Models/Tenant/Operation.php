@@ -3,6 +3,7 @@
 namespace App\Models\Tenant;
 
 use App\Enums\Tenant\Plant\Operation\Status;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -33,7 +34,8 @@ class Operation extends Model
         );
     }
 
-    public function scopeActive(Builder $query): void
+    #[Scope]
+    public function active(Builder $query): void
     {
         $query->where('status', Status::ACTIVE->value);
     }

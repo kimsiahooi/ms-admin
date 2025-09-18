@@ -3,6 +3,7 @@
 namespace App\Models\Tenant;
 
 use App\Enums\Tenant\Product\Status;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -47,7 +48,8 @@ class Product extends Model
         return $this->hasMany(Bom::class);
     }
 
-    public function scopeActive(Builder $query): void
+    #[Scope]
+    public function active(Builder $query): void
     {
         $query->where('status', Status::ACTIVE->value);
     }

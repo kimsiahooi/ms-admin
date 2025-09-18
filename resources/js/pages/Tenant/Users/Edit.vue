@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { Card } from '@/components/shared/card';
 import { Layout } from '@/components/shared/custom/container';
-import { FormButton, FormInput, FormSelect } from '@/components/shared/custom/form';
-import type { SelectOption } from '@/components/shared/select';
+import { FormButton, FormInput } from '@/components/shared/custom/form';
 import { useTenant } from '@/composables/useTenant';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
-import type { Plant } from '@/types/Tenant/plants';
-import type { TenantUserWithPlants } from '@/types/Tenant/tenant-users/plants';
+import { TenantUser } from '@/types/Tenant/tenant-users';
 import { Head, useForm } from '@inertiajs/vue3';
 
 defineOptions({
@@ -16,12 +14,7 @@ defineOptions({
 });
 
 const props = defineProps<{
-    user: TenantUserWithPlants;
-    options: {
-        select: {
-            plants: SelectOption<Plant['id']>[];
-        };
-    };
+    user: TenantUser;
 }>();
 
 const { tenant } = useTenant();
@@ -45,18 +38,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const form = useForm<{
-    name: string;
-    email: string;
-    password: string;
-    password_confirmation: string;
-    plants: Plant['id'][];
-}>({
+const form = useForm({
     name: props.user.name,
     email: props.user.email,
     password: '',
     password_confirmation: '',
-    plants: props.user.plants.map((plant) => plant.id),
 });
 
 const submit = () =>
@@ -81,13 +67,6 @@ const submit = () =>
                         :error="form.errors.password_confirmation"
                         v-model:model-value="form.password_confirmation"
                         type="password"
-                    />
-                    <FormSelect
-                        label="Plants"
-                        :options="options.select.plants"
-                        error-key="form.errors.plants"
-                        multiple
-                        v-model:model-value="form.plants"
                     />
                     <FormButton type="submit" :disabled="form.processing" label="Update" :loading="form.processing" />
                 </Card>

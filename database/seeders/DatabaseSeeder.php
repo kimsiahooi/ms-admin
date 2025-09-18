@@ -33,7 +33,6 @@ class DatabaseSeeder extends Seeder
             CustomerSeeder::class,
             CustomerBranchSeeder::class,
             PlantSeeder::class,
-            PlantTenantUserSeeder::class,
             OperationSeeder::class,
             TaskSeeder::class,
         ]);
