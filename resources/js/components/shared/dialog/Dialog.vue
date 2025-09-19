@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogDescription, DialogHeader, DialogScrollContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
-const props = withDefaults(
+withDefaults(
     defineProps<{
         title: string;
         description?: string;
@@ -20,7 +20,7 @@ const model = defineModel<boolean>('open');
     <Dialog v-model:open="model">
         <DialogTrigger as-child>
             <slot name="trigger">
-                <Button class="cursor-pointer">{{ props.triggerLabel }}</Button>
+                <Button class="cursor-pointer">{{ triggerLabel }}</Button>
             </slot>
         </DialogTrigger>
         <DialogScrollContent class="sm:max-w-[425px]">

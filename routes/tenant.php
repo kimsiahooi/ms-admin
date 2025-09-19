@@ -17,6 +17,7 @@ use App\Http\Controllers\Tenant\CustomerController;
 use App\Http\Controllers\Tenant\MachineController;
 use App\Http\Controllers\Tenant\MaterialController;
 use App\Http\Controllers\Tenant\OperationController;
+use App\Http\Controllers\Tenant\OperationTenantUserController;
 use App\Http\Controllers\Tenant\PlantController;
 use App\Http\Controllers\Tenant\ProductController;
 use App\Http\Controllers\Tenant\ProductPresetController;
@@ -116,6 +117,10 @@ Route::middleware([
             Route::prefix('operations/{operation}')->name('operations.')->group(function () {
                 Route::match(['put', 'patch'], 'toggleStatus', [OperationController::class, 'toggleStatus'])->name('toggleStatus');
 
+                Route::prefix('users/{user}')->name('users.')->group(function () {
+                    Route::match(['put', 'patch'], 'toggleStatus', [OperationTenantUserController::class, 'toggleStatus'])->name('toggleStatus');
+                });
+
                 Route::prefix('tasks/{task}')->name('tasks.')->group(function () {
                     Route::match(['put', 'patch'], 'toggleStatus', [TaskController::class, 'toggleStatus'])->name('toggleStatus');
                 });
@@ -123,6 +128,7 @@ Route::middleware([
         });
         Route::resource('plants', PlantController::class)->except(['create', 'show']);
         Route::resource('plants.operations', OperationController::class)->except(['create', 'show']);
+        Route::resource('plants.operations.users', OperationTenantUserController::class)->except(['create', 'show']);
         Route::resource('plants.operations.tasks', TaskController::class)->except(['create', 'show']);
 
         Route::prefix('machines/{machine}')->name('machines.')->group(function () {

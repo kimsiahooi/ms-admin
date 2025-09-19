@@ -22,11 +22,13 @@ const props = withDefaults(
         route: string;
         method?: Method;
         asChild?: boolean;
+        buttonLabel?: string;
     }>(),
     {
         description: 'Are you sure you want to delete?',
         asChild: true,
         method: 'delete',
+        buttonLabel: 'Delete',
     },
 );
 
@@ -72,7 +74,7 @@ const destroy = () => {
                     <Button type="button" variant="secondary" class="cursor-pointer"> Close </Button>
                 </DialogClose>
                 <Button variant="destructive" class="cursor-pointer disabled:cursor-not-allowed" :disabled="setting.processing" @click="destroy">
-                    <Loader v-if="setting.processing" class="animate-spin" /> Delete
+                    <Loader v-if="setting.processing" class="animate-spin" /> {{ buttonLabel }}
                 </Button>
             </DialogFooter>
         </DialogScrollContent>

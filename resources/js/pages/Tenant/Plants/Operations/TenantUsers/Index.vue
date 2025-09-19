@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { StatusBadge } from '@/components/shared/badge';
+import { BadgeVariants, StatusBadge } from '@/components/shared/badge';
 import { ActionButton } from '@/components/shared/custom/action';
 import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
-import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
+import { FormButton, FormSelect, FormSwitch } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
 import type { SelectOption } from '@/components/shared/select';
-import type { SwitchOption } from '@/components/shared/switch';
-import { StatusSwitch } from '@/components/shared/switch';
+import { StatusSwitch, type SwitchOption } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
@@ -19,24 +18,45 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
 import type { Plant } from '@/types/Tenant/plants';
-import { OperationWithTasks, Status, StatusLabel } from '@/types/Tenant/plants/operations';
+import { Operation, Status, StatusLabel } from '@/types/Tenant/plants/operations';
+import { StatusBadgeLabel } from '@/types/Tenant/plants/operations/tenant-users';
+import { TenantUser } from '@/types/Tenant/tenant-users';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { ListTodo, Pencil, Trash2, Users } from 'lucide-vue-next';
-import slug from 'slug';
-import { computed, h, reactive, watch } from 'vue';
+import { Pencil, Trash2 } from 'lucide-vue-next';
+import { computed, h, reactive } from 'vue';
+
+type PivotTenantUser = TenantUser & {
+    pivot: {
+        readonly id: string;
+        status: {
+            value: Status;
+            badge?: {
+                name: StatusBadgeLabel | null;
+                variant: BadgeVariants['variant'];
+            } | null;
+            switch?: boolean | null;
+        };
+        tuser_id: TenantUser['id'];
+        operation_id: Operation['id'];
+        created_at: Date | null;
+        updated_at: Date | null;
+    };
+};
 
 defineOptions({
     layout: AppMainLayout,
 });
 
 const props = defineProps<{
-    operations: PaginateData<OperationWithTasks[]>;
     plant: Plant;
+    operation: Operation;
+    users: PaginateData<PivotTenantUser[]>;
     options: {
         select: {
-            statuses: SelectOption<OperationWithTasks['status']['value']>[];
+            statuses: SelectOption<PivotTenantUser['pivot']['status']['value']>[];
+            users: SelectOption<TenantUser['id']>[];
         };
         switch: {
             statuses: SwitchOption[];
@@ -78,57 +98,80 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Operations',
         href: route('plants.operations.index', { tenant: tenant?.id || '', plant: props.plant.id }),
     },
+    {
+        title: props.operation.name,
+        href: '#',
+    },
+    {
+        title: 'Users',
+        href: route('plants.operations.users.index', { tenant: tenant?.id || '', plant: props.plant.id, operation: props.operation.id }),
+    },
 ];
 
 const search = () =>
-    router.visit(route('plants.operations.index', { ...pickBy(filter.data()), tenant: tenant?.id || '', plant: props.plant.id }), {
-        preserveScroll: true,
-        preserveState: true,
-    });
+    router.visit(
+        route('plants.operations.users.index', {
+            ...pickBy(filter.data()),
+            tenant: tenant?.id || '',
+            plant: props.plant.id,
+            operation: props.operation.id,
+        }),
+        {
+            preserveScroll: true,
+            preserveState: true,
+        },
+    );
 const reset = () => {
     filter.reset();
     search();
 };
 
-const columns: ColumnDef<OperationWithTasks>[] = [
+const columns: ColumnDef<PivotTenantUser>[] = [
     {
         accessorKey: 'actions',
         header: () => h('div', null, 'Actions'),
         cell: ({ row }) => {
-            const operation = row.original;
+            const user = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
                 h(StatusSwitch, {
-                    value: operation.status.switch,
+                    value: user.pivot.status.switch,
                     method: 'put',
-                    href: route('plants.operations.toggleStatus', { tenant: tenant?.id || '', plant: props.plant.id, operation: operation.id }),
+                    href: route('plants.operations.users.toggleStatus', {
+                        tenant: tenant?.id || '',
+                        plant: props.plant.id,
+                        operation: props.operation.id,
+                        user: user.id,
+                    }),
                 }),
                 h(ActionButton, {
                     text: 'Edit',
-                    href: route('plants.operations.edit', { tenant: tenant?.id || '', plant: props.plant.id, operation: operation.id }),
+                    href: route('plants.operations.users.edit', {
+                        tenant: tenant?.id || '',
+                        plant: props.plant.id,
+                        operation: props.operation.id,
+                        user: user.id,
+                    }),
                     icon: Pencil,
-                }),
-                h(ActionButton, {
-                    text: 'Users',
-                    href: route('plants.operations.users.index', { tenant: tenant?.id || '', plant: props.plant.id, operation: operation.id }),
-                    icon: Users,
-                }),
-                h(ActionButton, {
-                    text: 'Tasks',
-                    href: route('plants.operations.tasks.index', { tenant: tenant?.id || '', plant: props.plant.id, operation: operation.id }),
-                    icon: ListTodo,
                 }),
                 h(
                     DeleteDialog,
                     {
-                        title: `Delete ${operation.name}`,
-                        route: route('plants.operations.destroy', { tenant: tenant?.id || '', plant: props.plant.id, operation: operation.id }),
+                        title: `Detach ${user.name}`,
+                        route: route('plants.operations.users.destroy', {
+                            tenant: tenant?.id || '',
+                            plant: props.plant.id,
+                            operation: props.operation.id,
+                            user: user.id,
+                        }),
+                        description: 'Are you sure you want to detach?',
+                        buttonLabel: 'Detach',
                         asChild: false,
                     },
                     () =>
                         h(ActionButton, {
                             variant: 'destructive',
-                            text: 'Delete',
+                            text: 'Detach',
                             icon: Trash2,
                         }),
                 ),
@@ -139,9 +182,9 @@ const columns: ColumnDef<OperationWithTasks>[] = [
         accessorKey: 'status',
         header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
-            const { status } = row.original;
+            const { pivot } = row.original;
 
-            return h(StatusBadge, { statusBadge: status.badge });
+            return h(StatusBadge, { statusBadge: pivot.status.badge });
         },
     },
     {
@@ -150,35 +193,41 @@ const columns: ColumnDef<OperationWithTasks>[] = [
         cell: ({ row }) => h('div', null, row.getValue('id')),
     },
     {
-        accessorKey: 'name',
-        header: () => h('div', null, 'Name'),
-        cell: ({ row }) => h('div', null, row.getValue('name')),
+        accessorKey: 'user name',
+        header: () => h('div', null, 'User Name'),
+        cell: ({ row }) => {
+            const { name } = row.original;
+            return h('div', null, name);
+        },
     },
     {
-        accessorKey: 'code',
-        header: () => h('div', null, 'Code'),
-        cell: ({ row }) => h('div', null, row.getValue('code')),
-    },
-    {
-        accessorKey: 'description',
-        header: () => h('div', null, 'Description'),
-        cell: ({ row }) => h('div', null, row.getValue('description')),
+        accessorKey: 'user email',
+        header: () => h('div', null, 'User Email'),
+        cell: ({ row }) => {
+            const { email } = row.original;
+            return h('div', null, email);
+        },
     },
     {
         accessorKey: 'created_at',
         header: () => h('div', null, 'Created At'),
-        cell: ({ row }) => h('div', null, formatDateTime(row.getValue('created_at')) || ''),
+        cell: ({ row }) => {
+            const { pivot } = row.original;
+            return h('div', null, formatDateTime(pivot.created_at) || '');
+        },
     },
     {
         accessorKey: 'updated_at',
         header: () => h('div', null, 'Updated At'),
-        cell: ({ row }) => h('div', null, formatDateTime(row.getValue('updated_at')) || ''),
+        cell: ({ row }) => {
+            const { pivot } = row.original;
+            return h('div', null, formatDateTime(pivot.updated_at) || '');
+        },
     },
 ];
 
-const columnVisibility: VisibilityState<OperationWithTasks> = {
+const columnVisibility: VisibilityState<PivotTenantUser> = {
     id: false,
-    description: false,
 };
 
 const defaultStatus = computed<(typeof props.options.switch.statuses)[number]['value']>(
@@ -189,15 +238,16 @@ const statusDisplay = computed(
     () => props.options.switch.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
-const form = useForm({
-    name: '',
-    code: '',
-    description: '',
+const form = useForm<{
+    users: TenantUser['id'][];
+    status: (typeof props.options.switch.statuses)[number]['value'];
+}>({
+    users: [],
     status: defaultStatus.value,
 });
 
 const submit = () =>
-    form.post(route('plants.operations.store', { tenant: tenant?.id || '', plant: props.plant.id }), {
+    form.post(route('plants.operations.users.store', { tenant: tenant?.id || '', plant: props.plant.id, operation: props.operation.id }), {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => {
@@ -205,40 +255,38 @@ const submit = () =>
             setting.create.dialogIsOpen = false;
         },
     });
-
-watch(
-    () => form.name,
-    (newName) => {
-        form.code = slug(newName);
-    },
-);
 </script>
 
 <template>
-    <Head title="Operations" />
+    <Head title="Users" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Layout>
             <div class="space-y-3">
                 <FilterCard @search="search" @reset="reset">
-                    <FilterInput label="Name" placeholder="Search ID, Name, Code" v-model:model-value="filter.search" />
+                    <FilterInput label="Name" placeholder="Search ID, Name, Email" v-model:model-value="filter.search" />
                     <FilterSelect
                         label="Status"
                         placeholder="Select Status"
                         :options="options.select.statuses"
-                        multiple
                         v-model:model-value="filter.status"
+                        multiple
                     />
                 </FilterCard>
 
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Dialog title="Create Operation" v-model:open="setting.create.dialogIsOpen">
+                    <Dialog title="Attach Users" v-model:open="setting.create.dialogIsOpen" trigger-label="Attach">
                         <form @submit.prevent="submit" class="space-y-4">
-                            <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
-                            <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
-                            <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
+                            <FormSelect
+                                :options="options.select.users"
+                                placeholder="Select Users"
+                                label="Users"
+                                multiple
+                                v-model:model-value="form.users"
+                                error-key="users"
+                            />
                             <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
-                            <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
+                            <FormButton type="submit" label="Attach" :disabled="form.processing" :loading="form.processing" />
                         </form>
                     </Dialog>
                 </div>
@@ -246,7 +294,7 @@ watch(
                     <DataTable
                         v-model:model-value="filter"
                         :columns="columns"
-                        :paginate-data="operations"
+                        :paginate-data="users"
                         :column-visibility="columnVisibility"
                         :entry-options="entryOptions"
                         @search="search"

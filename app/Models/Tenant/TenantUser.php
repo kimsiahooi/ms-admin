@@ -6,6 +6,7 @@ namespace App\Models\Tenant;
 
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -50,5 +51,14 @@ class TenantUser extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function operations(): BelongsToMany
+    {
+        return $this->belongsToMany(Operation::class, 'operation_tenant_user', 'tuser_id')
+            ->withPivot(['id', 'status', 'tenant_id'])
+            ->wherePivotNull('deleted_at')
+            ->withTimestamps()
+            ->using(OperationTenantUser::class);
     }
 }

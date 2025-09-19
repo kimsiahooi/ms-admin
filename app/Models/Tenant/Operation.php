@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
@@ -35,7 +36,7 @@ class Operation extends Model
     }
 
     #[Scope]
-    public function active(Builder $query): void
+    protected function active(Builder $query): void
     {
         $query->where('status', Status::ACTIVE->value);
     }
@@ -48,5 +49,14 @@ class Operation extends Model
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
+    }
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(TenantUser::class, 'operation_tenant_user', 'operation_id', 'tuser_id')
+            ->withPivot(['id', 'status', 'tenant_id'])
+            ->wherePivotNull('deleted_at')
+            ->withTimestamps()
+            ->using(OperationTenantUser::class);
     }
 }

@@ -34,7 +34,7 @@ class Customer extends Model
     }
 
     #[Scope]
-    public function active(Builder $query): void
+    protected function active(Builder $query): void
     {
         $query->where('status', Status::ACTIVE->value);
     }

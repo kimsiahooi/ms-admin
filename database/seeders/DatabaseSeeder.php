@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
             PlantSeeder::class,
             OperationSeeder::class,
             TaskSeeder::class,
+            OperationTenantUserSeeder::class,
         ]);
     }
 }
