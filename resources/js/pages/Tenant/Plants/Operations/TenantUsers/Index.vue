@@ -141,7 +141,7 @@ const columns: ColumnDef<PivotTenantUser>[] = [
                         tenant: tenant?.id || '',
                         plant: props.plant.id,
                         operation: props.operation.id,
-                        user: user.id,
+                        user: user.pivot.id,
                     }),
                 }),
                 h(ActionButton, {
@@ -150,7 +150,7 @@ const columns: ColumnDef<PivotTenantUser>[] = [
                         tenant: tenant?.id || '',
                         plant: props.plant.id,
                         operation: props.operation.id,
-                        user: user.id,
+                        user: user.pivot.id,
                     }),
                     icon: Pencil,
                 }),
@@ -162,7 +162,7 @@ const columns: ColumnDef<PivotTenantUser>[] = [
                             tenant: tenant?.id || '',
                             plant: props.plant.id,
                             operation: props.operation.id,
-                            user: user.id,
+                            user: user.pivot.id,
                         }),
                         description: 'Are you sure you want to detach?',
                         buttonLabel: 'Detach',
@@ -238,11 +238,8 @@ const statusDisplay = computed(
     () => props.options.switch.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
-const form = useForm<{
-    users: TenantUser['id'][];
-    status: (typeof props.options.switch.statuses)[number]['value'];
-}>({
-    users: [],
+const form = useForm({
+    user: '',
     status: defaultStatus.value,
 });
 
@@ -275,15 +272,14 @@ const submit = () =>
                 </FilterCard>
 
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Dialog title="Attach Users" v-model:open="setting.create.dialogIsOpen" trigger-label="Attach">
+                    <Dialog title="Attach User" v-model:open="setting.create.dialogIsOpen" trigger-label="Attach">
                         <form @submit.prevent="submit" class="space-y-4">
                             <FormSelect
                                 :options="options.select.users"
-                                placeholder="Select Users"
-                                label="Users"
-                                multiple
-                                v-model:model-value="form.users"
-                                error-key="users"
+                                placeholder="Select User"
+                                label="User"
+                                v-model:model-value="form.user"
+                                :error="form.errors.user"
                             />
                             <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
                             <FormButton type="submit" label="Attach" :disabled="form.processing" :loading="form.processing" />

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tenant;
 use App\Enums\Tenant\Plant\Operation\TenantUser\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Operation;
+use App\Models\Tenant\OperationTenantUser;
 use App\Models\Tenant\Plant;
 use App\Models\Tenant\TenantUser;
 use Illuminate\Database\Eloquent\Builder;
@@ -76,8 +77,7 @@ class OperationTenantUserController extends Controller
     public function store(Request $request, Plant $plant, Operation $operation)
     {
         $validated = $request->validate([
-            'users' => ['required', 'array'],
-            'users.*' => [
+            'user' => [
                 'required',
                 Rule::exists('tenant_users', 'id')
                     ->withoutTrashed()
@@ -95,22 +95,19 @@ class OperationTenantUserController extends Controller
 
         $validated['status'] = Status::toggleStatus($validated['status']);
 
-        $users = collect($validated['users'])
-            ->mapWithKeys(fn(string $userId) => [
-                $userId => [
-                    'status' => $validated['status'],
-                ]
-            ]);
+        $operation->users()->attach([
+            $validated['user'] => [
+                'status' => $validated['status']
+            ]
+        ]);
 
-        $operation->users()->syncWithoutDetaching($users);
-
-        return back()->with('success', 'Users attached successfully.');
+        return back()->with('success', 'User attached successfully.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, Plant $plant, Operation $operation, TenantUser $user)
+    public function show(Request $request, Plant $plant, Operation $operation, OperationTenantUser $user)
     {
         //
     }
@@ -118,30 +115,73 @@ class OperationTenantUserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, Plant $plant, Operation $operation, TenantUser $user)
+    public function edit(Request $request, Plant $plant, Operation $operation, OperationTenantUser $user)
     {
-        //
+        return inertia('Tenant/Plants/Operations/TenantUsers/Edit', [
+            'plant' => $plant,
+            'operation' => $operation,
+            'user' => $user->load(['user']),
+            'options' => [
+                'select' => [
+                    'users' => TenantUser::all(['id', 'name'])
+                        ->map(fn(TenantUser $user) => [
+                            'name' => $user->name,
+                            'value' => $user->id,
+                        ])
+                ],
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ],
+            ]
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Plant $plant, Operation $operation, TenantUser $user)
+    public function update(Request $request, Plant $plant, Operation $operation, OperationTenantUser $user)
     {
-        //
+        $validated = $request->validate([
+            'user' => [
+                'required',
+                Rule::exists('tenant_users', 'id')
+                    ->withoutTrashed()
+                    ->where('tenant_id', $plant->id)
+                    ->where('tenant_id', $operation->id)
+                    ->where('tenant_id', $user->id)
+                    ->where('tenant_id', tenant('id')),
+                Rule::unique('operation_tenant_user', 'tuser_id')
+                    ->ignore($user->id)
+                    ->where('operation_id', $operation->id)
+                    ->where('tenant_id', $plant->id)
+                    ->where('tenant_id', $operation->id)
+                    ->where('tenant_id', $user->id)
+                    ->where('tenant_id', tenant('id'))
+            ],
+            'status' => ['required', 'boolean'],
+        ]);
+
+        $validated['status'] = Status::toggleStatus($validated['status']);
+
+        $user->update([
+            'tuser_id' => $validated['user'],
+            'status' => $validated['status'],
+        ]);
+
+        return back()->with('success', 'User updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Plant $plant, Operation $operation, TenantUser $user)
+    public function destroy(Request $request, Plant $plant, Operation $operation, OperationTenantUser $user)
     {
-        $operation->users()->toggle($user);
+        $user->delete();
 
         return back()->with('success', 'User detached successfully.');
     }
 
-    public function toggleStatus(Request $request, Plant $plant, Operation $operation, TenantUser $user)
+    public function toggleStatus(Request $request, Plant $plant, Operation $operation, OperationTenantUser $user)
     {
         $validated = $request->validate([
             'status' => ['required', 'boolean'],
@@ -149,7 +189,9 @@ class OperationTenantUserController extends Controller
 
         $validated['status'] = Status::toggleStatus($validated['status']);
 
-        $operation->users()->updateExistingPivot($user, $validated);
+        $user->update([
+            'status' => $validated['status']
+        ]);
 
         return back()->with('success', 'User status updated successfully.');
     }
