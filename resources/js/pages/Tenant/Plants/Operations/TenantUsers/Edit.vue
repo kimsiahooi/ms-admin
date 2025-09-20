@@ -2,7 +2,7 @@
 import { BadgeVariants } from '@/components/shared/badge';
 import { Card } from '@/components/shared/card';
 import { Layout } from '@/components/shared/custom/container';
-import { FormButton, FormSelect, FormSwitch } from '@/components/shared/custom/form';
+import { FormButton, FormCombobox, FormSwitch } from '@/components/shared/custom/form';
 import { SelectOption } from '@/components/shared/select';
 import type { SwitchOption } from '@/components/shared/switch';
 import { useTenant } from '@/composables/useTenant';
@@ -124,7 +124,7 @@ const submit = () =>
         <Layout>
             <form @submit.prevent="submit">
                 <Card :title="`Edit ${user.user?.name}`">
-                    <FormSelect
+                    <FormCombobox
                         :options="options.select.users"
                         placeholder="Select User"
                         label="User"

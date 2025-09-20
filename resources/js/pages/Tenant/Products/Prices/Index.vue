@@ -3,7 +3,7 @@ import { StatusBadge } from '@/components/shared/badge';
 import { ActionButton } from '@/components/shared/custom/action';
 import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
-import { FormButton, FormInput, FormSelect, FormSwitch } from '@/components/shared/custom/form';
+import { FormButton, FormCombobox, FormInput, FormSwitch } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
 import type { SelectOption } from '@/components/shared/select';
@@ -209,7 +209,7 @@ const submit = () =>
                 <div class="flex flex-wrap items-center justify-end gap-2">
                     <Dialog title="Create Price" v-model:open="setting.create.dialogIsOpen">
                         <form @submit.prevent="submit" class="space-y-4">
-                            <FormSelect
+                            <FormCombobox
                                 label="Currency"
                                 :options="options.select.currencies"
                                 v-model:model-value="form.currency"

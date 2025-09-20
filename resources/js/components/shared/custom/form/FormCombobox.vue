@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T extends AcceptableValue">
+import { Combobox } from '@/components/shared/combobox';
 import { FormContainer, FormError } from '@/components/shared/custom/form';
 import type { SelectOption } from '@/components/shared/select';
-import { Select } from '@/components/shared/select';
 import { Label } from '@/components/ui/label';
 import { useError } from '@/composables/useError';
 import type { AcceptableValue } from 'reka-ui';
@@ -18,7 +18,13 @@ const props = defineProps<{
 const { findErrors } = useError();
 const model = defineModel<T | T[]>();
 
-const placeholder = computed(() => props.placeholder ?? `Select ${props.label}`);
+const placeholderValue = computed(() =>
+    Array.isArray(model.value) ? `${model.value?.length} selected` : props.options.find((option) => option.value === model.value)?.name,
+);
+
+const commandPlaceholder = computed(() => props.placeholder ?? `Select ${props.label}`);
+
+const computedPlaceholder = computed(() => placeholderValue.value || commandPlaceholder.value);
 
 const existingErrors = computed(() => props.errorKey && findErrors(props.errorKey));
 </script>
@@ -32,17 +38,16 @@ const existingErrors = computed(() => props.errorKey && findErrors(props.errorKe
         >
             {{ label }}:
         </Label>
-        <Select
+        <Combobox
             v-bind="$attrs"
             :options="options"
-            :placeholder="placeholder"
+            :placeholder="computedPlaceholder"
+            :command-placeholder="commandPlaceholder"
             v-model:model-value="model"
-            :trigger-class="[
-                'w-full',
-                {
-                    'border-destructive': error || existingErrors,
-                },
-            ]"
+            :class="{
+                '!border-destructive': error || existingErrors,
+                '!text-muted-foreground': (Array.isArray(model) && !model.length) || !model,
+            }"
         />
         <FormError :error="error" :error-key="errorKey" />
     </FormContainer>

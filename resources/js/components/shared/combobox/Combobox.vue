@@ -1,78 +1,86 @@
-<script setup lang="ts">
-import type { SelectOption } from '@/components/shared/select';
+<script setup lang="ts" generic="T extends AcceptableValue">
+import { SelectOption } from '@/components/shared/select';
 import { Button } from '@/components/ui/button';
-import {
-    Combobox,
-    ComboboxAnchor,
-    ComboboxEmpty,
-    ComboboxGroup,
-    ComboboxInput,
-    ComboboxItem,
-    ComboboxItemIndicator,
-    ComboboxList,
-    ComboboxTrigger,
-} from '@/components/ui/combobox';
-import { cn } from '@/lib/utils';
-import { Check, ChevronsUpDown, Search } from 'lucide-vue-next';
-import type { AcceptableValue } from 'reka-ui';
-import { ref, watch } from 'vue';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Check, ChevronDown } from 'lucide-vue-next';
+import { AcceptableValue } from 'reka-ui';
+import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 
 const props = defineProps<{
-    options: SelectOption[];
     placeholder: string;
-    emptyPlaceholder: string;
+    commandPlaceholder: string;
+    options: SelectOption<T>[];
+    multiple?: boolean;
 }>();
 
-const model = defineModel<AcceptableValue | undefined>();
+const model = defineModel<T | T[]>();
+const openModel = defineModel<boolean>('open');
+const buttonEl = useTemplateRef<{ button: { $el: HTMLButtonElement } }>('buttonEl');
+const buttonWidth = ref(300);
 
-const value = ref<SelectOption | undefined>(props.options.find((option) => model.value === option.value));
+const resize = () => {
+    const width = buttonEl.value?.button.$el.offsetWidth;
 
-const emits = defineEmits<{
-    'update:value': [AcceptableValue];
-}>();
-
-watch(value, (newValue) => {
-    if (newValue?.value) {
-        model.value = newValue.value;
+    if (width) {
+        buttonWidth.value = width;
     }
+};
+
+const optionIncluded = computed(
+    () => (option: SelectOption<T>) => (Array.isArray(model.value) ? model.value?.includes(option.value) : model.value === option.value),
+);
+
+const select = () => {
+    if (!props.multiple && openModel.value) {
+        openModel.value = false;
+    }
+};
+
+onMounted(() => {
+    resize();
+    window.addEventListener('resize', resize);
 });
 
-watch(model, (newValue) => {
-    if (newValue) {
-        emits('update:value', newValue);
-    }
+onUnmounted(() => {
+    window.removeEventListener('resize', resize);
 });
 </script>
 
 <template>
-    <Combobox v-model="value" by="name">
-        <ComboboxAnchor as-child>
-            <ComboboxTrigger as-child>
-                <Button variant="outline" class="w-full justify-between">
-                    {{ value?.name ?? placeholder }}
-                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-            </ComboboxTrigger>
-        </ComboboxAnchor>
-
-        <ComboboxList>
-            <div class="relative w-full max-w-sm items-center">
-                <ComboboxInput class="h-10 rounded-none border-0 border-b pl-9 focus-visible:ring-0" :placeholder="placeholder" />
-                <span class="absolute inset-y-0 start-0 flex items-center justify-center px-3">
-                    <Search class="size-4 text-muted-foreground" />
-                </span>
-            </div>
-
-            <ComboboxEmpty> {{ emptyPlaceholder }} </ComboboxEmpty>
-
-            <ComboboxGroup>
-                <ComboboxItem v-for="option in options" :key="option.name" :value="option">
-                    {{ option.name }}
-                    <ComboboxItemIndicator>
-                        <Check :class="cn('ml-auto h-4 w-4')" />
-                    </ComboboxItemIndicator>
-                </ComboboxItem>
-            </ComboboxGroup>
-        </ComboboxList>
-    </Combobox>
+    <Popover v-model:open="openModel">
+        <PopoverTrigger as-child>
+            <Button
+                variant="outline"
+                class="w-full justify-between"
+                ref="buttonEl"
+                :class="[options.length ? 'cursor-pointer' : 'cursor-not-allowed']"
+                :disabled="!options.length"
+                v-bind="$attrs"
+            >
+                {{ placeholder }}
+                <ChevronDown />
+            </Button>
+        </PopoverTrigger>
+        <PopoverContent
+            class="p-0"
+            align="center"
+            :style="{
+                width: `${buttonWidth}px`,
+            }"
+        >
+            <Command v-model:model-value="model" :multiple="multiple">
+                <CommandInput :placeholder="commandPlaceholder" />
+                <CommandList>
+                    <CommandEmpty>No results found.</CommandEmpty>
+                    <CommandGroup>
+                        <CommandItem v-for="option in options" :key="option.name" :value="option.value" class="justify-between" @select="select">
+                            {{ option.name }}
+                            <Check v-if="optionIncluded(option)" />
+                        </CommandItem>
+                    </CommandGroup>
+                </CommandList>
+            </Command>
+        </PopoverContent>
+    </Popover>
 </template>

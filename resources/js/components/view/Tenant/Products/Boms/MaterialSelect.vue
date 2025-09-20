@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FormInput, FormSelect } from '@/components/shared/custom/form';
+import { FormCombobox, FormInput, FormSelect } from '@/components/shared/custom/form';
 import type { SelectOption } from '@/components/shared/select';
 import { Button } from '@/components/ui/button';
 import { useUuid } from '@/composables/useUuid';
@@ -76,7 +76,7 @@ watch(
     <div>
         <div class="flex flex-col gap-2 md:flex-row">
             <div class="flex-1">
-                <FormSelect label="Material" :options="filteredOptions" v-model:model-value="selected" :error-key="`materials.${currIndex}.id`" />
+                <FormCombobox label="Material" :options="filteredOptions" v-model:model-value="selected" :error-key="`materials.${currIndex}.id`" />
             </div>
             <div class="flex-1">
                 <FormSelect

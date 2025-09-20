@@ -3,7 +3,7 @@ import { BadgeVariants, StatusBadge } from '@/components/shared/badge';
 import { ActionButton } from '@/components/shared/custom/action';
 import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
-import { FormButton, FormSelect, FormSwitch } from '@/components/shared/custom/form';
+import { FormButton, FormCombobox, FormSwitch } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
 import type { SelectOption } from '@/components/shared/select';
@@ -274,7 +274,7 @@ const submit = () =>
                 <div class="flex flex-wrap items-center justify-end gap-2">
                     <Dialog title="Attach User" v-model:open="setting.create.dialogIsOpen" trigger-label="Attach">
                         <form @submit.prevent="submit" class="space-y-4">
-                            <FormSelect
+                            <FormCombobox
                                 :options="options.select.users"
                                 placeholder="Select User"
                                 label="User"
