@@ -60,7 +60,7 @@ const setting = reactive({
     },
 });
 
-const breadcrumbs: BreadcrumbItem[] = [
+const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     {
         title: 'Dashboard',
         href: route('dashboard', { tenant: tenant?.id || '' }),
@@ -77,7 +77,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Branches',
         href: route('customers.branches.index', { tenant: tenant?.id || '', customer: props.customer.id }),
     },
-];
+]);
 
 const search = () =>
     router.visit(route('customers.branches.index', { ...pickBy(filter.data()), tenant: tenant?.id || '', customer: props.customer.id }), {

@@ -41,7 +41,7 @@ const props = defineProps<{
 const { tenant } = useTenant();
 const { uuid } = useUuid();
 
-const breadcrumbs: BreadcrumbItem[] = [
+const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     {
         title: 'Dashboard',
         href: route('dashboard', { tenant: tenant?.id || '' }),
@@ -62,7 +62,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Create',
         href: route('products.boms.create', { tenant: tenant?.id || '', product: props.product.id }),
     },
-];
+]);
 
 const materialConfig: Omit<MaterialConfig<PartialMaterial>, 'key'> = {
     data: null,

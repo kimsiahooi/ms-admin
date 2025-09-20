@@ -24,7 +24,7 @@ const props = defineProps<{
     };
 }>();
 
-const breadcrumbs: BreadcrumbItem[] = [
+const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     {
         title: 'Dashboard',
         href: route('admin.dashboard'),
@@ -41,7 +41,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Edit',
         href: route('admin.tenants.edit', { tenant: props.tenant.id }),
     },
-];
+]);
 
 const statusDisplay = computed(
     () => props.options.switch.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],

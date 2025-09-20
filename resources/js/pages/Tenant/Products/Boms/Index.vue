@@ -50,7 +50,7 @@ const filter = useForm<Filter>({
     status: routeParams.value.status,
 });
 
-const breadcrumbs: BreadcrumbItem[] = [
+const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     {
         title: 'Dashboard',
         href: route('dashboard', { tenant: tenant?.id || '' }),
@@ -67,7 +67,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Boms',
         href: route('products.boms.index', { tenant: tenant?.id || '', product: props.product.id }),
     },
-];
+]);
 
 const search = () =>
     router.visit(route('products.boms.index', { ...pickBy(filter.data()), tenant: tenant?.id || '', product: props.product.id }), {

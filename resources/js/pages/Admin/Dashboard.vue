@@ -3,13 +3,14 @@ import PlaceholderPattern from '@/components/Admin/PlaceholderPattern.vue';
 import AppLayout from '@/layouts/Admin/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
-const breadcrumbs: BreadcrumbItem[] = [
+const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     {
         title: 'Dashboard',
         href: route('admin.dashboard'),
     },
-];
+]);
 </script>
 
 <template>

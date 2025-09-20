@@ -8,6 +8,7 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import { TenantUser } from '@/types/Tenant/tenant-users';
 import { Head, useForm } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -19,7 +20,7 @@ const props = defineProps<{
 
 const { tenant } = useTenant();
 
-const breadcrumbs: BreadcrumbItem[] = [
+const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     {
         title: 'Dashboard',
         href: route('dashboard', { tenant: tenant?.id || '' }),
@@ -36,7 +37,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Edit',
         href: route('users.edit', { tenant: tenant?.id || '', user: props.user.id }),
     },
-];
+]);
 
 const form = useForm({
     name: props.user.name,

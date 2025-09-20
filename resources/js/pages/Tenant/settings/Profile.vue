@@ -23,12 +23,12 @@ const page = usePage<AppPageProps>();
 
 const tenant = computed(() => page.props.tenant?.id || '');
 
-const breadcrumbs: BreadcrumbItem[] = [
+const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     {
         title: 'Profile settings',
         href: route('profile.edit', { tenant: tenant.value }),
     },
-];
+]);
 
 const user = page.props.auth.user as User;
 

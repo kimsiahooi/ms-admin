@@ -9,12 +9,12 @@ const page = usePage<AppPageProps>();
 
 const tenant = computed(() => page.props.tenant?.id || '');
 
-const breadcrumbs: BreadcrumbItem[] = [
+const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     {
         title: 'Dashboard',
         href: route('dashboard', { tenant: tenant.value }),
     },
-];
+]);
 </script>
 
 <template>

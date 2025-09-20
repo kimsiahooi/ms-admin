@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/Admin/AppLayout.vue';
 import SettingsLayout from '@/layouts/Admin/settings/Layout.vue';
 import type { BreadcrumbItem, User } from '@/types';
+import { computed } from 'vue';
 
 interface Props {
     mustVerifyEmail: boolean;
@@ -18,12 +19,12 @@ interface Props {
 
 defineProps<Props>();
 
-const breadcrumbs: BreadcrumbItem[] = [
+const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     {
         title: 'Profile settings',
         href: route('admin.profile.edit'),
     },
-];
+]);
 
 const page = usePage();
 const user = page.props.auth.user as User;

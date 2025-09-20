@@ -63,7 +63,7 @@ const setting = reactive({
     },
 });
 
-const breadcrumbs: BreadcrumbItem[] = [
+const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     {
         title: 'Dashboard',
         href: route('dashboard', { tenant: tenant?.id || '' }),
@@ -80,7 +80,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Presets',
         href: route('products.presets.index', { tenant: tenant?.id || '', product: props.product.id }),
     },
-];
+]);
 
 const search = () =>
     router.visit(route('products.presets.index', { ...pickBy(filter.data()), tenant: tenant?.id || '', product: props.product.id }), {
@@ -221,11 +221,11 @@ const form = useForm({
     code: '',
     description: '',
     cavity_quantity: '',
-    cavity_type: '',
+    cavity_type: undefined,
     cycle_time: '',
-    cycle_time_type: '',
+    cycle_time_type: undefined,
     shelf_life_duration: '',
-    shelf_life_type: '',
+    shelf_life_type: undefined,
     status: defaultStatus.value,
 });
 
