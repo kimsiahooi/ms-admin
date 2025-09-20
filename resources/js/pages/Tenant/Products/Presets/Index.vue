@@ -3,7 +3,7 @@ import { StatusBadge } from '@/components/shared/badge';
 import { ActionButton } from '@/components/shared/custom/action';
 import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
-import { FormButton, FormInput, FormSelect, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
+import { FormButton, FormCombobox, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
 import type { SelectOption } from '@/components/shared/select';
@@ -277,7 +277,7 @@ watch(
                                 type="number"
                                 step=".01"
                             />
-                            <FormSelect
+                            <FormCombobox
                                 label="Cavity Type"
                                 :options="options.select.cavity_types"
                                 v-model:model-value="form.cavity_type"
@@ -290,7 +290,7 @@ watch(
                                 type="number"
                                 step=".01"
                             />
-                            <FormSelect
+                            <FormCombobox
                                 label="Cycle Time Type"
                                 :options="options.select.cycle_time_types"
                                 v-model:model-value="form.cycle_time_type"
@@ -303,7 +303,7 @@ watch(
                                 type="number"
                                 step=".01"
                             />
-                            <FormSelect
+                            <FormCombobox
                                 label="Shelf Life Type"
                                 :options="options.select.shelf_life_types"
                                 v-model:model-value="form.shelf_life_type"

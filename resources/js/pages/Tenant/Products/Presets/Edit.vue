@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Card } from '@/components/shared/card';
 import { Layout } from '@/components/shared/custom/container';
-import { FormButton, FormInput, FormSelect, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
+import { FormButton, FormCombobox, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import type { SelectOption } from '@/components/shared/select';
 import type { SwitchOption } from '@/components/shared/switch';
 import { useTenant } from '@/composables/useTenant';
@@ -101,7 +101,7 @@ const submit = () =>
                             type="number"
                             step=".01"
                         />
-                        <FormSelect
+                        <FormCombobox
                             label="Cavity Type"
                             :options="options.select.cavity_types"
                             v-model:model-value="form.cavity_type"
@@ -114,7 +114,7 @@ const submit = () =>
                             type="number"
                             step=".01"
                         />
-                        <FormSelect
+                        <FormCombobox
                             label="Cycle Time Type"
                             :options="options.select.cycle_time_types"
                             v-model:model-value="form.cycle_time_type"
@@ -127,7 +127,7 @@ const submit = () =>
                             type="number"
                             step=".01"
                         />
-                        <FormSelect
+                        <FormCombobox
                             label="Shelf Life Type"
                             :options="options.select.shelf_life_types"
                             v-model:model-value="form.shelf_life_type"
