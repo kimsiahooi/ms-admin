@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\TaskController;
 use App\Http\Controllers\Tenant\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Tenant\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Tenant\Auth\EmailVerificationNotificationController;
@@ -22,8 +21,10 @@ use App\Http\Controllers\Tenant\PlantController;
 use App\Http\Controllers\Tenant\ProductController;
 use App\Http\Controllers\Tenant\ProductPresetController;
 use App\Http\Controllers\Tenant\ProductPriceController;
+use App\Http\Controllers\Tenant\RouteController;
 use App\Http\Controllers\Tenant\Settings\PasswordController;
 use App\Http\Controllers\Tenant\Settings\ProfileController;
+use App\Http\Controllers\Tenant\TaskController;
 use App\Http\Controllers\Tenant\TenantUserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -170,5 +171,10 @@ Route::middleware([
         });
         Route::resource('customers', CustomerController::class)->except(['create', 'show']);
         Route::resource('customers.branches', CustomerBranchController::class)->except(['create', 'show']);
+
+        Route::prefix('routes/{route}')->name('routes.')->group(function () {
+            Route::match(['put', 'patch'], 'toggleStatus', [RouteController::class, 'toggleStatus'])->name('toggleStatus');
+        });
+        Route::resource('routes', RouteController::class)->except(['create', 'show']);
     });
 });

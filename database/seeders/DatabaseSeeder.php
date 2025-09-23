@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
             OperationSeeder::class,
             TaskSeeder::class,
             OperationTenantUserSeeder::class,
+            RouteSeeder::class,
         ]);
     }
 }

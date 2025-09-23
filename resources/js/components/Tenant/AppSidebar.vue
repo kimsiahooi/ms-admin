@@ -6,7 +6,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { useTenant } from '@/composables/useTenant';
 import type { NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Building2, Computer, Folder, LayoutGrid, Recycle, Route, Speaker, User } from 'lucide-vue-next';
+import { BookOpen, Building2, Computer, Folder, LayoutGrid, Recycle, Route, Speaker, User, Waypoints } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const { tenant } = useTenant();
@@ -26,7 +26,7 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Plants',
         href: route('plants.index', { tenant: tenant?.id || '' }),
-        icon: Route,
+        icon: Waypoints,
         isActive: route().current('plants.*', { tenant: tenant?.id || '' }),
     },
     {
@@ -52,6 +52,12 @@ const mainNavItems: NavItem[] = [
         href: route('products.index', { tenant: tenant?.id || '' }),
         icon: Speaker,
         isActive: route().current('products.*', { tenant: tenant?.id || '' }),
+    },
+    {
+        title: 'Routes',
+        href: route('routes.index', { tenant: tenant?.id || '' }),
+        icon: Route,
+        isActive: route().current('routes.*', { tenant: tenant?.id || '' }),
     },
 ];
 

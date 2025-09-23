@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Tenant;
 
 use App\Enums\Tenant\Plant\Operation\Task\Status;
+use App\Http\Controllers\Controller;
 use App\Models\Tenant\Operation;
 use App\Models\Tenant\Plant;
 use App\Models\Tenant\Task;
