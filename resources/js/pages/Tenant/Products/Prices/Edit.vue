@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Card } from '@/components/shared/card';
 import { Layout } from '@/components/shared/custom/container';
-import { FormButton, FormInput, FormSelect, FormSwitch } from '@/components/shared/custom/form';
+import { FormButton, FormCombobox, FormInput, FormSwitch } from '@/components/shared/custom/form';
 import type { SelectOption } from '@/components/shared/select';
 import type { SwitchOption } from '@/components/shared/switch';
 import { useTenant } from '@/composables/useTenant';
@@ -84,7 +84,7 @@ const submit = () =>
             <div class="space-y-3">
                 <form @submit.prevent="submit">
                     <Card :title="`Edit ${price.currency}`">
-                        <FormSelect
+                        <FormCombobox
                             label="Currency"
                             :options="options.select.currencies"
                             v-model:model-value="form.currency"
