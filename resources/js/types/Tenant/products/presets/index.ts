@@ -19,8 +19,8 @@ export interface ProductPreset {
     name: string;
     code: string;
     description: string | null;
-    cavity_quantity: string;
-    cavity_type: number;
+    quantity: string;
+    product_type: number;
     cavity_type_label?: string | null;
     cycle_time: string;
     cycle_time_type: number;

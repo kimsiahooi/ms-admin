@@ -35,7 +35,7 @@ const props = defineProps<{
     presets: PaginateData<ProductPreset[]>;
     options: {
         select: {
-            cavity_types: SelectOption<ProductPreset['cavity_type']>[];
+            product_types: SelectOption<ProductPreset['product_type']>[];
             cycle_time_types: SelectOption<ProductPreset['cycle_time_type']>[];
             shelf_life_types: SelectOption<ProductPreset['shelf_life_type']>[];
             statuses: SelectOption<ProductPreset['status']['value']>[];
@@ -156,19 +156,6 @@ const columns: ColumnDef<ProductPreset>[] = [
         cell: ({ row }) => h('div', null, row.getValue('description')),
     },
     {
-        accessorKey: 'cavity_quantity',
-        header: () => h('div', null, 'Cavity Quantity'),
-        cell: ({ row }) => h('div', null, row.getValue('cavity_quantity')),
-    },
-    {
-        accessorKey: 'cavity_type',
-        header: () => h('div', null, 'Cavity Type'),
-        cell: ({ row }) => {
-            const { cavity_type_label } = row.original;
-            return h('div', null, cavity_type_label || '');
-        },
-    },
-    {
         accessorKey: 'cycle_time',
         header: () => h('div', null, 'Cycle Time'),
         cell: ({ row }) => h('div', null, row.getValue('cycle_time')),
@@ -179,6 +166,19 @@ const columns: ColumnDef<ProductPreset>[] = [
         cell: ({ row }) => {
             const { cycle_time_type_label } = row.original;
             return h('div', null, cycle_time_type_label || '');
+        },
+    },
+    {
+        accessorKey: 'quantity',
+        header: () => h('div', null, 'Quantity / Cycle Time'),
+        cell: ({ row }) => h('div', null, row.getValue('quantity')),
+    },
+    {
+        accessorKey: 'product_type',
+        header: () => h('div', null, 'Product Type'),
+        cell: ({ row }) => {
+            const { cavity_type_label } = row.original;
+            return h('div', null, cavity_type_label || '');
         },
     },
     {
@@ -220,8 +220,8 @@ const form = useForm({
     name: '',
     code: '',
     description: '',
-    cavity_quantity: '',
-    cavity_type: undefined,
+    quantity: '',
+    product_type: undefined,
     cycle_time: '',
     cycle_time_type: undefined,
     shelf_life_duration: '',
@@ -271,19 +271,6 @@ watch(
                             <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
                             <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
                             <FormInput
-                                label="Cavity Quantity"
-                                :error="form.errors.cavity_quantity"
-                                v-model:model-value="form.cavity_quantity"
-                                type="number"
-                                step=".01"
-                            />
-                            <FormCombobox
-                                label="Cavity Type"
-                                :options="options.select.cavity_types"
-                                v-model:model-value="form.cavity_type"
-                                :error="form.errors.cavity_type"
-                            />
-                            <FormInput
                                 label="Cycle Time"
                                 :error="form.errors.cycle_time"
                                 v-model:model-value="form.cycle_time"
@@ -295,6 +282,19 @@ watch(
                                 :options="options.select.cycle_time_types"
                                 v-model:model-value="form.cycle_time_type"
                                 :error="form.errors.cycle_time_type"
+                            />
+                            <FormInput
+                                label="Quantity / Cycle Time"
+                                :error="form.errors.quantity"
+                                v-model:model-value="form.quantity"
+                                type="number"
+                                step=".01"
+                            />
+                            <FormCombobox
+                                label="Product Type"
+                                :options="options.select.product_types"
+                                v-model:model-value="form.product_type"
+                                :error="form.errors.product_type"
                             />
                             <FormInput
                                 label="Shelf Life Duration"

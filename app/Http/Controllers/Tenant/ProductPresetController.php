@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Tenant;
 
-use App\Enums\Tenant\Product\Preset\CavityType;
+use App\Enums\Tenant\Product\Preset\ProductType;
 use App\Enums\Tenant\Product\Preset\CycleTimeType;
 use App\Enums\Tenant\Product\Preset\ShelfLifeType;
 use App\Enums\Tenant\Product\Preset\Status;
@@ -41,7 +41,7 @@ class ProductPresetController extends Controller
             'presets' => $presets,
             'options' => [
                 'select' => [
-                    'cavity_types' => CavityType::selectOptions(),
+                    'product_types' => ProductType::selectOptions(),
                     'cycle_time_types' => CycleTimeType::selectOptions(),
                     'statuses' => Status::selectOptions(),
                     'shelf_life_types' => ShelfLifeType::selectOptions(),
@@ -79,8 +79,8 @@ class ProductPresetController extends Controller
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
-            'cavity_quantity' => ['required', 'numeric', 'decimal:0,2', 'min:0.01', 'max:999999.99'],
-            'cavity_type' => ['required', Rule::enum(CavityType::class)],
+            'quantity' => ['required', 'numeric', 'decimal:0,2', 'min:0.01', 'max:999999.99'],
+            'product_type' => ['required', Rule::enum(ProductType::class)],
             'cycle_time' => ['required', 'numeric', 'decimal:0,2', 'min:0.01', 'max:999999.99'],
             'cycle_time_type' => ['required', Rule::enum(CycleTimeType::class)],
             'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type',  'numeric', 'decimal:0,2', 'min:0.01', 'max:999999.99'],
@@ -117,7 +117,7 @@ class ProductPresetController extends Controller
             'preset' => $preset,
             'options' => [
                 'select' => [
-                    'cavity_types' => CavityType::selectOptions(),
+                    'product_types' => ProductType::selectOptions(),
                     'cycle_time_types' => CycleTimeType::selectOptions(),
                     'shelf_life_types' => ShelfLifeType::selectOptions(),
                 ],
@@ -147,8 +147,8 @@ class ProductPresetController extends Controller
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
-            'cavity_quantity' => ['required', 'numeric', 'decimal:0,2', 'min:0.01', 'max:999999.99'],
-            'cavity_type' => ['required', Rule::enum(CavityType::class)],
+            'quantity' => ['required', 'numeric', 'decimal:0,2', 'min:0.01', 'max:999999.99'],
+            'product_type' => ['required', Rule::enum(ProductType::class)],
             'cycle_time' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:999999.99'],
             'cycle_time_type' => ['required', Rule::enum(CycleTimeType::class)],
             'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type', 'numeric', 'decimal:0,2', 'min:0.01', 'max:999999.99'],

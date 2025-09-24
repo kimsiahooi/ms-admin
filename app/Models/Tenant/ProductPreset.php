@@ -2,7 +2,7 @@
 
 namespace App\Models\Tenant;
 
-use App\Enums\Tenant\Product\Preset\CavityType;
+use App\Enums\Tenant\Product\Preset\ProductType;
 use App\Enums\Tenant\Product\Preset\CycleTimeType;
 use App\Enums\Tenant\Product\Preset\ShelfLifeType;
 use App\Enums\Tenant\Product\Preset\Status;
@@ -18,7 +18,7 @@ class ProductPreset extends Model
 {
     use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
-    protected $fillable = ['product_id', 'name', 'code', 'description', 'cavity_quantity', 'cavity_type', 'cycle_time', 'cycle_time_type', 'shelf_life_duration', 'shelf_life_type', 'status', 'tenant_id'];
+    protected $fillable = ['product_id', 'name', 'code', 'description', 'quantity', 'product_type', 'cycle_time', 'cycle_time_type', 'shelf_life_duration', 'shelf_life_type', 'status', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
@@ -27,7 +27,7 @@ class ProductPreset extends Model
     protected function cavityTypeLabel(): Attribute
     {
         return Attribute::make(
-            get: fn($value, $attributes) => CavityType::tryFrom($attributes['cavity_type'])?->label(),
+            get: fn($value, $attributes) => ProductType::tryFrom($attributes['product_type'])?->label(),
         );
     }
 

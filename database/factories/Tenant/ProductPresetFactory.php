@@ -2,7 +2,7 @@
 
 namespace Database\Factories\Tenant;
 
-use App\Enums\Tenant\Product\Preset\CavityType;
+use App\Enums\Tenant\Product\Preset\ProductType;
 use App\Enums\Tenant\Product\Preset\CycleTimeType;
 use App\Enums\Tenant\Product\Preset\ShelfLifeType;
 use App\Enums\Tenant\Product\Preset\Status;
@@ -32,8 +32,8 @@ class ProductPresetFactory extends Factory
             'name' => $name,
             'code' => Str::slug($name),
             'description' => fake()->sentence(),
-            'cavity_quantity' => fake()->numberBetween(0, 10),
-            'cavity_type' => fake()->randomElement(CavityType::cases()),
+            'quantity' => fake()->numberBetween(0, 10),
+            'product_type' => fake()->randomElement(ProductType::cases()),
             'cycle_time' => fake()->randomFloat(2, 0, 10),
             'cycle_time_type' => fake()->randomElement(CycleTimeType::cases()),
             'shelf_life_duration' => $shelfLifeDuration,

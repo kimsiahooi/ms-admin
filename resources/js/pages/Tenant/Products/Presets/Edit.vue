@@ -24,7 +24,7 @@ const props = defineProps<{
     options: {
         select: {
             machines: SelectOption<Machine['id']>[];
-            cavity_types: SelectOption<ProductPreset['cavity_type']>[];
+            product_types: SelectOption<ProductPreset['product_type']>[];
             cycle_time_types: SelectOption<ProductPreset['cycle_time_type']>[];
             shelf_life_types: SelectOption<ProductPreset['shelf_life_type']>[];
         };
@@ -67,8 +67,8 @@ const form = useForm({
     name: props.preset.name,
     code: props.preset.code,
     description: props.preset.description || '',
-    cavity_quantity: +props.preset.cavity_quantity,
-    cavity_type: props.preset.cavity_type,
+    quantity: props.preset.quantity,
+    product_type: props.preset.product_type,
     cycle_time: +props.preset.cycle_time,
     cycle_time_type: props.preset.cycle_time_type,
     shelf_life_duration: props.preset.shelf_life_duration || '',
@@ -94,19 +94,7 @@ const submit = () =>
                         <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
                         <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
                         <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
-                        <FormInput
-                            label="Cavity Quantity"
-                            :error="form.errors.cavity_quantity"
-                            v-model:model-value="form.cavity_quantity"
-                            type="number"
-                            step=".01"
-                        />
-                        <FormCombobox
-                            label="Cavity Type"
-                            :options="options.select.cavity_types"
-                            v-model:model-value="form.cavity_type"
-                            :error="form.errors.cavity_type"
-                        />
+
                         <FormInput
                             label="Cycle Time"
                             :error="form.errors.cycle_time"
@@ -119,6 +107,19 @@ const submit = () =>
                             :options="options.select.cycle_time_types"
                             v-model:model-value="form.cycle_time_type"
                             :error="form.errors.cycle_time_type"
+                        />
+                        <FormInput
+                            label="Quantity / Cycle Time"
+                            :error="form.errors.quantity"
+                            v-model:model-value="form.quantity"
+                            type="number"
+                            step=".01"
+                        />
+                        <FormCombobox
+                            label="Product Type"
+                            :options="options.select.product_types"
+                            v-model:model-value="form.product_type"
+                            :error="form.errors.product_type"
                         />
                         <FormInput
                             label="Shelf Life Duration"

@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('code');
             $table->text('description')->nullable();
-            $table->decimal('cavity_quantity')->default(0);
-            $table->string('cavity_type')->nullable();
+            $table->decimal('quantity')->default(0);
+            $table->string('product_type')->nullable();
             $table->decimal('cycle_time')->default(0);
             $table->string('cycle_time_type')->nullable();
             $table->decimal('shelf_life_duration')->nullable();
