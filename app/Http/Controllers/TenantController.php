@@ -61,8 +61,6 @@ class TenantController extends Controller
             'status' => ['required', 'boolean'],
         ]);
 
-        $validated['status'] = Status::toggleStatus($validated['status']);
-
         Tenant::create($validated);
 
         return back()->with('success', 'Tenant created successfully.');

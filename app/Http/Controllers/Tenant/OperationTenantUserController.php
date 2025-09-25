@@ -158,10 +158,12 @@ class OperationTenantUserController extends Controller
                     ->where('tenant_id', $user->id)
                     ->where('tenant_id', tenant('id'))
             ],
-            'status' => ['required', 'boolean'],
+            'status' => ['sometimes', 'boolean'],
         ]);
 
-        $validated['status'] = Status::toggleStatus($validated['status']);
+        if (isset($validated['status'])) {
+            $validated['status'] = Status::toggleStatus($validated['status']);
+        }
 
         $user->update([
             'tuser_id' => $validated['user'],

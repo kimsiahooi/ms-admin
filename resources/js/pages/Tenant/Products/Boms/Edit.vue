@@ -173,7 +173,12 @@ watch(
                             <Button type="button" class="cursor-pointer" variant="outline" @click="addMeterial"><Plus /> Add Material</Button>
                         </div>
                     </div>
-                    <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
+                    <FormSwitch
+                        v-if="form.status !== undefined"
+                        :label="statusDisplay"
+                        :error="form.errors.status"
+                        v-model:model-value="form.status"
+                    />
                     <FormButton type="submit" label="Update" :disabled="form.processing" :loading="form.processing" />
                 </form>
             </div>

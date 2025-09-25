@@ -91,7 +91,12 @@ const submit = () =>
                             :error="form.errors.currency"
                         />
                         <FormInput label="Amount" type="number" :error="form.errors.amount" v-model:model-value="form.amount" step=".01" />
-                        <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
+                        <FormSwitch
+                            v-if="form.status !== undefined"
+                            :label="statusDisplay"
+                            :error="form.errors.status"
+                            v-model:model-value="form.status"
+                        />
                         <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
                     </Card>
                 </form>

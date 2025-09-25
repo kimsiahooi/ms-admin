@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Tenant\Route;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class RouteController extends Controller
 {
@@ -46,7 +47,7 @@ class RouteController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
         //
     }
@@ -56,7 +57,25 @@ class RouteController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'code' => [
+                'required',
+                'string',
+                'alpha_dash',
+                'max:255',
+                Rule::unique('routes')
+                    ->where('tenant_id', tenant('id'))
+            ],
+            'description' => ['nullable', 'string'],
+            'status' => ['required', 'boolean'],
+        ]);
+
+        $validated['status'] = Status::toggleStatus($validated['status']);
+
+        Route::create($validated);
+
+        return back()->with('success', 'Route created successfully.');
     }
 
     /**
@@ -70,9 +89,16 @@ class RouteController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Route $route)
+    public function edit(Request $request, Route $route)
     {
-        //
+        return inertia('Tenant/Routes/Edit', [
+            'route' => $route,
+            'options' => [
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ],
+            ]
+        ]);
     }
 
     /**
@@ -80,7 +106,29 @@ class RouteController extends Controller
      */
     public function update(Request $request, Route $route)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'code' => [
+                'required',
+                'string',
+                'alpha_dash',
+                'max:255',
+                Rule::unique('routes')
+                    ->ignore($route->id)
+                    ->where('tenant_id', $route->tenant_id)
+                    ->where('tenant_id', tenant('id'))
+            ],
+            'description' => ['nullable', 'string'],
+            'status' => ['sometimes', 'boolean'],
+        ]);
+
+        if (isset($validated['status'])) {
+            $validated['status'] = Status::toggleStatus($validated['status']);
+        }
+
+        $route->update($validated);
+
+        return back()->with('success', 'Route updated successfully.');
     }
 
     /**
