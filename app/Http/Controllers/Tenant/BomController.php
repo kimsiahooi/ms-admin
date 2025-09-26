@@ -89,7 +89,8 @@ class BomController extends Controller
 
         $bom->materials()->sync($materials);
 
-        return back()->with('success', 'Product Bom created successfully.');
+        return to_route('products.boms.index', ['tenant' => tenant('id'), 'product' => $product->id])
+            ->with('success', 'Product Bom created successfully.');
     }
 
     /**

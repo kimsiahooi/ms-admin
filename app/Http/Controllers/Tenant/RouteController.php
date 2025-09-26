@@ -37,9 +37,6 @@ class RouteController extends Controller
                 'select' => [
                     'statuses' => Status::selectOptions(),
                 ],
-                'switch' => [
-                    'statuses' => Status::switchOptions(),
-                ],
             ]
         ]);
     }
@@ -49,7 +46,13 @@ class RouteController extends Controller
      */
     public function create(Request $request)
     {
-        //
+        return inertia('Tenant/Routes/Create', [
+            'options' => [
+                'switch' => [
+                    'statuses' => Status::switchOptions(),
+                ],
+            ]
+        ]);
     }
 
     /**
@@ -75,7 +78,8 @@ class RouteController extends Controller
 
         Route::create($validated);
 
-        return back()->with('success', 'Route created successfully.');
+        return to_route('routes.index', ['tenant' => tenant('id')])
+            ->with('success', 'Route created successfully.');
     }
 
     /**

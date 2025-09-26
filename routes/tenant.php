@@ -175,6 +175,6 @@ Route::middleware([
         Route::prefix('routes/{route}')->name('routes.')->group(function () {
             Route::match(['put', 'patch'], 'toggleStatus', [RouteController::class, 'toggleStatus'])->name('toggleStatus');
         });
-        Route::resource('routes', RouteController::class)->except(['create', 'show']);
+        Route::resource('routes', RouteController::class)->except(['show']);
     });
 });

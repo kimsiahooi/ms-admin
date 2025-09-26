@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Card } from '@/components/shared/card';
 import { Layout } from '@/components/shared/custom/container';
 import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import type { SelectOption } from '@/components/shared/select';
@@ -144,32 +145,34 @@ watch(
     <AppLayout :breadcrumbs="breadcrumbs">
         <Layout>
             <div class="space-y-3">
-                <form @submit.prevent="submit" class="space-y-4">
-                    <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
-                    <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
-                    <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
-                    <div class="space-y-3">
-                        <div>
-                            <Label class="mb-1">Materials:</Label>
-                        </div>
+                <form @submit.prevent="submit">
+                    <Card title="Create Bom">
+                        <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
+                        <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
+                        <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
                         <div class="space-y-3">
-                            <div v-for="(material, index) in selectedMaterials" :key="material.key" class="space-y-1">
-                                <MaterialSelect
-                                    :material-options="materialOptions"
-                                    :unit-type-options="options.select.unit_types"
-                                    :total-selected="selectedMaterials.length"
-                                    v-model:model-value="selectedMaterials[index]"
-                                    :curr-index="index"
-                                    @remove="removeMaterial"
-                                />
+                            <div>
+                                <Label class="mb-1">Materials:</Label>
+                            </div>
+                            <div class="space-y-3">
+                                <div v-for="(material, index) in selectedMaterials" :key="material.key" class="space-y-1">
+                                    <MaterialSelect
+                                        :material-options="materialOptions"
+                                        :unit-type-options="options.select.unit_types"
+                                        :total-selected="selectedMaterials.length"
+                                        v-model:model-value="selectedMaterials[index]"
+                                        :curr-index="index"
+                                        @remove="removeMaterial"
+                                    />
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-center">
+                                <Button type="button" class="cursor-pointer" variant="outline" @click="addMeterial"><Plus /> Add Material</Button>
                             </div>
                         </div>
-                        <div class="flex items-center justify-center">
-                            <Button type="button" class="cursor-pointer" variant="outline" @click="addMeterial"><Plus /> Add Material</Button>
-                        </div>
-                    </div>
-                    <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
-                    <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
+                        <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
+                        <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
+                    </Card>
                 </form>
             </div>
         </Layout>

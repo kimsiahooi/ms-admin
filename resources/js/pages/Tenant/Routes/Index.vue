@@ -3,14 +3,13 @@ import { StatusBadge } from '@/components/shared/badge';
 import { ActionButton } from '@/components/shared/custom/action';
 import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
-import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
-import { DeleteDialog, Dialog } from '@/components/shared/dialog';
+import { DeleteDialog } from '@/components/shared/dialog';
 import { PaginateData } from '@/components/shared/pagination';
 import type { SelectOption } from '@/components/shared/select';
-import type { SwitchOption } from '@/components/shared/switch';
 import { StatusSwitch } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
+import { Button } from '@/components/ui/button';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
 import { useTenant } from '@/composables/useTenant';
 import { entryOptions } from '@/constants/entries/options';
@@ -18,26 +17,22 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
-import { Route, Status, StatusLabel } from '@/types/Tenant/routes';
-import { Head, router, useForm } from '@inertiajs/vue3';
+import { Route } from '@/types/Tenant/routes';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
 import { Pencil, Trash2 } from 'lucide-vue-next';
-import slug from 'slug';
-import { computed, h, reactive, watch } from 'vue';
+import { computed, h } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
 });
 
-const props = defineProps<{
+defineProps<{
     routes: PaginateData<Route[]>;
     options: {
         select: {
             statuses: SelectOption<Route['status']['value']>[];
-        };
-        switch: {
-            statuses: SwitchOption[];
         };
     };
 }>();
@@ -51,12 +46,6 @@ const filter = useForm<Filter>({
     search: routeParams.value.search,
     entries: routeParams.value.entries || '10',
     status: routeParams.value.status,
-});
-
-const setting = reactive({
-    create: {
-        dialogIsOpen: false,
-    },
 });
 
 const breadcrumbs = computed<BreadcrumbItem[]>(() => [
@@ -160,38 +149,6 @@ const columnVisibility: VisibilityState<Route> = {
     id: false,
     description: false,
 };
-
-const defaultStatus = computed<(typeof props.options.switch.statuses)[number]['value']>(
-    () => !!props.options.switch.statuses.find((status) => status.is_default)?.value,
-);
-
-const statusDisplay = computed(
-    () => props.options.switch.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
-);
-
-const form = useForm({
-    name: '',
-    code: '',
-    description: '',
-    status: defaultStatus.value,
-});
-
-const submit = () =>
-    form.post(route('routes.store', { tenant: tenant?.id || '' }), {
-        preserveScroll: true,
-        preserveState: true,
-        onSuccess: () => {
-            form.reset();
-            setting.create.dialogIsOpen = false;
-        },
-    });
-
-watch(
-    () => form.name,
-    (newName) => {
-        form.code = slug(newName);
-    },
-);
 </script>
 
 <template>
@@ -210,17 +167,10 @@ watch(
                         v-model:model-value="filter.status"
                     />
                 </FilterCard>
-
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Dialog title="Create Route" v-model:open="setting.create.dialogIsOpen">
-                        <form @submit.prevent="submit" class="space-y-4">
-                            <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
-                            <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
-                            <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
-                            <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
-                            <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
-                        </form>
-                    </Dialog>
+                    <Link :href="route('routes.create', { tenant: tenant?.id || '' })" as-child>
+                        <Button class="cursor-pointer">Create</Button>
+                    </Link>
                 </div>
                 <div>
                     <DataTable

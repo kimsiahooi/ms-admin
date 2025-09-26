@@ -179,7 +179,7 @@ const columnVisibility: VisibilityState<ProductBom> = {
                 </FilterCard>
 
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Link :href="route('products.boms.create', { tenant: tenant?.id || '', product: props.product.id })" as-child>
+                    <Link :href="route('products.boms.create', { tenant: tenant?.id || '', product: product.id })" as-child>
                         <Button class="cursor-pointer">Create</Button>
                     </Link>
                 </div>
