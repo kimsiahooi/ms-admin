@@ -1,3 +1,4 @@
+import { FormDataConvertible } from '@inertiajs/core';
 import type { LucideIcon } from 'lucide-vue-next';
 import type { Config } from 'ziggy-js';
 
@@ -45,3 +46,5 @@ export interface User {
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;
+
+export type FormDataType = Record<string, FormDataConvertible>;

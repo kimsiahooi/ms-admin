@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
@@ -36,5 +37,14 @@ class Route extends Model
     protected function active(Builder $query): void
     {
         $query->where('status', Status::ACTIVE->value);
+    }
+
+    public function tasks(): BelongsToMany
+    {
+        return $this->belongsToMany(Task::class)
+            ->withPivot(['id', 'tenant_id'])
+            ->wherePivotNull('deleted_at')
+            ->withTimestamps()
+            ->using(RouteTask::class);
     }
 }

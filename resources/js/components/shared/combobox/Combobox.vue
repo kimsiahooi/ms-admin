@@ -52,7 +52,7 @@ onUnmounted(() => {
         <PopoverTrigger as-child>
             <Button
                 variant="outline"
-                class="w-full justify-between font-normal"
+                class="flex-1 justify-between font-normal"
                 ref="buttonEl"
                 :class="[options.length ? 'cursor-pointer' : 'cursor-not-allowed']"
                 :disabled="!options.length"

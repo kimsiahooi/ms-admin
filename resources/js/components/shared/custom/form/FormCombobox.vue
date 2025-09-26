@@ -38,17 +38,20 @@ const existingErrors = computed(() => props.errorKey && findErrors(props.errorKe
         >
             {{ label }}:
         </Label>
-        <Combobox
-            v-bind="$attrs"
-            :options="options"
-            :placeholder="computedPlaceholder"
-            :command-placeholder="commandPlaceholder"
-            v-model:model-value="model"
-            :class="{
-                '!border-destructive': error || existingErrors,
-                '!text-muted-foreground': (Array.isArray(model) && !model.length) || !model,
-            }"
-        />
+        <div class="flex items-center gap-2">
+            <Combobox
+                v-bind="$attrs"
+                :options="options"
+                :placeholder="computedPlaceholder"
+                :command-placeholder="commandPlaceholder"
+                v-model:model-value="model"
+                :class="{
+                    '!border-destructive': error || existingErrors,
+                    '!text-muted-foreground': (Array.isArray(model) && !model.length) || !model,
+                }"
+            />
+            <slot />
+        </div>
         <FormError :error="error" :error-key="errorKey" />
     </FormContainer>
 </template>

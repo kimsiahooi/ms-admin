@@ -1,4 +1,5 @@
 import type { BadgeVariants } from '@/components/shared/badge';
+import { Task } from '@/types/Tenant/plants/operations/tasks';
 
 export enum Status {
     ACTIVE = 'ACTIVE',
@@ -28,4 +29,16 @@ export interface Route {
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;
+}
+
+export interface RouteWithTasks extends Route {
+    tasks: (Task & {
+        pivot: {
+            id: string;
+            route_id: Route['id'];
+            task_id: Task['id'];
+            created_at: Date | null;
+            updated_at: Date | null;
+        };
+    })[];
 }
