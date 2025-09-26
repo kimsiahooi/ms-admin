@@ -128,7 +128,8 @@ class CustomerController extends Controller
 
         $customer->update($validated);
 
-        return back()->with('success', 'Customer updated successfully.');
+        return to_route('customers.index', ['tenant' => tenant('id')])
+            ->with('success', 'Customer updated successfully.');
     }
 
     /**

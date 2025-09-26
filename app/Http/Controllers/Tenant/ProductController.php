@@ -127,7 +127,8 @@ class ProductController extends Controller
 
         $product->update($validated);
 
-        return back()->with('success', 'Product updated successfully.');
+        return to_route('products.index', ['tenant' => tenant('id')])
+            ->with('success', 'Product updated successfully.');
     }
 
     /**

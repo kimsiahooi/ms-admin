@@ -132,7 +132,8 @@ class RouteController extends Controller
 
         $route->update($validated);
 
-        return back()->with('success', 'Route updated successfully.');
+        return to_route('routes.index', ['tenant' => tenant('id')])
+            ->with('success', 'Route updated successfully.');
     }
 
     /**

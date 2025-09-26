@@ -136,7 +136,8 @@ class CustomerBranchController extends Controller
 
         $branch->update($validated);
 
-        return back()->with('success', 'Branch updated successfully.');
+        return to_route('customers.branches.index', ['tenant' => tenant('id'), 'customer' => $customer->id])
+            ->with('success', 'Branch updated successfully.');
     }
 
     /**

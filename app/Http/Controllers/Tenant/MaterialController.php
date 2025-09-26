@@ -134,7 +134,8 @@ class MaterialController extends Controller
 
         $material->update($validated);
 
-        return back()->with('success', 'Material updated successfully.');
+        return to_route('materials.index', ['tenant' => tenant('id')])
+            ->with('success', 'Material updated successfully.');
     }
 
     /**

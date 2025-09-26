@@ -162,7 +162,8 @@ class ProductPresetController extends Controller
 
         $preset->update($validated);
 
-        return back()->with('success', 'Preset updated successfully.');
+        return to_route('products.presets.index', ['tenant' => tenant('id'), 'product' => $product->id])
+            ->with('success', 'Preset updated successfully.');
     }
 
     /**

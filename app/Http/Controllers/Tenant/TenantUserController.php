@@ -105,7 +105,8 @@ class TenantUserController extends Controller
 
         $user->update($validated);
 
-        return back()->with('success', 'User updated successfully.');
+        return to_route('users.index', ['tenant' => tenant('id')])
+            ->with('success', 'User updated successfully.');
     }
 
     /**

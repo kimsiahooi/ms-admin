@@ -140,7 +140,8 @@ class TaskController extends Controller
 
         $task->update($validated);
 
-        return back()->with('success', 'Task updated successfully.');
+        return to_route('plants.operations.tasks.index', ['tenant' => tenant('id'), 'plant' => $plant->id, 'operation' => $operation->id])
+            ->with('success', 'Task updated successfully.');
     }
 
     /**

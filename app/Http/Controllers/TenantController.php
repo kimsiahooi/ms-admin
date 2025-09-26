@@ -105,7 +105,8 @@ class TenantController extends Controller
 
         $tenant->update($validated);
 
-        return back()->with('success', 'Tenant updated successfully.');
+        return to_route('admin.tenants.index')
+            ->with('success', 'Tenant updated successfully.');
     }
 
     /**

@@ -170,7 +170,8 @@ class OperationTenantUserController extends Controller
             'status' => $validated['status'],
         ]);
 
-        return back()->with('success', 'User updated successfully.');
+        return to_route('plants.operations.users.index', ['tenant' => tenant('id'), 'plant' => $plant->id, 'operation' => $operation->id])
+            ->with('success', 'User updated successfully.');
     }
 
     /**

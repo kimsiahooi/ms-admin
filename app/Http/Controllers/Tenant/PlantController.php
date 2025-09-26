@@ -129,7 +129,8 @@ class PlantController extends Controller
 
         $plant->update($validated);
 
-        return back()->with('success', 'Plant updated successfully.');
+        return to_route('plants.index', ['tenant' => tenant('id')])
+            ->with('success', 'Plant updated successfully.');
     }
 
     /**

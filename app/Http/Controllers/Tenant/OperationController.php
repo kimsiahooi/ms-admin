@@ -135,7 +135,8 @@ class OperationController extends Controller
 
         $operation->update($validated);
 
-        return back()->with('success', 'Operation updated successfully.');
+        return to_route('plants.operations.index', ['tenant' => tenant('id'), 'plant' => $plant->id])
+            ->with('success', 'Operation updated successfully.');
     }
 
     /**

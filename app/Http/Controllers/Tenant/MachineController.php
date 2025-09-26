@@ -127,7 +127,8 @@ class MachineController extends Controller
 
         $machine->update($validated);
 
-        return back()->with('success', 'Machine updated successfully.');
+        return to_route('machines.index', ['tenant' => tenant('id')])
+            ->with('success', 'Machine updated successfully.');
     }
 
     /**
