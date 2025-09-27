@@ -143,8 +143,16 @@ watch(filterModel, (newFilter) => {
                     @update:model-value="entryHandler"
                 />
             </div>
-            <div class="space-x-2">
-                <Pagination :paginate-data="paginateData" />
+            <div class="flex flex-col items-center gap-x-8 gap-y-2 md:items-end xl:flex-row xl:items-center">
+                <div>
+                    <p class="text-muted-foreground">
+                        Showing {{ (paginateData.from ?? 0).toLocaleString() }} to {{ (paginateData.to ?? 0).toLocaleString() }} of
+                        {{ paginateData.total.toLocaleString() }} entries
+                    </p>
+                </div>
+                <div class="space-x-2">
+                    <Pagination :paginate-data="paginateData" />
+                </div>
             </div>
         </div>
     </div>
