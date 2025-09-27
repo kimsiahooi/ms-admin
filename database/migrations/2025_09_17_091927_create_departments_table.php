@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\Tenant\Plant\Operation\Status;
+use App\Enums\Tenant\Plant\Department\Status;
 use App\Models\Tenant;
 use App\Models\Tenant\Plant;
 use Illuminate\Database\Migrations\Migration;
@@ -14,7 +14,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('operations', function (Blueprint $table) {
+        Schema::create('departments', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->string('name');
             $table->string('code');
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('operations');
+        Schema::dropIfExists('departments');
     }
 };

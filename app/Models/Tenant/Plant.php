@@ -40,13 +40,13 @@ class Plant extends Model
         $query->where('status', Status::ACTIVE->value);
     }
 
-    public function operations(): HasMany
+    public function departments(): HasMany
     {
-        return $this->hasMany(Operation::class);
+        return $this->hasMany(Department::class);
     }
 
     public function tasks(): HasManyThrough
     {
-        return $this->hasManyThrough(Task::class, Operation::class);
+        return $this->hasManyThrough(Task::class, Department::class);
     }
 }

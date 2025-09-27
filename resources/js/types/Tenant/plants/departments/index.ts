@@ -1,5 +1,5 @@
 import type { BadgeVariants } from '@/components/shared/badge';
-import { Task } from '@/types/Tenant/plants/operations/tasks';
+import { Task } from '@/types/Tenant/plants/departments/tasks';
 
 export enum Status {
     ACTIVE = 'ACTIVE',
@@ -13,7 +13,7 @@ export const StatusLabel = {
 
 export type StatusBadgeLabel = (typeof StatusLabel)[Status];
 
-export interface Operation {
+export interface Department {
     readonly id: string;
     name: string;
     code: string;
@@ -31,6 +31,6 @@ export interface Operation {
     deleted_at: Date | null;
 }
 
-export interface OperationWithTasks extends Operation {
+export interface DepartmentWithTasks extends Department {
     tasks: Task[];
 }

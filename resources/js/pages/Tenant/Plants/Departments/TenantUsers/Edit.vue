@@ -1,17 +1,37 @@
 <script setup lang="ts">
+import { BadgeVariants } from '@/components/shared/badge';
 import { Card } from '@/components/shared/card';
 import { Layout } from '@/components/shared/custom/container';
-import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
+import { FormButton, FormCombobox, FormSwitch } from '@/components/shared/custom/form';
+import { SelectOption } from '@/components/shared/select';
 import type { SwitchOption } from '@/components/shared/switch';
 import { useTenant } from '@/composables/useTenant';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import { Status, StatusLabel, type Plant } from '@/types/Tenant/plants';
-import { Operation } from '@/types/Tenant/plants/operations';
-import { Task } from '@/types/Tenant/plants/operations/tasks';
+import { Department } from '@/types/Tenant/plants/departments';
+import { StatusBadgeLabel } from '@/types/Tenant/plants/departments/tenant-users';
+import { TenantUser } from '@/types/Tenant/tenant-users';
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
+
+interface PivotTenantUser {
+    readonly id: string;
+    status: {
+        value: Status;
+        badge?: {
+            name: StatusBadgeLabel | null;
+            variant: BadgeVariants['variant'];
+        } | null;
+        switch?: boolean | null;
+    };
+    tuser_id: TenantUser['id'];
+    department_id: Department['id'];
+    created_at: Date | null;
+    updated_at: Date | null;
+    user: TenantUser | null;
+}
 
 defineOptions({
     layout: AppMainLayout,
@@ -19,9 +39,12 @@ defineOptions({
 
 const props = defineProps<{
     plant: Plant;
-    operation: Operation;
-    task: Task;
+    department: Department;
+    user: PivotTenantUser;
     options: {
+        select: {
+            users: SelectOption<TenantUser['id']>[];
+        };
         switch: {
             statuses: SwitchOption[];
         };
@@ -44,28 +67,28 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
         href: '#',
     },
     {
-        title: 'Operations',
-        href: route('plants.operations.index', { tenant: tenant?.id || '', plant: props.plant.id }),
+        title: 'Departments',
+        href: route('plants.departments.index', { tenant: tenant?.id || '', plant: props.plant.id }),
     },
     {
-        title: props.operation.name,
+        title: props.department.name,
         href: '#',
     },
     {
-        title: 'Tasks',
-        href: route('plants.operations.tasks.index', { tenant: tenant?.id || '', plant: props.plant.id, operation: props.operation.id }),
+        title: 'Users',
+        href: route('plants.departments.users.index', { tenant: tenant?.id || '', plant: props.plant.id, department: props.department.id }),
     },
     {
-        title: props.task.name,
+        title: props.user.user?.name ?? '',
         href: '#',
     },
     {
         title: 'Edit',
-        href: route('plants.operations.tasks.edit', {
+        href: route('plants.departments.users.edit', {
             tenant: tenant?.id || '',
             plant: props.plant.id,
-            operation: props.operation.id,
-            task: props.task.id,
+            department: props.department.id,
+            user: props.user.id,
         }),
     },
 ]);
@@ -75,19 +98,17 @@ const statusDisplay = computed(
 );
 
 const form = useForm({
-    name: props.task.name,
-    code: props.task.code,
-    description: props.task.description || '',
-    status: props.task.status.switch ?? undefined,
+    user: props.user.user?.id,
+    status: props.user.status.switch ?? undefined,
 });
 
 const submit = () =>
     form.put(
-        route('plants.operations.tasks.update', {
+        route('plants.departments.users.update', {
             tenant: tenant?.id || '',
             plant: props.plant.id,
-            operation: props.operation.id,
-            task: props.task.id,
+            department: props.department.id,
+            user: props.user.id,
         }),
         {
             preserveScroll: true,
@@ -97,15 +118,19 @@ const submit = () =>
 </script>
 
 <template>
-    <Head :title="task.name" />
+    <Head :title="user.user?.name" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Layout>
             <form @submit.prevent="submit">
-                <Card :title="`Edit ${task.name}`">
-                    <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
-                    <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
-                    <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
+                <Card :title="`Edit ${user.user?.name}`">
+                    <FormCombobox
+                        :options="options.select.users"
+                        placeholder="Select User"
+                        label="User"
+                        v-model:model-value="form.user"
+                        :error="form.errors.user"
+                    />
                     <FormSwitch
                         v-if="form.status !== undefined"
                         :label="statusDisplay"

@@ -2,26 +2,26 @@
 
 namespace App\Http\Controllers\Tenant;
 
-use App\Enums\Tenant\Plant\Operation\TenantUser\Status;
+use App\Enums\Tenant\Plant\Department\TenantUser\Status;
 use App\Http\Controllers\Controller;
-use App\Models\Tenant\Operation;
-use App\Models\Tenant\OperationTenantUser;
+use App\Models\Tenant\Department;
+use App\Models\Tenant\DepartmentTenantUser;
 use App\Models\Tenant\Plant;
 use App\Models\Tenant\TenantUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
-class OperationTenantUserController extends Controller
+class DepartmentTenantUserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request, Plant $plant, Operation $operation)
+    public function index(Request $request, Plant $plant, Department $department)
     {
         $entries = $request->input('entries', 10);
 
-        $users = $operation->users()
+        $users = $department->users()
             ->when(
                 $request->search,
                 fn(Builder $query, $search) =>
@@ -35,7 +35,7 @@ class OperationTenantUserController extends Controller
                 $request->status,
                 fn(Builder $query, $status) =>
                 $query->whereHas(
-                    'operations',
+                    'departments',
                     fn() => $query->whereIn('status', $status)
                 )
             )
@@ -43,9 +43,9 @@ class OperationTenantUserController extends Controller
             ->paginate($entries)
             ->withQueryString();
 
-        return inertia('Tenant/Plants/Operations/TenantUsers/Index', [
+        return inertia('Tenant/Plants/Departments/TenantUsers/Index', [
             'plant' => $plant,
-            'operation' => $operation,
+            'department' => $department,
             'users' => $users,
             'options' => [
                 'select' => [
@@ -66,7 +66,7 @@ class OperationTenantUserController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request, Plant $plant, Operation $operation)
+    public function create(Request $request, Plant $plant, Department $department)
     {
         //
     }
@@ -74,7 +74,7 @@ class OperationTenantUserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Plant $plant, Operation $operation)
+    public function store(Request $request, Plant $plant, Department $department)
     {
         $validated = $request->validate([
             'user' => [
@@ -82,12 +82,12 @@ class OperationTenantUserController extends Controller
                 Rule::exists('tenant_users', 'id')
                     ->withoutTrashed()
                     ->where('tenant_id', $plant->id)
-                    ->where('tenant_id', $operation->id)
+                    ->where('tenant_id', $department->id)
                     ->where('tenant_id', tenant('id')),
-                Rule::unique('operation_tenant_user', 'tuser_id')
-                    ->where('operation_id', $operation->id)
+                Rule::unique('department_tenant_user', 'tuser_id')
+                    ->where('department_id', $department->id)
                     ->where('tenant_id', $plant->id)
-                    ->where('tenant_id', $operation->id)
+                    ->where('tenant_id', $department->id)
                     ->where('tenant_id', tenant('id'))
             ],
             'status' => ['required', 'boolean'],
@@ -95,7 +95,7 @@ class OperationTenantUserController extends Controller
 
         $validated['status'] = Status::toggleStatus($validated['status']);
 
-        $operation->users()->attach([
+        $department->users()->attach([
             $validated['user'] => [
                 'status' => $validated['status']
             ]
@@ -107,7 +107,7 @@ class OperationTenantUserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, Plant $plant, Operation $operation, OperationTenantUser $user)
+    public function show(Request $request, Plant $plant, Department $department, DepartmentTenantUser $user)
     {
         //
     }
@@ -115,11 +115,11 @@ class OperationTenantUserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, Plant $plant, Operation $operation, OperationTenantUser $user)
+    public function edit(Request $request, Plant $plant, Department $department, DepartmentTenantUser $user)
     {
-        return inertia('Tenant/Plants/Operations/TenantUsers/Edit', [
+        return inertia('Tenant/Plants/Departments/TenantUsers/Edit', [
             'plant' => $plant,
-            'operation' => $operation,
+            'department' => $department,
             'user' => $user->load(['user']),
             'options' => [
                 'select' => [
@@ -139,7 +139,7 @@ class OperationTenantUserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Plant $plant, Operation $operation, OperationTenantUser $user)
+    public function update(Request $request, Plant $plant, Department $department, DepartmentTenantUser $user)
     {
         $validated = $request->validate([
             'user' => [
@@ -147,14 +147,14 @@ class OperationTenantUserController extends Controller
                 Rule::exists('tenant_users', 'id')
                     ->withoutTrashed()
                     ->where('tenant_id', $plant->id)
-                    ->where('tenant_id', $operation->id)
+                    ->where('tenant_id', $department->id)
                     ->where('tenant_id', $user->id)
                     ->where('tenant_id', tenant('id')),
-                Rule::unique('operation_tenant_user', 'tuser_id')
+                Rule::unique('department_tenant_user', 'tuser_id')
                     ->ignore($user->id)
-                    ->where('operation_id', $operation->id)
+                    ->where('department_id', $department->id)
                     ->where('tenant_id', $plant->id)
-                    ->where('tenant_id', $operation->id)
+                    ->where('tenant_id', $department->id)
                     ->where('tenant_id', $user->id)
                     ->where('tenant_id', tenant('id'))
             ],
@@ -170,21 +170,21 @@ class OperationTenantUserController extends Controller
             'status' => $validated['status'],
         ]);
 
-        return to_route('plants.operations.users.index', ['tenant' => tenant('id'), 'plant' => $plant->id, 'operation' => $operation->id])
+        return to_route('plants.departments.users.index', ['tenant' => tenant('id'), 'plant' => $plant->id, 'department' => $department->id])
             ->with('success', 'User updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Plant $plant, Operation $operation, OperationTenantUser $user)
+    public function destroy(Request $request, Plant $plant, Department $department, DepartmentTenantUser $user)
     {
         $user->delete();
 
         return back()->with('success', 'User detached successfully.');
     }
 
-    public function toggleStatus(Request $request, Plant $plant, Operation $operation, OperationTenantUser $user)
+    public function toggleStatus(Request $request, Plant $plant, Department $department, DepartmentTenantUser $user)
     {
         $validated = $request->validate([
             'status' => ['required', 'boolean'],

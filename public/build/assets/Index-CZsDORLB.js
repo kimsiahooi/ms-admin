@@ -1,1 +1,347 @@
-import{d as w,c as p,x as h,r as A,a as D,o as K,e as n,u as a,g as N,w as d,b as m,W as O,f as T,k as o,l as B,F as C}from"./app-DW3qUSpG.js";import{_ as E,a as k,b as L}from"./StatusSwitch.vue_vue_type_script_setup_true_lang-BR-Y-PE9.js";import{_ as P,a as F,b as R,e as W,p as j,c as b,P as M,d as q,T as z,u as G}from"./pickBy-NvTHZy8I.js";import{L as H}from"./index-Bi-HJBVM.js";import{_ as J}from"./FormError.vue_vue_type_script_setup_true_lang-1af55uzd.js";import{_ as Q}from"./FormCombobox.vue_vue_type_script_setup_true_lang-D8IKo5CC.js";import{_ as X}from"./FormSwitch.vue_vue_type_script_setup_true_lang-zC1jdb_M.js";import{_ as Y}from"./Dialog.vue_vue_type_script_setup_true_lang-CoKZHrq5.js";import{u as Z,_ as ee}from"./AppLayout.vue_vue_type_script_setup_true_lang-BgvfEKRj.js";import{_ as te}from"./AppMainLayout.vue_vue_type_script_setup_true_lang-o02Mcb03.js";import{S as ae,a as se}from"./index-BWts5uV5.js";import"./index-CgwL-eGe.js";import"./useForwardExpose-CvcD0Rb6.js";import"./Label.vue_vue_type_script_setup_true_lang-Mfd-XF4S.js";import"./Select.vue_vue_type_script_setup_true_lang-tA2CQygX.js";import"./RovingFocusGroup-RdfVjWf9.js";import"./BreadcrumbSeparator.vue_vue_type_script_setup_true_lang-vj4ZpyyN.js";import"./check-CxD0QyHG.js";import"./useFormControl-D4ksLBo0.js";import"./nullish-CHIgUVhi.js";import"./chevron-down-MWTkW-nX.js";import"./Switch.vue_vue_type_script_setup_true_lang-C_KlnxJK.js";import"./VisuallyHiddenInput-ChKgx7vy.js";import"./Input.vue_vue_type_script_setup_true_lang-JOJUwJ_8.js";import"./DialogTrigger.vue_vue_type_script_setup_true_lang-DCPYUlgw.js";import"./AppLogoIcon.vue_vue_type_script_setup_true_lang-DsKetNlE.js";const oe={class:"space-y-3"},re={class:"flex flex-wrap items-center justify-end gap-2"},Oe=w({layout:te,__name:"Index",props:{plant:{},operation:{},users:{},options:{}},setup(g){const r=g,{tenant:t}=Z(),{formatDateTime:_}=G(),c=p(()=>route().params),u=h({search:c.value.search,entries:c.value.entries||"10",status:c.value.status}),f=A({create:{dialogIsOpen:!1}}),y=p(()=>[{title:"Dashboard",href:route("dashboard",{tenant:(t==null?void 0:t.id)||""})},{title:"Plants",href:route("plants.index",{tenant:(t==null?void 0:t.id)||""})},{title:r.plant.name,href:"#"},{title:"Operations",href:route("plants.operations.index",{tenant:(t==null?void 0:t.id)||"",plant:r.plant.id})},{title:r.operation.name,href:"#"},{title:"Users",href:route("plants.operations.users.index",{tenant:(t==null?void 0:t.id)||"",plant:r.plant.id,operation:r.operation.id})}]),v=()=>O.visit(route("plants.operations.users.index",{...j(u.data()),tenant:(t==null?void 0:t.id)||"",plant:r.plant.id,operation:r.operation.id}),{preserveScroll:!0,preserveState:!0}),S=()=>{u.reset(),v()},$=[{accessorKey:"actions",header:()=>o("div",null,"Actions"),cell:({row:s})=>{const e=s.original;return o("div",{class:"flex items-center gap-2"},[o(k,{value:e.pivot.status.switch,method:"put",href:route("plants.operations.users.toggleStatus",{tenant:(t==null?void 0:t.id)||"",plant:r.plant.id,operation:r.operation.id,user:e.pivot.id})}),o(b,{text:"Edit",href:route("plants.operations.users.edit",{tenant:(t==null?void 0:t.id)||"",plant:r.plant.id,operation:r.operation.id,user:e.pivot.id}),icon:M}),o(q,{title:`Detach ${e.name}`,route:route("plants.operations.users.destroy",{tenant:(t==null?void 0:t.id)||"",plant:r.plant.id,operation:r.operation.id,user:e.pivot.id}),description:"Are you sure you want to detach?",buttonLabel:"Detach",asChild:!1},()=>o(b,{variant:"destructive",text:"Detach",icon:z}))])}},{accessorKey:"status",header:()=>o("div",null,"Status"),cell:({row:s})=>{const{pivot:e}=s.original;return o(L,{statusBadge:e.status.badge})}},{accessorKey:"id",header:()=>o("div",null,"Id"),cell:({row:s})=>o("div",null,s.getValue("id"))},{accessorKey:"user name",header:()=>o("div",null,"User Name"),cell:({row:s})=>{const{name:e}=s.original;return o("div",null,e)}},{accessorKey:"user email",header:()=>o("div",null,"User Email"),cell:({row:s})=>{const{email:e}=s.original;return o("div",null,e)}},{accessorKey:"created_at",header:()=>o("div",null,"Created At"),cell:({row:s})=>{const{pivot:e}=s.original;return o("div",null,_(e.created_at)||"")}},{accessorKey:"updated_at",header:()=>o("div",null,"Updated At"),cell:({row:s})=>{const{pivot:e}=s.original;return o("div",null,_(e.updated_at)||"")}}],U={id:!1},x=p(()=>{var s;return!!((s=r.options.switch.statuses.find(e=>e.is_default))!=null&&s.value)}),V=p(()=>{var s;return((s=r.options.switch.statuses.find(e=>e.value===i.status))==null?void 0:s.name)??ae[se.INACTIVE]}),i=h({user:"",status:x.value}),I=()=>i.post(route("plants.operations.users.store",{tenant:(t==null?void 0:t.id)||"",plant:r.plant.id,operation:r.operation.id}),{preserveScroll:!0,preserveState:!0,onSuccess:()=>{i.reset(),f.create.dialogIsOpen=!1}});return(s,e)=>(K(),D(C,null,[n(a(N),{title:"Users"}),n(ee,{breadcrumbs:y.value},{default:d(()=>[n(a(H),null,{default:d(()=>[m("div",oe,[n(a(P),{onSearch:v,onReset:S},{default:d(()=>[n(a(F),{label:"Name",placeholder:"Search ID, Name, Email","model-value":a(u).search,"onUpdate:modelValue":e[0]||(e[0]=l=>a(u).search=l)},null,8,["model-value"]),n(a(E),{label:"Status",placeholder:"Select Status",options:s.options.select.statuses,"model-value":a(u).status,"onUpdate:modelValue":e[1]||(e[1]=l=>a(u).status=l),multiple:""},null,8,["options","model-value"])]),_:1}),m("div",re,[n(a(Y),{title:"Attach User",open:f.create.dialogIsOpen,"onUpdate:open":e[4]||(e[4]=l=>f.create.dialogIsOpen=l),"trigger-label":"Attach"},{default:d(()=>[m("form",{onSubmit:T(I,["prevent"]),class:"space-y-4"},[n(a(Q),{options:s.options.select.users,placeholder:"Select User",label:"User","model-value":a(i).user,"onUpdate:modelValue":e[2]||(e[2]=l=>a(i).user=l),error:a(i).errors.user},null,8,["options","model-value","error"]),n(a(X),{label:V.value,error:a(i).errors.status,"model-value":a(i).status,"onUpdate:modelValue":e[3]||(e[3]=l=>a(i).status=l)},null,8,["label","error","model-value"]),n(a(J),{type:"submit",label:"Attach",disabled:a(i).processing,loading:a(i).processing},null,8,["disabled","loading"])],32)]),_:1},8,["open"])]),m("div",null,[n(a(R),{"model-value":a(u),"onUpdate:modelValue":e[5]||(e[5]=l=>B(u)?u.value=l:null),columns:$,"paginate-data":s.users,"column-visibility":U,"entry-options":a(W),onSearch:v},null,8,["model-value","paginate-data","entry-options"])])])]),_:1})]),_:1},8,["breadcrumbs"])],64))}});export{Oe as default};
+import {
+    r as A,
+    u as a,
+    l as B,
+    F as C,
+    a as D,
+    w as d,
+    x as h,
+    o as K,
+    b as m,
+    e as n,
+    g as N,
+    W as O,
+    k as o,
+    c as p,
+    f as T,
+    d as w,
+} from './app-DW3qUSpG.js';
+import { _ as ee, u as Z } from './AppLayout.vue_vue_type_script_setup_true_lang-BgvfEKRj.js';
+import './AppLogoIcon.vue_vue_type_script_setup_true_lang-DsKetNlE.js';
+import { _ as te } from './AppMainLayout.vue_vue_type_script_setup_true_lang-o02Mcb03.js';
+import './BreadcrumbSeparator.vue_vue_type_script_setup_true_lang-vj4ZpyyN.js';
+import './check-CxD0QyHG.js';
+import './chevron-down-MWTkW-nX.js';
+import { _ as Y } from './Dialog.vue_vue_type_script_setup_true_lang-CoKZHrq5.js';
+import './DialogTrigger.vue_vue_type_script_setup_true_lang-DCPYUlgw.js';
+import { _ as Q } from './FormCombobox.vue_vue_type_script_setup_true_lang-D8IKo5CC.js';
+import { _ as J } from './FormError.vue_vue_type_script_setup_true_lang-1af55uzd.js';
+import { _ as X } from './FormSwitch.vue_vue_type_script_setup_true_lang-zC1jdb_M.js';
+import { L as H } from './index-Bi-HJBVM.js';
+import { S as ae, a as se } from './index-BWts5uV5.js';
+import './index-CgwL-eGe.js';
+import './Input.vue_vue_type_script_setup_true_lang-JOJUwJ_8.js';
+import './Label.vue_vue_type_script_setup_true_lang-Mfd-XF4S.js';
+import './nullish-CHIgUVhi.js';
+import { c as b, a as F, u as G, p as j, P as M, _ as P, d as q, b as R, e as W, T as z } from './pickBy-NvTHZy8I.js';
+import './RovingFocusGroup-RdfVjWf9.js';
+import './Select.vue_vue_type_script_setup_true_lang-tA2CQygX.js';
+import { _ as E, a as k, b as L } from './StatusSwitch.vue_vue_type_script_setup_true_lang-BR-Y-PE9.js';
+import './Switch.vue_vue_type_script_setup_true_lang-C_KlnxJK.js';
+import './useFormControl-D4ksLBo0.js';
+import './useForwardExpose-CvcD0Rb6.js';
+import './VisuallyHiddenInput-ChKgx7vy.js';
+const oe = { class: 'space-y-3' },
+    re = { class: 'flex flex-wrap items-center justify-end gap-2' },
+    Oe = w({
+        layout: te,
+        __name: 'Index',
+        props: { plant: {}, department: {}, users: {}, options: {} },
+        setup(g) {
+            const r = g,
+                { tenant: t } = Z(),
+                { formatDateTime: _ } = G(),
+                c = p(() => route().params),
+                u = h({ search: c.value.search, entries: c.value.entries || '10', status: c.value.status }),
+                f = A({ create: { dialogIsOpen: !1 } }),
+                y = p(() => [
+                    { title: 'Dashboard', href: route('dashboard', { tenant: (t == null ? void 0 : t.id) || '' }) },
+                    { title: 'Plants', href: route('plants.index', { tenant: (t == null ? void 0 : t.id) || '' }) },
+                    { title: r.plant.name, href: '#' },
+                    {
+                        title: 'Departments',
+                        href: route('plants.departments.index', { tenant: (t == null ? void 0 : t.id) || '', plant: r.plant.id }),
+                    },
+                    { title: r.department.name, href: '#' },
+                    {
+                        title: 'Users',
+                        href: route('plants.departments.users.index', {
+                            tenant: (t == null ? void 0 : t.id) || '',
+                            plant: r.plant.id,
+                            department: r.department.id,
+                        }),
+                    },
+                ]),
+                v = () =>
+                    O.visit(
+                        route('plants.departments.users.index', {
+                            ...j(u.data()),
+                            tenant: (t == null ? void 0 : t.id) || '',
+                            plant: r.plant.id,
+                            department: r.department.id,
+                        }),
+                        { preserveScroll: !0, preserveState: !0 },
+                    ),
+                S = () => {
+                    u.reset(), v();
+                },
+                $ = [
+                    {
+                        accessorKey: 'actions',
+                        header: () => o('div', null, 'Actions'),
+                        cell: ({ row: s }) => {
+                            const e = s.original;
+                            return o('div', { class: 'flex items-center gap-2' }, [
+                                o(k, {
+                                    value: e.pivot.status.switch,
+                                    method: 'put',
+                                    href: route('plants.departments.users.toggleStatus', {
+                                        tenant: (t == null ? void 0 : t.id) || '',
+                                        plant: r.plant.id,
+                                        department: r.department.id,
+                                        user: e.pivot.id,
+                                    }),
+                                }),
+                                o(b, {
+                                    text: 'Edit',
+                                    href: route('plants.departments.users.edit', {
+                                        tenant: (t == null ? void 0 : t.id) || '',
+                                        plant: r.plant.id,
+                                        department: r.department.id,
+                                        user: e.pivot.id,
+                                    }),
+                                    icon: M,
+                                }),
+                                o(
+                                    q,
+                                    {
+                                        title: `Detach ${e.name}`,
+                                        route: route('plants.departments.users.destroy', {
+                                            tenant: (t == null ? void 0 : t.id) || '',
+                                            plant: r.plant.id,
+                                            department: r.department.id,
+                                            user: e.pivot.id,
+                                        }),
+                                        description: 'Are you sure you want to detach?',
+                                        buttonLabel: 'Detach',
+                                        asChild: !1,
+                                    },
+                                    () => o(b, { variant: 'destructive', text: 'Detach', icon: z }),
+                                ),
+                            ]);
+                        },
+                    },
+                    {
+                        accessorKey: 'status',
+                        header: () => o('div', null, 'Status'),
+                        cell: ({ row: s }) => {
+                            const { pivot: e } = s.original;
+                            return o(L, { statusBadge: e.status.badge });
+                        },
+                    },
+                    { accessorKey: 'id', header: () => o('div', null, 'Id'), cell: ({ row: s }) => o('div', null, s.getValue('id')) },
+                    {
+                        accessorKey: 'user name',
+                        header: () => o('div', null, 'User Name'),
+                        cell: ({ row: s }) => {
+                            const { name: e } = s.original;
+                            return o('div', null, e);
+                        },
+                    },
+                    {
+                        accessorKey: 'user email',
+                        header: () => o('div', null, 'User Email'),
+                        cell: ({ row: s }) => {
+                            const { email: e } = s.original;
+                            return o('div', null, e);
+                        },
+                    },
+                    {
+                        accessorKey: 'created_at',
+                        header: () => o('div', null, 'Created At'),
+                        cell: ({ row: s }) => {
+                            const { pivot: e } = s.original;
+                            return o('div', null, _(e.created_at) || '');
+                        },
+                    },
+                    {
+                        accessorKey: 'updated_at',
+                        header: () => o('div', null, 'Updated At'),
+                        cell: ({ row: s }) => {
+                            const { pivot: e } = s.original;
+                            return o('div', null, _(e.updated_at) || '');
+                        },
+                    },
+                ],
+                U = { id: !1 },
+                x = p(() => {
+                    var s;
+                    return !!((s = r.options.switch.statuses.find((e) => e.is_default)) != null && s.value);
+                }),
+                V = p(() => {
+                    var s;
+                    return ((s = r.options.switch.statuses.find((e) => e.value === i.status)) == null ? void 0 : s.name) ?? ae[se.INACTIVE];
+                }),
+                i = h({ user: '', status: x.value }),
+                I = () =>
+                    i.post(
+                        route('plants.departments.users.store', {
+                            tenant: (t == null ? void 0 : t.id) || '',
+                            plant: r.plant.id,
+                            department: r.department.id,
+                        }),
+                        {
+                            preserveScroll: !0,
+                            preserveState: !0,
+                            onSuccess: () => {
+                                i.reset(), (f.create.dialogIsOpen = !1);
+                            },
+                        },
+                    );
+            return (s, e) => (
+                K(),
+                D(
+                    C,
+                    null,
+                    [
+                        n(a(N), { title: 'Users' }),
+                        n(
+                            ee,
+                            { breadcrumbs: y.value },
+                            {
+                                default: d(() => [
+                                    n(a(H), null, {
+                                        default: d(() => [
+                                            m('div', oe, [
+                                                n(
+                                                    a(P),
+                                                    { onSearch: v, onReset: S },
+                                                    {
+                                                        default: d(() => [
+                                                            n(
+                                                                a(F),
+                                                                {
+                                                                    label: 'Name',
+                                                                    placeholder: 'Search ID, Name, Email',
+                                                                    'model-value': a(u).search,
+                                                                    'onUpdate:modelValue': e[0] || (e[0] = (l) => (a(u).search = l)),
+                                                                },
+                                                                null,
+                                                                8,
+                                                                ['model-value'],
+                                                            ),
+                                                            n(
+                                                                a(E),
+                                                                {
+                                                                    label: 'Status',
+                                                                    placeholder: 'Select Status',
+                                                                    options: s.options.select.statuses,
+                                                                    'model-value': a(u).status,
+                                                                    'onUpdate:modelValue': e[1] || (e[1] = (l) => (a(u).status = l)),
+                                                                    multiple: '',
+                                                                },
+                                                                null,
+                                                                8,
+                                                                ['options', 'model-value'],
+                                                            ),
+                                                        ]),
+                                                        _: 1,
+                                                    },
+                                                ),
+                                                m('div', re, [
+                                                    n(
+                                                        a(Y),
+                                                        {
+                                                            title: 'Attach User',
+                                                            open: f.create.dialogIsOpen,
+                                                            'onUpdate:open': e[4] || (e[4] = (l) => (f.create.dialogIsOpen = l)),
+                                                            'trigger-label': 'Attach',
+                                                        },
+                                                        {
+                                                            default: d(() => [
+                                                                m(
+                                                                    'form',
+                                                                    { onSubmit: T(I, ['prevent']), class: 'space-y-4' },
+                                                                    [
+                                                                        n(
+                                                                            a(Q),
+                                                                            {
+                                                                                options: s.options.select.users,
+                                                                                placeholder: 'Select User',
+                                                                                label: 'User',
+                                                                                'model-value': a(i).user,
+                                                                                'onUpdate:modelValue': e[2] || (e[2] = (l) => (a(i).user = l)),
+                                                                                error: a(i).errors.user,
+                                                                            },
+                                                                            null,
+                                                                            8,
+                                                                            ['options', 'model-value', 'error'],
+                                                                        ),
+                                                                        n(
+                                                                            a(X),
+                                                                            {
+                                                                                label: V.value,
+                                                                                error: a(i).errors.status,
+                                                                                'model-value': a(i).status,
+                                                                                'onUpdate:modelValue': e[3] || (e[3] = (l) => (a(i).status = l)),
+                                                                            },
+                                                                            null,
+                                                                            8,
+                                                                            ['label', 'error', 'model-value'],
+                                                                        ),
+                                                                        n(
+                                                                            a(J),
+                                                                            {
+                                                                                type: 'submit',
+                                                                                label: 'Attach',
+                                                                                disabled: a(i).processing,
+                                                                                loading: a(i).processing,
+                                                                            },
+                                                                            null,
+                                                                            8,
+                                                                            ['disabled', 'loading'],
+                                                                        ),
+                                                                    ],
+                                                                    32,
+                                                                ),
+                                                            ]),
+                                                            _: 1,
+                                                        },
+                                                        8,
+                                                        ['open'],
+                                                    ),
+                                                ]),
+                                                m('div', null, [
+                                                    n(
+                                                        a(R),
+                                                        {
+                                                            'model-value': a(u),
+                                                            'onUpdate:modelValue': e[5] || (e[5] = (l) => (B(u) ? (u.value = l) : null)),
+                                                            columns: $,
+                                                            'paginate-data': s.users,
+                                                            'column-visibility': U,
+                                                            'entry-options': a(W),
+                                                            onSearch: v,
+                                                        },
+                                                        null,
+                                                        8,
+                                                        ['model-value', 'paginate-data', 'entry-options'],
+                                                    ),
+                                                ]),
+                                            ]),
+                                        ]),
+                                        _: 1,
+                                    }),
+                                ]),
+                                _: 1,
+                            },
+                            8,
+                            ['breadcrumbs'],
+                        ),
+                    ],
+                    64,
+                )
+            );
+        },
+    });
+export { Oe as default };

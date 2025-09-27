@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Tenant;
 
-use App\Enums\Tenant\Plant\Operation\Task\Status;
+use App\Enums\Tenant\Plant\Department\Task\Status;
 use App\Http\Controllers\Controller;
-use App\Models\Tenant\Operation;
+use App\Models\Tenant\Department;
 use App\Models\Tenant\Plant;
 use App\Models\Tenant\Task;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,11 +16,11 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request, Plant $plant, Operation $operation)
+    public function index(Request $request, Plant $plant, Department $department)
     {
         $entries = $request->input('entries', 10);
 
-        $tasks = $operation->tasks()->when(
+        $tasks = $department->tasks()->when(
             $request->search,
             fn(Builder $query, $search) =>
             $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
@@ -33,9 +33,9 @@ class TaskController extends Controller
             ->paginate($entries)
             ->withQueryString();
 
-        return inertia('Tenant/Plants/Operations/Tasks/Index', [
+        return inertia('Tenant/Plants/Departments/Tasks/Index', [
             'plant' => $plant,
-            'operation' => $operation,
+            'department' => $department,
             'tasks' => $tasks,
             'options' => [
                 'select' => [
@@ -51,7 +51,7 @@ class TaskController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request, Plant $plant, Operation $operation)
+    public function create(Request $request, Plant $plant, Department $department)
     {
         //
     }
@@ -59,7 +59,7 @@ class TaskController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Plant $plant, Operation $operation)
+    public function store(Request $request, Plant $plant, Department $department)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -69,9 +69,9 @@ class TaskController extends Controller
                 'alpha_dash',
                 'max:255',
                 Rule::unique('tasks')
-                    ->where('operation_id', $operation->id)
+                    ->where('department_id', $department->id)
                     ->where('tenant_id', $plant->tenant_id)
-                    ->where('tenant_id', $operation->tenant_id)
+                    ->where('tenant_id', $department->tenant_id)
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
@@ -80,7 +80,7 @@ class TaskController extends Controller
 
         $validated['status'] = Status::toggleStatus($validated['status']);
 
-        $operation->tasks()->create($validated);
+        $department->tasks()->create($validated);
 
         return back()->with('success', 'Task created successfully.');
     }
@@ -88,7 +88,7 @@ class TaskController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, Plant $plant, Operation $operation, Task $task)
+    public function show(Request $request, Plant $plant, Department $department, Task $task)
     {
         //
     }
@@ -96,11 +96,11 @@ class TaskController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, Plant $plant, Operation $operation, Task $task)
+    public function edit(Request $request, Plant $plant, Department $department, Task $task)
     {
-        return inertia('Tenant/Plants/Operations/Tasks/Edit', [
+        return inertia('Tenant/Plants/Departments/Tasks/Edit', [
             'plant' => $plant,
-            'operation' => $operation,
+            'department' => $department,
             'task' => $task,
             'options' => [
                 'switch' => [
@@ -113,7 +113,7 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Plant $plant, Operation $operation, Task $task)
+    public function update(Request $request, Plant $plant, Department $department, Task $task)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -124,9 +124,9 @@ class TaskController extends Controller
                 'max:255',
                 Rule::unique('tasks')
                     ->ignore($task->id)
-                    ->where('operation_id', $operation->id)
+                    ->where('department_id', $department->id)
                     ->where('tenant_id', $plant->tenant_id)
-                    ->where('tenant_id', $operation->tenant_id)
+                    ->where('tenant_id', $department->tenant_id)
                     ->where('tenant_id', $task->tenant_id)
                     ->where('tenant_id', tenant('id'))
             ],
@@ -140,21 +140,21 @@ class TaskController extends Controller
 
         $task->update($validated);
 
-        return to_route('plants.operations.tasks.index', ['tenant' => tenant('id'), 'plant' => $plant->id, 'operation' => $operation->id])
+        return to_route('plants.departments.tasks.index', ['tenant' => tenant('id'), 'plant' => $plant->id, 'department' => $department->id])
             ->with('success', 'Task updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Plant $plant, Operation $operation, Task $task)
+    public function destroy(Request $request, Plant $plant, Department $department, Task $task)
     {
         $task->delete();
 
         return back()->with('success', 'Task deleted successfully.');
     }
 
-    public function toggleStatus(Request $request, Plant $plant, Operation $operation, Task $task)
+    public function toggleStatus(Request $request, Plant $plant, Department $department, Task $task)
     {
         $validated = $request->validate([
             'status' => ['required', 'boolean'],

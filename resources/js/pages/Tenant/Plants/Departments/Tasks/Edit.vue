@@ -8,7 +8,8 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import { Status, StatusLabel, type Plant } from '@/types/Tenant/plants';
-import { Operation } from '@/types/Tenant/plants/operations';
+import { Department } from '@/types/Tenant/plants/departments';
+import { Task } from '@/types/Tenant/plants/departments/tasks';
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -18,7 +19,8 @@ defineOptions({
 
 const props = defineProps<{
     plant: Plant;
-    operation: Operation;
+    department: Department;
+    task: Task;
     options: {
         switch: {
             statuses: SwitchOption[];
@@ -42,12 +44,29 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
         href: '#',
     },
     {
-        title: 'Operations',
-        href: route('plants.operations.index', { tenant: tenant?.id || '', plant: props.plant.id }),
+        title: 'Departments',
+        href: route('plants.departments.index', { tenant: tenant?.id || '', plant: props.plant.id }),
+    },
+    {
+        title: props.department.name,
+        href: '#',
+    },
+    {
+        title: 'Tasks',
+        href: route('plants.departments.tasks.index', { tenant: tenant?.id || '', plant: props.plant.id, department: props.department.id }),
+    },
+    {
+        title: props.task.name,
+        href: '#',
     },
     {
         title: 'Edit',
-        href: route('plants.operations.edit', { tenant: tenant?.id || '', plant: props.plant.id, operation: props.operation.id }),
+        href: route('plants.departments.tasks.edit', {
+            tenant: tenant?.id || '',
+            plant: props.plant.id,
+            department: props.department.id,
+            task: props.task.id,
+        }),
     },
 ]);
 
@@ -56,26 +75,34 @@ const statusDisplay = computed(
 );
 
 const form = useForm({
-    name: props.operation.name,
-    code: props.operation.code,
-    description: props.operation.description || '',
-    status: props.operation.status.switch ?? undefined,
+    name: props.task.name,
+    code: props.task.code,
+    description: props.task.description || '',
+    status: props.task.status.switch ?? undefined,
 });
 
 const submit = () =>
-    form.put(route('plants.operations.update', { tenant: tenant?.id || '', plant: props.plant.id, operation: props.operation.id }), {
-        preserveScroll: true,
-        preserveState: true,
-    });
+    form.put(
+        route('plants.departments.tasks.update', {
+            tenant: tenant?.id || '',
+            plant: props.plant.id,
+            department: props.department.id,
+            task: props.task.id,
+        }),
+        {
+            preserveScroll: true,
+            preserveState: true,
+        },
+    );
 </script>
 
 <template>
-    <Head :title="operation.name" />
+    <Head :title="task.name" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Layout>
             <form @submit.prevent="submit">
-                <Card :title="`Edit ${operation.name}`">
+                <Card :title="`Edit ${task.name}`">
                     <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
                     <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
                     <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />

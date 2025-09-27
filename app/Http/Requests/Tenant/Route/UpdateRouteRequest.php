@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Tenant\Route;
 
-use App\Enums\Tenant\Plant\Operation\Status as OperationStatus;
-use App\Enums\Tenant\Plant\Operation\Task\Status as TaskStatus;
+use App\Enums\Tenant\Plant\Department\Status as DepartmentStatus;
+use App\Enums\Tenant\Plant\Department\Task\Status as TaskStatus;
 use App\Enums\Tenant\Plant\Status as PlantStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -46,11 +46,11 @@ class UpdateRouteRequest extends FormRequest
                     ->where('status', PlantStatus::ACTIVE->value)
                     ->where('tenant_id', tenant('id'))
             ],
-            'tasks.*.operation_id' => [
+            'tasks.*.department_id' => [
                 'required',
-                Rule::exists('operations', 'id')
+                Rule::exists('departments', 'id')
                     ->withoutTrashed()
-                    ->where('status', OperationStatus::ACTIVE->value)
+                    ->where('status', DepartmentStatus::ACTIVE->value)
                     ->where('tenant_id', tenant('id'))
             ],
             'tasks.*.task_id' => [
@@ -68,7 +68,7 @@ class UpdateRouteRequest extends FormRequest
     {
         return [
             'tasks.*.plant_id' => 'plant',
-            'tasks.*.operation_id' => 'operation',
+            'tasks.*.department_id' => 'department',
             'tasks.*.task_id' => 'task',
         ];
     }

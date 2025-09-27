@@ -53,12 +53,12 @@ class TenantUser extends Authenticatable
         ];
     }
 
-    public function operations(): BelongsToMany
+    public function departments(): BelongsToMany
     {
-        return $this->belongsToMany(Operation::class, 'operation_tenant_user', 'tuser_id')
+        return $this->belongsToMany(Department::class, 'department_tenant_user', 'tuser_id')
             ->withPivot(['id', 'status', 'tenant_id'])
             ->wherePivotNull('deleted_at')
             ->withTimestamps()
-            ->using(OperationTenantUser::class);
+            ->using(DepartmentTenantUser::class);
     }
 }

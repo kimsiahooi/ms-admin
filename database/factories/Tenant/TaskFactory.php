@@ -2,8 +2,8 @@
 
 namespace Database\Factories\Tenant;
 
-use App\Enums\Tenant\Plant\Operation\Task\Status;
-use App\Models\Tenant\Operation;
+use App\Enums\Tenant\Plant\Department\Task\Status;
+use App\Models\Tenant\Department;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -20,15 +20,15 @@ class TaskFactory extends Factory
     public function definition(): array
     {
         $name = fake()->unique()->sentence(2);
-        $operation = Operation::inRandomOrder()->first();
+        $department = Department::inRandomOrder()->first();
 
         return [
             'name' => $name,
             'code' => Str::slug($name),
             'description' => fake()->sentence(),
             'status' => fake()->randomElement(Status::cases()),
-            'operation_id' => $operation->id,
-            'tenant_id' => $operation->tenant_id,
+            'department_id' => $department->id,
+            'tenant_id' => $department->tenant_id,
         ];
     }
 }

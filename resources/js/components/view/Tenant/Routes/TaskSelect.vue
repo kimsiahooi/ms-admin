@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 import { useUuid } from '@/composables/useUuid';
 import { Minus } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
-import { PlantWithOperationsWithTasks, TaskForm, TaskFormDataType } from '.';
+import { PlantWithDepartmentsWithTasks, TaskForm, TaskFormDataType } from '.';
 
 const props = defineProps<{
-    plants: PlantWithOperationsWithTasks[];
+    plants: PlantWithDepartmentsWithTasks[];
     totalSelected: number;
     currIndex: number;
 }>();
@@ -23,26 +23,26 @@ const emits = defineEmits<{
 const form = ref<TaskForm>({
     key: model.value?.key ?? uuid(),
     plant_id: model.value?.plant_id,
-    operation_id: model.value?.operation_id,
+    department_id: model.value?.department_id,
     task_id: model.value?.task_id,
 });
 
-const plantOptions = computed<SelectOption<PlantWithOperationsWithTasks['id']>[]>(() =>
+const plantOptions = computed<SelectOption<PlantWithDepartmentsWithTasks['id']>[]>(() =>
     props.plants.map((plant) => ({ name: plant.name, value: plant.id })),
 );
 
-const operationOptions = computed<SelectOption<PlantWithOperationsWithTasks['operations'][number]['id']>[]>(
+const departmentOptions = computed<SelectOption<PlantWithDepartmentsWithTasks['departments'][number]['id']>[]>(
     () =>
         props.plants
             .find((plant) => plant.id === form.value.plant_id)
-            ?.operations.map((operation) => ({ name: operation.name, value: operation.id })) ?? [],
+            ?.departments.map((department) => ({ name: department.name, value: department.id })) ?? [],
 );
 
-const taskOptions = computed<SelectOption<PlantWithOperationsWithTasks['operations'][number]['tasks'][number]['id']>[]>(
+const taskOptions = computed<SelectOption<PlantWithDepartmentsWithTasks['departments'][number]['tasks'][number]['id']>[]>(
     () =>
         props.plants
             .find((plant) => plant.id === form.value.plant_id)
-            ?.operations.find((operation) => operation.id === form.value.operation_id)
+            ?.departments.find((department) => department.id === form.value.department_id)
             ?.tasks.map((task) => ({ name: task.name, value: task.id })) ?? [],
 );
 
@@ -53,12 +53,12 @@ const remove = () => {
 watch(
     () => form.value.plant_id,
     () => {
-        form.value.operation_id = undefined;
+        form.value.department_id = undefined;
     },
 );
 
 watch(
-    () => form.value.operation_id,
+    () => form.value.department_id,
     () => {
         form.value.task_id = undefined;
     },
@@ -93,10 +93,10 @@ watch(
             </div>
             <div class="flex-1">
                 <FormCombobox
-                    label="Operation"
-                    :options="operationOptions"
-                    v-model:model-value="form.operation_id"
-                    :error-key="`tasks.${currIndex}.operation_id`"
+                    label="Department"
+                    :options="departmentOptions"
+                    v-model:model-value="form.department_id"
+                    :error-key="`tasks.${currIndex}.department_id`"
                 />
             </div>
             <div class="flex-1">

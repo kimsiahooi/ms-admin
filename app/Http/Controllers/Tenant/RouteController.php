@@ -51,7 +51,7 @@ class RouteController extends Controller
     {
         return inertia('Tenant/Routes/Create', [
             'plants' => Plant::active()
-                ->withWhereHas('operations', fn($query) =>
+                ->withWhereHas('departments', fn($query) =>
                 $query->active()->withWhereHas('tasks', fn($q) => $q->active()))
                 ->get(),
             'options' => [
@@ -94,10 +94,10 @@ class RouteController extends Controller
      */
     public function edit(Request $request, Route $route)
     {
-        $route->load(['tasks.operation.plant']);
+        $route->load(['tasks.department.plant']);
 
-        $plantIds     = $route->tasks->pluck('operation.plant_id')->filter()->unique();
-        $operationIds = $route->tasks->pluck('operation_id')->filter()->unique();
+        $plantIds     = $route->tasks->pluck('department.plant_id')->filter()->unique();
+        $departmentIds = $route->tasks->pluck('department_id')->filter()->unique();
         $taskIds      = $route->tasks->pluck('id');
 
         return inertia('Tenant/Routes/Edit', [
@@ -105,10 +105,10 @@ class RouteController extends Controller
             'plants' => Plant::where(fn($query) =>
             $query->active()->orWhere(fn($query) =>
             $query->whereIn('id', $plantIds)))
-                ->withWhereHas('operations', fn($query) =>
+                ->withWhereHas('departments', fn($query) =>
                 $query->where(fn($query) =>
                 $query->active()->orWhere(fn($query) =>
-                $query->whereIn('id', $operationIds)))
+                $query->whereIn('id', $departmentIds)))
                     ->withWhereHas('tasks', fn($query) =>
                     $query->active()->orWhere(fn($query) =>
                     $query->whereIn('id', $taskIds))))

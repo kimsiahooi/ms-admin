@@ -2,7 +2,7 @@
 
 namespace App\Models\Tenant;
 
-use App\Enums\Tenant\Plant\Operation\Task\Status;
+use App\Enums\Tenant\Plant\Department\Task\Status;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -19,7 +19,7 @@ class Task extends Model
     /** @use HasFactory<\Database\Factories\Tenant\TaskFactory> */
     use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
-    protected $fillable = ['name', 'code', 'description', 'status', 'operation_id', 'tenant_id'];
+    protected $fillable = ['name', 'code', 'description', 'status', 'department_id', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
@@ -40,9 +40,9 @@ class Task extends Model
         $query->where('status', Status::ACTIVE->value);
     }
 
-    public function operation(): BelongsTo
+    public function department(): BelongsTo
     {
-        return $this->belongsTo(Operation::class);
+        return $this->belongsTo(Department::class);
     }
 
     public function routes(): BelongsToMany

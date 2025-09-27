@@ -19,12 +19,11 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
 import type { Plant } from '@/types/Tenant/plants';
-import { Operation, Status, StatusLabel } from '@/types/Tenant/plants/operations';
-import { Task } from '@/types/Tenant/plants/operations/tasks';
+import { DepartmentWithTasks, Status, StatusLabel } from '@/types/Tenant/plants/departments';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { Pencil, Trash2 } from 'lucide-vue-next';
+import { ListTodo, Pencil, Trash2, Users } from 'lucide-vue-next';
 import slug from 'slug';
 import { computed, h, reactive, watch } from 'vue';
 
@@ -33,12 +32,11 @@ defineOptions({
 });
 
 const props = defineProps<{
+    departments: PaginateData<DepartmentWithTasks[]>;
     plant: Plant;
-    operation: Operation;
-    tasks: PaginateData<Task[]>;
     options: {
         select: {
-            statuses: SelectOption<Task['status']['value']>[];
+            statuses: SelectOption<DepartmentWithTasks['status']['value']>[];
         };
         switch: {
             statuses: SwitchOption[];
@@ -77,75 +75,54 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
         href: '#',
     },
     {
-        title: 'Operations',
-        href: route('plants.operations.index', { tenant: tenant?.id || '', plant: props.plant.id }),
-    },
-    {
-        title: props.operation.name,
-        href: '#',
-    },
-    {
-        title: 'Tasks',
-        href: route('plants.operations.tasks.index', { tenant: tenant?.id || '', plant: props.plant.id, operation: props.operation.id }),
+        title: 'Departments',
+        href: route('plants.departments.index', { tenant: tenant?.id || '', plant: props.plant.id }),
     },
 ]);
 
 const search = () =>
-    router.visit(
-        route('plants.operations.tasks.index', {
-            ...pickBy(filter.data()),
-            tenant: tenant?.id || '',
-            plant: props.plant.id,
-            operation: props.operation.id,
-        }),
-        {
-            preserveScroll: true,
-            preserveState: true,
-        },
-    );
+    router.visit(route('plants.departments.index', { ...pickBy(filter.data()), tenant: tenant?.id || '', plant: props.plant.id }), {
+        preserveScroll: true,
+        preserveState: true,
+    });
 const reset = () => {
     filter.reset();
     search();
 };
 
-const columns: ColumnDef<Task>[] = [
+const columns: ColumnDef<DepartmentWithTasks>[] = [
     {
         accessorKey: 'actions',
         header: () => h('div', null, 'Actions'),
         cell: ({ row }) => {
-            const task = row.original;
+            const department = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
                 h(StatusSwitch, {
-                    value: task.status.switch,
+                    value: department.status.switch,
                     method: 'put',
-                    href: route('plants.operations.tasks.toggleStatus', {
-                        tenant: tenant?.id || '',
-                        plant: props.plant.id,
-                        operation: props.operation.id,
-                        task: task.id,
-                    }),
+                    href: route('plants.departments.toggleStatus', { tenant: tenant?.id || '', plant: props.plant.id, department: department.id }),
                 }),
                 h(ActionButton, {
                     text: 'Edit',
-                    href: route('plants.operations.tasks.edit', {
-                        tenant: tenant?.id || '',
-                        plant: props.plant.id,
-                        operation: props.operation.id,
-                        task: task.id,
-                    }),
+                    href: route('plants.departments.edit', { tenant: tenant?.id || '', plant: props.plant.id, department: department.id }),
                     icon: Pencil,
+                }),
+                h(ActionButton, {
+                    text: 'Users',
+                    href: route('plants.departments.users.index', { tenant: tenant?.id || '', plant: props.plant.id, department: department.id }),
+                    icon: Users,
+                }),
+                h(ActionButton, {
+                    text: 'Tasks',
+                    href: route('plants.departments.tasks.index', { tenant: tenant?.id || '', plant: props.plant.id, department: department.id }),
+                    icon: ListTodo,
                 }),
                 h(
                     DeleteDialog,
                     {
-                        title: `Delete ${task.name}`,
-                        route: route('plants.operations.tasks.destroy', {
-                            tenant: tenant?.id || '',
-                            plant: props.plant.id,
-                            operation: props.operation.id,
-                            task: task.id,
-                        }),
+                        title: `Delete ${department.name}`,
+                        route: route('plants.departments.destroy', { tenant: tenant?.id || '', plant: props.plant.id, department: department.id }),
                         asChild: false,
                     },
                     () =>
@@ -199,7 +176,7 @@ const columns: ColumnDef<Task>[] = [
     },
 ];
 
-const columnVisibility: VisibilityState<Task> = {
+const columnVisibility: VisibilityState<DepartmentWithTasks> = {
     id: false,
     description: false,
 };
@@ -220,7 +197,7 @@ const form = useForm({
 });
 
 const submit = () =>
-    form.post(route('plants.operations.tasks.store', { tenant: tenant?.id || '', plant: props.plant.id, operation: props.operation.id }), {
+    form.post(route('plants.departments.store', { tenant: tenant?.id || '', plant: props.plant.id }), {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => {
@@ -238,7 +215,7 @@ watch(
 </script>
 
 <template>
-    <Head title="Tasks" />
+    <Head title="Departments" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Layout>
@@ -255,7 +232,7 @@ watch(
                 </FilterCard>
 
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Dialog title="Create Task" v-model:open="setting.create.dialogIsOpen">
+                    <Dialog title="Create Department" v-model:open="setting.create.dialogIsOpen">
                         <form @submit.prevent="submit" class="space-y-4">
                             <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
                             <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
@@ -269,7 +246,7 @@ watch(
                     <DataTable
                         v-model:model-value="filter"
                         :columns="columns"
-                        :paginate-data="tasks"
+                        :paginate-data="departments"
                         :column-visibility="columnVisibility"
                         :entry-options="entryOptions"
                         @search="search"

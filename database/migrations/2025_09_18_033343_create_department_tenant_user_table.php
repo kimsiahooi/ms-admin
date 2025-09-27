@@ -1,8 +1,8 @@
 <?php
 
-use App\Enums\Tenant\Plant\Operation\TenantUser\Status;
+use App\Enums\Tenant\Plant\Department\TenantUser\Status;
 use App\Models\Tenant;
-use App\Models\Tenant\Operation;
+use App\Models\Tenant\Department;
 use App\Models\Tenant\TenantUser;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -15,16 +15,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('operation_tenant_user', function (Blueprint $table) {
+        Schema::create('department_tenant_user', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->string('status')->default(Status::ACTIVE->value);
             $table->foreignIdFor(TenantUser::class, 'tuser_id')->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(Operation::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Department::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Tenant::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
 
-            $table->unique(['tuser_id', 'operation_id', 'tenant_id']);
+            $table->unique(['tuser_id', 'department_id', 'tenant_id']);
         });
     }
 
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('operation_tenant_user');
+        Schema::dropIfExists('department_tenant_user');
     }
 };

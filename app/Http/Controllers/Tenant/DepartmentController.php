@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Tenant;
 
-use App\Enums\Tenant\Plant\Operation\Status;
+use App\Enums\Tenant\Plant\Department\Status;
 use App\Http\Controllers\Controller;
-use App\Models\Tenant\Operation;
+use App\Models\Tenant\Department;
 use App\Models\Tenant\Plant;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
-class OperationController extends Controller
+class DepartmentController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,7 +19,7 @@ class OperationController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $operations = $plant->operations()->with(['tasks'])->when(
+        $departments = $plant->departments()->with(['tasks'])->when(
             $request->search,
             fn(Builder $query, $search) =>
             $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
@@ -32,8 +32,8 @@ class OperationController extends Controller
             ->paginate($entries)
             ->withQueryString();
 
-        return inertia('Tenant/Plants/Operations/Index', [
-            'operations' => $operations,
+        return inertia('Tenant/Plants/Departments/Index', [
+            'departments' => $departments,
             'plant' => $plant,
             'options' => [
                 'select' => [
@@ -66,7 +66,7 @@ class OperationController extends Controller
                 'string',
                 'alpha_dash',
                 'max:255',
-                Rule::unique('operations')
+                Rule::unique('departments')
                     ->where('plant_id', $plant->id)
                     ->where('tenant_id', $plant->tenant_id)
                     ->where('tenant_id', tenant('id'))
@@ -77,15 +77,15 @@ class OperationController extends Controller
 
         $validated['status'] = Status::toggleStatus($validated['status']);
 
-        $plant->operations()->create($validated);
+        $plant->departments()->create($validated);
 
-        return back()->with('success', 'Operation created successfully.');
+        return back()->with('success', 'Department created successfully.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Plant $plant, Operation $operation)
+    public function show(Plant $plant, Department $department)
     {
         //
     }
@@ -93,11 +93,11 @@ class OperationController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Plant $plant, Operation $operation)
+    public function edit(Plant $plant, Department $department)
     {
-        return inertia('Tenant/Plants/Operations/Edit', [
+        return inertia('Tenant/Plants/Departments/Edit', [
             'plant' => $plant,
-            'operation' => $operation,
+            'department' => $department,
             'options' => [
                 'switch' => [
                     'statuses' => Status::switchOptions(),
@@ -109,7 +109,7 @@ class OperationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Plant $plant, Operation $operation)
+    public function update(Request $request, Plant $plant, Department $department)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -118,11 +118,11 @@ class OperationController extends Controller
                 'string',
                 'alpha_dash',
                 'max:255',
-                Rule::unique('operations')
-                    ->ignore($operation->id)
+                Rule::unique('departments')
+                    ->ignore($department->id)
                     ->where('plant_id', $plant->id)
                     ->where('tenant_id', $plant->tenant_id)
-                    ->where('tenant_id', $operation->tenant_id)
+                    ->where('tenant_id', $department->tenant_id)
                     ->where('tenant_id', tenant('id'))
             ],
             'description' => ['nullable', 'string'],
@@ -133,23 +133,23 @@ class OperationController extends Controller
             $validated['status'] = Status::toggleStatus($validated['status']);
         }
 
-        $operation->update($validated);
+        $department->update($validated);
 
-        return to_route('plants.operations.index', ['tenant' => tenant('id'), 'plant' => $plant->id])
-            ->with('success', 'Operation updated successfully.');
+        return to_route('plants.departments.index', ['tenant' => tenant('id'), 'plant' => $plant->id])
+            ->with('success', 'Department updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Plant $plant, Operation $operation)
+    public function destroy(Plant $plant, Department $department)
     {
-        $operation->delete();
+        $department->delete();
 
-        return back()->with('success', 'Operation deleted successfully.');
+        return back()->with('success', 'Department deleted successfully.');
     }
 
-    public function toggleStatus(Request $request, Plant $plant, Operation $operation)
+    public function toggleStatus(Request $request, Plant $plant, Department $department)
     {
         $validated = $request->validate([
             'status' => ['required', 'boolean'],
@@ -157,8 +157,8 @@ class OperationController extends Controller
 
         $validated['status'] = Status::toggleStatus($validated['status']);
 
-        $operation->update($validated);
+        $department->update($validated);
 
-        return back()->with('success', 'Operation status updated successfully.');
+        return back()->with('success', 'Department status updated successfully.');
     }
 }

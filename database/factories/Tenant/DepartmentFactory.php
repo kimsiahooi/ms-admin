@@ -2,15 +2,15 @@
 
 namespace Database\Factories\Tenant;
 
-use App\Enums\Tenant\Plant\Operation\Status;
+use App\Enums\Tenant\Plant\Department\Status;
 use App\Models\Tenant\Plant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Tenant\Operation>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Tenant\Department>
  */
-class OperationFactory extends Factory
+class DepartmentFactory extends Factory
 {
     /**
      * Define the model's default state.

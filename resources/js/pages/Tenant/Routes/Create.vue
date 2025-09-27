@@ -5,7 +5,7 @@ import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/sh
 import { SwitchOption } from '@/components/shared/switch';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { PlantWithOperationsWithTasks, TaskFormDataType, TaskSelect } from '@/components/view/Tenant/Routes';
+import { PlantWithDepartmentsWithTasks, TaskFormDataType, TaskSelect } from '@/components/view/Tenant/Routes';
 import { useTenant } from '@/composables/useTenant';
 import { useUuid } from '@/composables/useUuid';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
@@ -22,7 +22,7 @@ defineOptions({
 });
 
 const props = defineProps<{
-    plants: PlantWithOperationsWithTasks[];
+    plants: PlantWithDepartmentsWithTasks[];
     options: {
         switch: {
             statuses: SwitchOption[];
@@ -71,7 +71,7 @@ const form = useForm<{
         {
             key: uuid(),
             plant_id: '',
-            operation_id: '',
+            department_id: '',
             task_id: '',
         },
     ],
@@ -92,7 +92,7 @@ const add = () => {
         {
             key: uuid(),
             plant_id: '',
-            operation_id: '',
+            department_id: '',
             task_id: '',
         },
     ];

@@ -18,7 +18,7 @@ import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
-import { PlantWithOperations, Status, StatusLabel } from '@/types/Tenant/plants';
+import { PlantWithDepartments, Status, StatusLabel } from '@/types/Tenant/plants';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
@@ -31,10 +31,10 @@ defineOptions({
 });
 
 const props = defineProps<{
-    plants: PaginateData<PlantWithOperations[]>;
+    plants: PaginateData<PlantWithDepartments[]>;
     options: {
         select: {
-            statuses: SelectOption<PlantWithOperations['status']['value']>[];
+            statuses: SelectOption<PlantWithDepartments['status']['value']>[];
         };
         switch: {
             statuses: SwitchOption[];
@@ -80,7 +80,7 @@ const reset = () => {
     search();
 };
 
-const columns: ColumnDef<PlantWithOperations>[] = [
+const columns: ColumnDef<PlantWithDepartments>[] = [
     {
         accessorKey: 'actions',
         header: () => h('div', null, 'Actions'),
@@ -99,8 +99,8 @@ const columns: ColumnDef<PlantWithOperations>[] = [
                     icon: Pencil,
                 }),
                 h(ActionButton, {
-                    text: 'Operations',
-                    href: route('plants.operations.index', { tenant: tenant?.id || '', plant: plant.id }),
+                    text: 'Departments',
+                    href: route('plants.departments.index', { tenant: tenant?.id || '', plant: plant.id }),
                     icon: Pickaxe,
                 }),
                 h(
@@ -166,7 +166,7 @@ const columns: ColumnDef<PlantWithOperations>[] = [
     },
 ];
 
-const columnVisibility: VisibilityState<PlantWithOperations> = {
+const columnVisibility: VisibilityState<PlantWithDepartments> = {
     id: false,
     description: false,
     address: false,

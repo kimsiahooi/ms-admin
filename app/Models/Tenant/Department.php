@@ -2,7 +2,7 @@
 
 namespace App\Models\Tenant;
 
-use App\Enums\Tenant\Plant\Operation\Status;
+use App\Enums\Tenant\Plant\Department\Status;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -15,9 +15,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
-class Operation extends Model
+class Department extends Model
 {
-    /** @use HasFactory<\Database\Factories\Tenant\OperationFactory> */
+    /** @use HasFactory<\Database\Factories\Tenant\DepartmentFactory> */
     use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
     protected $fillable = ['name', 'code', 'description', 'status', 'plant_id', 'tenant_id'];
@@ -53,10 +53,10 @@ class Operation extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(TenantUser::class, 'operation_tenant_user', 'operation_id', 'tuser_id')
+        return $this->belongsToMany(TenantUser::class, 'department_tenant_user', 'department_id', 'tuser_id')
             ->withPivot(['id', 'status', 'tenant_id'])
             ->wherePivotNull('deleted_at')
             ->withTimestamps()
-            ->using(OperationTenantUser::class);
+            ->using(DepartmentTenantUser::class);
     }
 }

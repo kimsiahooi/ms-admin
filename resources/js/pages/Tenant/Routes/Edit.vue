@@ -5,15 +5,15 @@ import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/sh
 import { SwitchOption } from '@/components/shared/switch';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { PlantWithOperationsWithTasks, TaskFormDataType, TaskSelect } from '@/components/view/Tenant/Routes';
+import { PlantWithDepartmentsWithTasks, TaskFormDataType, TaskSelect } from '@/components/view/Tenant/Routes';
 import { useTenant } from '@/composables/useTenant';
 import { useUuid } from '@/composables/useUuid';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
 import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import { Plant } from '@/types/Tenant/plants';
-import { Operation } from '@/types/Tenant/plants/operations';
-import { Task } from '@/types/Tenant/plants/operations/tasks';
+import { Department } from '@/types/Tenant/plants/departments';
+import { Task } from '@/types/Tenant/plants/departments/tasks';
 import { Route, Status, StatusLabel } from '@/types/Tenant/routes';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Plus } from 'lucide-vue-next';
@@ -28,9 +28,9 @@ interface CustomRoute extends Route {
             created_at: Date | null;
             updated_at: Date | null;
         };
-        operation_id: Operation['id'] | null;
-        operation:
-            | (Operation & {
+        department_id: Department['id'] | null;
+        department:
+            | (Department & {
                   plant_id: Plant['id'] | null;
                   plant: Plant | null;
               })
@@ -44,7 +44,7 @@ defineOptions({
 
 const props = defineProps<{
     route: CustomRoute;
-    plants: PlantWithOperationsWithTasks[];
+    plants: PlantWithDepartmentsWithTasks[];
     options: {
         switch: {
             statuses: SwitchOption[];
@@ -80,18 +80,18 @@ const statusDisplay = computed(
 
 const routeTaskData = computed(() =>
     props.route.tasks
-        .filter((task) => task.operation?.plant)
+        .filter((task) => task.department?.plant)
         .map((task) => ({
             key: uuid(),
-            plant_id: task.operation?.plant_id ?? undefined,
-            operation_id: task.operation_id ?? undefined,
+            plant_id: task.department?.plant_id ?? undefined,
+            department_id: task.department_id ?? undefined,
             task_id: task.id,
         })),
 );
 
 const defaultTaskData = {
     plant_id: '',
-    operation_id: '',
+    department_id: '',
     task_id: '',
 };
 

@@ -2,7 +2,7 @@
 
 namespace App\Models\Tenant;
 
-use App\Enums\Tenant\Plant\Operation\TenantUser\Status;
+use App\Enums\Tenant\Plant\Department\TenantUser\Status;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,11 +11,11 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
-class OperationTenantUser extends Pivot
+class DepartmentTenantUser extends Pivot
 {
     use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
-    protected $fillable = ['status', 'operation_id', 'tuser_id', 'tenant_id'];
+    protected $fillable = ['status', 'department_id', 'tuser_id', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 
@@ -35,8 +35,8 @@ class OperationTenantUser extends Pivot
         return $this->belongsTo(TenantUser::class, 'tuser_id');
     }
 
-    public function operation(): BelongsTo
+    public function department(): BelongsTo
     {
-        return $this->belongsTo(Operation::class);
+        return $this->belongsTo(Department::class);
     }
 }

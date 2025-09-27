@@ -1,8 +1,8 @@
 <?php
 
-use App\Enums\Tenant\Plant\Operation\Task\Status;
+use App\Enums\Tenant\Plant\Department\Task\Status;
 use App\Models\Tenant;
-use App\Models\Tenant\Operation;
+use App\Models\Tenant\Department;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -20,12 +20,12 @@ return new class extends Migration
             $table->string('code');
             $table->text('description')->nullable();
             $table->string('status')->default(Status::ACTIVE->value);
-            $table->foreignIdFor(Operation::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Department::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Tenant::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
 
-            $table->unique(['code', 'operation_id', 'tenant_id']);
+            $table->unique(['code', 'department_id', 'tenant_id']);
         });
     }
 

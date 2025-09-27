@@ -18,7 +18,7 @@ class PlantController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $plants = Plant::with(['operations'])->when(
+        $plants = Plant::with(['departments'])->when(
             $request->search,
             fn(Builder $query, $search) =>
             $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")

@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { BadgeVariants, StatusBadge } from '@/components/shared/badge';
+import { StatusBadge } from '@/components/shared/badge';
 import { ActionButton } from '@/components/shared/custom/action';
 import { Layout } from '@/components/shared/custom/container';
 import { FilterCard, FilterInput, FilterSelect } from '@/components/shared/custom/filter';
-import { FormButton, FormCombobox, FormSwitch } from '@/components/shared/custom/form';
+import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/shared/custom/form';
 import { DeleteDialog, Dialog } from '@/components/shared/dialog';
 import type { PaginateData } from '@/components/shared/pagination';
 import type { SelectOption } from '@/components/shared/select';
-import { StatusSwitch, type SwitchOption } from '@/components/shared/switch';
+import type { SwitchOption } from '@/components/shared/switch';
+import { StatusSwitch } from '@/components/shared/switch';
 import type { VisibilityState } from '@/components/shared/table';
 import { DataTable } from '@/components/shared/table';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
@@ -18,32 +19,14 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
 import type { Plant } from '@/types/Tenant/plants';
-import { Operation, Status, StatusLabel } from '@/types/Tenant/plants/operations';
-import { StatusBadgeLabel } from '@/types/Tenant/plants/operations/tenant-users';
-import { TenantUser } from '@/types/Tenant/tenant-users';
+import { Department, Status, StatusLabel } from '@/types/Tenant/plants/departments';
+import { Task } from '@/types/Tenant/plants/departments/tasks';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
 import { Pencil, Trash2 } from 'lucide-vue-next';
-import { computed, h, reactive } from 'vue';
-
-type PivotTenantUser = TenantUser & {
-    pivot: {
-        readonly id: string;
-        status: {
-            value: Status;
-            badge?: {
-                name: StatusBadgeLabel | null;
-                variant: BadgeVariants['variant'];
-            } | null;
-            switch?: boolean | null;
-        };
-        tuser_id: TenantUser['id'];
-        operation_id: Operation['id'];
-        created_at: Date | null;
-        updated_at: Date | null;
-    };
-};
+import slug from 'slug';
+import { computed, h, reactive, watch } from 'vue';
 
 defineOptions({
     layout: AppMainLayout,
@@ -51,12 +34,11 @@ defineOptions({
 
 const props = defineProps<{
     plant: Plant;
-    operation: Operation;
-    users: PaginateData<PivotTenantUser[]>;
+    department: Department;
+    tasks: PaginateData<Task[]>;
     options: {
         select: {
-            statuses: SelectOption<PivotTenantUser['pivot']['status']['value']>[];
-            users: SelectOption<TenantUser['id']>[];
+            statuses: SelectOption<Task['status']['value']>[];
         };
         switch: {
             statuses: SwitchOption[];
@@ -95,26 +77,26 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
         href: '#',
     },
     {
-        title: 'Operations',
-        href: route('plants.operations.index', { tenant: tenant?.id || '', plant: props.plant.id }),
+        title: 'Departments',
+        href: route('plants.departments.index', { tenant: tenant?.id || '', plant: props.plant.id }),
     },
     {
-        title: props.operation.name,
+        title: props.department.name,
         href: '#',
     },
     {
-        title: 'Users',
-        href: route('plants.operations.users.index', { tenant: tenant?.id || '', plant: props.plant.id, operation: props.operation.id }),
+        title: 'Tasks',
+        href: route('plants.departments.tasks.index', { tenant: tenant?.id || '', plant: props.plant.id, department: props.department.id }),
     },
 ]);
 
 const search = () =>
     router.visit(
-        route('plants.operations.users.index', {
+        route('plants.departments.tasks.index', {
             ...pickBy(filter.data()),
             tenant: tenant?.id || '',
             plant: props.plant.id,
-            operation: props.operation.id,
+            department: props.department.id,
         }),
         {
             preserveScroll: true,
@@ -126,52 +108,50 @@ const reset = () => {
     search();
 };
 
-const columns: ColumnDef<PivotTenantUser>[] = [
+const columns: ColumnDef<Task>[] = [
     {
         accessorKey: 'actions',
         header: () => h('div', null, 'Actions'),
         cell: ({ row }) => {
-            const user = row.original;
+            const task = row.original;
 
             return h('div', { class: 'flex items-center gap-2' }, [
                 h(StatusSwitch, {
-                    value: user.pivot.status.switch,
+                    value: task.status.switch,
                     method: 'put',
-                    href: route('plants.operations.users.toggleStatus', {
+                    href: route('plants.departments.tasks.toggleStatus', {
                         tenant: tenant?.id || '',
                         plant: props.plant.id,
-                        operation: props.operation.id,
-                        user: user.pivot.id,
+                        department: props.department.id,
+                        task: task.id,
                     }),
                 }),
                 h(ActionButton, {
                     text: 'Edit',
-                    href: route('plants.operations.users.edit', {
+                    href: route('plants.departments.tasks.edit', {
                         tenant: tenant?.id || '',
                         plant: props.plant.id,
-                        operation: props.operation.id,
-                        user: user.pivot.id,
+                        department: props.department.id,
+                        task: task.id,
                     }),
                     icon: Pencil,
                 }),
                 h(
                     DeleteDialog,
                     {
-                        title: `Detach ${user.name}`,
-                        route: route('plants.operations.users.destroy', {
+                        title: `Delete ${task.name}`,
+                        route: route('plants.departments.tasks.destroy', {
                             tenant: tenant?.id || '',
                             plant: props.plant.id,
-                            operation: props.operation.id,
-                            user: user.pivot.id,
+                            department: props.department.id,
+                            task: task.id,
                         }),
-                        description: 'Are you sure you want to detach?',
-                        buttonLabel: 'Detach',
                         asChild: false,
                     },
                     () =>
                         h(ActionButton, {
                             variant: 'destructive',
-                            text: 'Detach',
+                            text: 'Delete',
                             icon: Trash2,
                         }),
                 ),
@@ -182,9 +162,9 @@ const columns: ColumnDef<PivotTenantUser>[] = [
         accessorKey: 'status',
         header: () => h('div', null, 'Status'),
         cell: ({ row }) => {
-            const { pivot } = row.original;
+            const { status } = row.original;
 
-            return h(StatusBadge, { statusBadge: pivot.status.badge });
+            return h(StatusBadge, { statusBadge: status.badge });
         },
     },
     {
@@ -193,41 +173,35 @@ const columns: ColumnDef<PivotTenantUser>[] = [
         cell: ({ row }) => h('div', null, row.getValue('id')),
     },
     {
-        accessorKey: 'user name',
-        header: () => h('div', null, 'User Name'),
-        cell: ({ row }) => {
-            const { name } = row.original;
-            return h('div', null, name);
-        },
+        accessorKey: 'name',
+        header: () => h('div', null, 'Name'),
+        cell: ({ row }) => h('div', null, row.getValue('name')),
     },
     {
-        accessorKey: 'user email',
-        header: () => h('div', null, 'User Email'),
-        cell: ({ row }) => {
-            const { email } = row.original;
-            return h('div', null, email);
-        },
+        accessorKey: 'code',
+        header: () => h('div', null, 'Code'),
+        cell: ({ row }) => h('div', null, row.getValue('code')),
+    },
+    {
+        accessorKey: 'description',
+        header: () => h('div', null, 'Description'),
+        cell: ({ row }) => h('div', null, row.getValue('description')),
     },
     {
         accessorKey: 'created_at',
         header: () => h('div', null, 'Created At'),
-        cell: ({ row }) => {
-            const { pivot } = row.original;
-            return h('div', null, formatDateTime(pivot.created_at) || '');
-        },
+        cell: ({ row }) => h('div', null, formatDateTime(row.getValue('created_at')) || ''),
     },
     {
         accessorKey: 'updated_at',
         header: () => h('div', null, 'Updated At'),
-        cell: ({ row }) => {
-            const { pivot } = row.original;
-            return h('div', null, formatDateTime(pivot.updated_at) || '');
-        },
+        cell: ({ row }) => h('div', null, formatDateTime(row.getValue('updated_at')) || ''),
     },
 ];
 
-const columnVisibility: VisibilityState<PivotTenantUser> = {
+const columnVisibility: VisibilityState<Task> = {
     id: false,
+    description: false,
 };
 
 const defaultStatus = computed<(typeof props.options.switch.statuses)[number]['value']>(
@@ -239,12 +213,14 @@ const statusDisplay = computed(
 );
 
 const form = useForm({
-    user: '',
+    name: '',
+    code: '',
+    description: '',
     status: defaultStatus.value,
 });
 
 const submit = () =>
-    form.post(route('plants.operations.users.store', { tenant: tenant?.id || '', plant: props.plant.id, operation: props.operation.id }), {
+    form.post(route('plants.departments.tasks.store', { tenant: tenant?.id || '', plant: props.plant.id, department: props.department.id }), {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => {
@@ -252,37 +228,40 @@ const submit = () =>
             setting.create.dialogIsOpen = false;
         },
     });
+
+watch(
+    () => form.name,
+    (newName) => {
+        form.code = slug(newName);
+    },
+);
 </script>
 
 <template>
-    <Head title="Users" />
+    <Head title="Tasks" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Layout>
             <div class="space-y-3">
                 <FilterCard @search="search" @reset="reset">
-                    <FilterInput label="Name" placeholder="Search ID, Name, Email" v-model:model-value="filter.search" />
+                    <FilterInput label="Name" placeholder="Search ID, Name, Code" v-model:model-value="filter.search" />
                     <FilterSelect
                         label="Status"
                         placeholder="Select Status"
                         :options="options.select.statuses"
-                        v-model:model-value="filter.status"
                         multiple
+                        v-model:model-value="filter.status"
                     />
                 </FilterCard>
 
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Dialog title="Attach User" v-model:open="setting.create.dialogIsOpen" trigger-label="Attach">
+                    <Dialog title="Create Task" v-model:open="setting.create.dialogIsOpen">
                         <form @submit.prevent="submit" class="space-y-4">
-                            <FormCombobox
-                                :options="options.select.users"
-                                placeholder="Select User"
-                                label="User"
-                                v-model:model-value="form.user"
-                                :error="form.errors.user"
-                            />
+                            <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
+                            <FormInput label="Code" :error="form.errors.code" v-model:model-value="form.code" />
+                            <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
                             <FormSwitch :label="statusDisplay" :error="form.errors.status" v-model:model-value="form.status" />
-                            <FormButton type="submit" label="Attach" :disabled="form.processing" :loading="form.processing" />
+                            <FormButton type="submit" :disabled="form.processing" :loading="form.processing" />
                         </form>
                     </Dialog>
                 </div>
@@ -290,7 +269,7 @@ const submit = () =>
                     <DataTable
                         v-model:model-value="filter"
                         :columns="columns"
-                        :paginate-data="users"
+                        :paginate-data="tasks"
                         :column-visibility="columnVisibility"
                         :entry-options="entryOptions"
                         @search="search"

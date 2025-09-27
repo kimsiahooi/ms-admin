@@ -1,5 +1,5 @@
 import type { BadgeVariants } from '@/components/shared/badge';
-import { Task } from '@/types/Tenant/plants/operations/tasks';
+import { Task } from '@/types/Tenant/plants/departments/tasks';
 
 export enum Status {
     ACTIVE = 'ACTIVE',
