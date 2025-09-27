@@ -52,7 +52,7 @@ class BomController extends Controller
      */
     public function create(Request $request, Product $product)
     {
-        $materials = Material::all(['id', 'name', 'unit_type']);
+        $materials = Material::active()->get(['id', 'name', 'unit_type']);
 
         return inertia('Tenant/Products/Boms/Create', [
             'product' => $product,
@@ -106,7 +106,11 @@ class BomController extends Controller
      */
     public function edit(Request $request, Product $product, Bom $bom)
     {
-        $materials = Material::all(['id', 'name', 'unit_type']);
+        $materialIds = $bom->materials()->pluck('material_id');
+
+        $materials = Material::active()
+            ->orWhere(fn($query) => $query->whereIn('id', $materialIds))
+            ->get(['id', 'name', 'unit_type']);
 
         return inertia('Tenant/Products/Boms/Edit', [
             'product' => $product,

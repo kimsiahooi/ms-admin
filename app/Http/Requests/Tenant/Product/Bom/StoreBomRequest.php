@@ -4,7 +4,6 @@ namespace App\Http\Requests\Tenant\Product\Bom;
 
 use App\Enums\Tenant\Material\Status as MaterialStatus;
 use App\Enums\Tenant\Material\UnitType;
-use App\Enums\Tenant\Product\Bom\Status;
 use App\Models\Tenant\Material;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -59,19 +58,21 @@ class StoreBomRequest extends FormRequest
         ];
     }
 
-    public function withValidator(Validator $validator)
+    public function after(): array
     {
-        $validator->after(function (Validator $validator) {
-            foreach ($this->materials as $i => $material) {
-                $unitType = Material::where('id', $material['id'])->value('unit_type');
-                if ($unitType !== $material['unit_type']) {
-                    $validator->errors()->add(
-                        "materials.$i.unit_type",
-                        "Unit type must match the material's defined unit type."
-                    );
+        return [
+            function (Validator $validator) {
+                foreach ($this->materials as $i => $material) {
+                    $unitType = Material::where('id', $material['id'])->value('unit_type');
+                    if ($unitType !== $material['unit_type']) {
+                        $validator->errors()->add(
+                            "materials.$i.unit_type",
+                            "Unit type must match the material's defined unit type."
+                        );
+                    }
                 }
             }
-        });
+        ];
     }
 
     public function attributes(): array

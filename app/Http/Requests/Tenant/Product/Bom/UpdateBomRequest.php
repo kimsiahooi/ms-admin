@@ -60,19 +60,21 @@ class UpdateBomRequest extends FormRequest
         ];
     }
 
-    public function withValidator(Validator $validator)
+    public function after(): array
     {
-        $validator->after(function (Validator $validator) {
-            foreach ($this->materials as $i => $material) {
-                $unitType = Material::where('id', $material['id'])->value('unit_type');
-                if ($unitType !== $material['unit_type']) {
-                    $validator->errors()->add(
-                        "materials.$i.unit_type",
-                        "Unit type must match the material's defined unit type."
-                    );
+        return [
+            function (Validator $validator) {
+                foreach ($this->materials as $i => $material) {
+                    $unitType = Material::where('id', $material['id'])->value('unit_type');
+                    if ($unitType !== $material['unit_type']) {
+                        $validator->errors()->add(
+                            "materials.$i.unit_type",
+                            "Unit type must match the material's defined unit type."
+                        );
+                    }
                 }
             }
-        });
+        ];
     }
 
     public function attributes(): array
