@@ -1,5 +1,5 @@
 import type { BadgeVariants } from '@/components/shared/badge';
-import { Task } from '@/types/Tenant/plants/departments/tasks';
+import { Operation } from '@/types/Tenant/plants/departments/operations';
 
 export enum Status {
     ACTIVE = 'ACTIVE',
@@ -31,6 +31,6 @@ export interface Department {
     deleted_at: Date | null;
 }
 
-export interface DepartmentWithTasks extends Department {
-    tasks: Task[];
+export interface DepartmentWithOperations extends Department {
+    operations: Operation[];
 }

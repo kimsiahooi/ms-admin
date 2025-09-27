@@ -1,19 +1,19 @@
 import { FormDataType } from '@/types';
 import { Plant } from '@/types/Tenant/plants';
-import { Department, DepartmentWithTasks } from '@/types/Tenant/plants/departments';
-import { Task } from '@/types/Tenant/plants/departments/tasks';
+import { Department, DepartmentWithOperations } from '@/types/Tenant/plants/departments';
+import { Operation } from '@/types/Tenant/plants/departments/operations';
 
-export { default as TaskSelect } from './TaskSelect.vue';
+export { default as OperationSelect } from './OperationSelect.vue';
 
-export interface TaskForm {
+export interface OperationForm {
     readonly key: string;
     plant_id?: Plant['id'];
     department_id?: Department['id'];
-    task_id?: Task['id'];
+    operation_id?: Operation['id'];
 }
 
-export type TaskFormDataType = TaskForm & FormDataType;
+export type OperationFormDataType = OperationForm & FormDataType;
 
-export interface PlantWithDepartmentsWithTasks extends Plant {
-    departments: DepartmentWithTasks[];
+export interface PlantWithDepartmentsWithOperations extends Plant {
+    departments: DepartmentWithOperations[];
 }

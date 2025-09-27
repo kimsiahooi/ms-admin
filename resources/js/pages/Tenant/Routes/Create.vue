@@ -5,7 +5,7 @@ import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/sh
 import { SwitchOption } from '@/components/shared/switch';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { PlantWithDepartmentsWithTasks, TaskFormDataType, TaskSelect } from '@/components/view/Tenant/Routes';
+import { OperationFormDataType, OperationSelect, PlantWithDepartmentsWithOperations } from '@/components/view/Tenant/Routes';
 import { useTenant } from '@/composables/useTenant';
 import { useUuid } from '@/composables/useUuid';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
@@ -22,7 +22,7 @@ defineOptions({
 });
 
 const props = defineProps<{
-    plants: PlantWithDepartmentsWithTasks[];
+    plants: PlantWithDepartmentsWithOperations[];
     options: {
         switch: {
             statuses: SwitchOption[];
@@ -61,18 +61,18 @@ const form = useForm<{
     code: string;
     description: string;
     status: boolean;
-    tasks: TaskFormDataType[];
+    operations: OperationFormDataType[];
 }>({
     name: '',
     code: '',
     description: '',
     status: defaultStatus.value,
-    tasks: [
+    operations: [
         {
             key: uuid(),
             plant_id: '',
             department_id: '',
-            task_id: '',
+            operation_id: '',
         },
     ],
 });
@@ -87,19 +87,19 @@ const submit = () =>
     });
 
 const add = () => {
-    form.tasks = [
-        ...form.tasks,
+    form.operations = [
+        ...form.operations,
         {
             key: uuid(),
             plant_id: '',
             department_id: '',
-            task_id: '',
+            operation_id: '',
         },
     ];
 };
 
 const remove = (key: string) => {
-    form.tasks = form.tasks.filter((task) => task.key !== key);
+    form.operations = form.operations.filter((operation) => operation.key !== key);
 };
 
 watch(
@@ -122,22 +122,22 @@ watch(
                     <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
                     <div class="space-y-3">
                         <div>
-                            <Label class="mb-1">Tasks:</Label>
+                            <Label class="mb-1">Operations:</Label>
                         </div>
                         <div class="space-y-3">
-                            <div v-for="(task, index) in form.tasks" :key="task.key" class="space-y-1">
-                                <TaskSelect
-                                    :key="task.key"
+                            <div v-for="(operation, index) in form.operations" :key="operation.key" class="space-y-1">
+                                <OperationSelect
+                                    :key="operation.key"
                                     :plants="plants"
-                                    :total-selected="form.tasks.length"
+                                    :total-selected="form.operations.length"
                                     :curr-index="index"
-                                    v-model:model-value="form.tasks[index]"
+                                    v-model:model-value="form.operations[index]"
                                     @remove="remove"
                                 />
                             </div>
                         </div>
                         <div class="flex items-center justify-center">
-                            <Button type="button" class="cursor-pointer" variant="outline" @click="add"><Plus /> Add Task</Button>
+                            <Button type="button" class="cursor-pointer" variant="outline" @click="add"><Plus /> Add Operation</Button>
                         </div>
                     </div>
                     <FormSwitch

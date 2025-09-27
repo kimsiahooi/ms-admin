@@ -24,7 +24,7 @@ use App\Http\Controllers\Tenant\ProductPriceController;
 use App\Http\Controllers\Tenant\RouteController;
 use App\Http\Controllers\Tenant\Settings\PasswordController;
 use App\Http\Controllers\Tenant\Settings\ProfileController;
-use App\Http\Controllers\Tenant\TaskController;
+use App\Http\Controllers\Tenant\OperationController;
 use App\Http\Controllers\Tenant\TenantUserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -122,15 +122,15 @@ Route::middleware([
                     Route::match(['put', 'patch'], 'toggleStatus', [DepartmentTenantUserController::class, 'toggleStatus'])->name('toggleStatus');
                 });
 
-                Route::prefix('tasks/{task}')->name('tasks.')->group(function () {
-                    Route::match(['put', 'patch'], 'toggleStatus', [TaskController::class, 'toggleStatus'])->name('toggleStatus');
+                Route::prefix('operations/{operation}')->name('operations.')->group(function () {
+                    Route::match(['put', 'patch'], 'toggleStatus', [OperationController::class, 'toggleStatus'])->name('toggleStatus');
                 });
             });
         });
         Route::resource('plants', PlantController::class)->except(['create', 'show']);
         Route::resource('plants.departments', DepartmentController::class)->except(['create', 'show']);
         Route::resource('plants.departments.users', DepartmentTenantUserController::class)->except(['create', 'show']);
-        Route::resource('plants.departments.tasks', TaskController::class)->except(['create', 'show']);
+        Route::resource('plants.departments.operations', OperationController::class)->except(['create', 'show']);
 
         Route::prefix('machines/{machine}')->name('machines.')->group(function () {
             Route::match(['put', 'patch'], 'toggleStatus', [MachineController::class, 'toggleStatus'])->name('toggleStatus');

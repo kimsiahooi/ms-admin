@@ -46,9 +46,9 @@ class Department extends Model
         return $this->belongsTo(Plant::class);
     }
 
-    public function tasks(): HasMany
+    public function operations(): HasMany
     {
-        return $this->hasMany(Task::class);
+        return $this->hasMany(Operation::class);
     }
 
     public function users(): BelongsToMany

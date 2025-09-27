@@ -45,8 +45,8 @@ class Plant extends Model
         return $this->hasMany(Department::class);
     }
 
-    public function tasks(): HasManyThrough
+    public function operations(): HasManyThrough
     {
-        return $this->hasManyThrough(Task::class, Department::class);
+        return $this->hasManyThrough(Operation::class, Department::class);
     }
 }

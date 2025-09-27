@@ -19,7 +19,7 @@ class DepartmentController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $departments = $plant->departments()->with(['tasks'])->when(
+        $departments = $plant->departments()->with(['operations'])->when(
             $request->search,
             fn(Builder $query, $search) =>
             $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")

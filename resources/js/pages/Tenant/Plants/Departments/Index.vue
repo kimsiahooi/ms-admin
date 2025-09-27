@@ -19,7 +19,7 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import type { Filter } from '@/types/shared';
 import type { Plant } from '@/types/Tenant/plants';
-import { DepartmentWithTasks, Status, StatusLabel } from '@/types/Tenant/plants/departments';
+import { DepartmentWithOperations, Status, StatusLabel } from '@/types/Tenant/plants/departments';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
@@ -32,11 +32,11 @@ defineOptions({
 });
 
 const props = defineProps<{
-    departments: PaginateData<DepartmentWithTasks[]>;
+    departments: PaginateData<DepartmentWithOperations[]>;
     plant: Plant;
     options: {
         select: {
-            statuses: SelectOption<DepartmentWithTasks['status']['value']>[];
+            statuses: SelectOption<DepartmentWithOperations['status']['value']>[];
         };
         switch: {
             statuses: SwitchOption[];
@@ -90,7 +90,7 @@ const reset = () => {
     search();
 };
 
-const columns: ColumnDef<DepartmentWithTasks>[] = [
+const columns: ColumnDef<DepartmentWithOperations>[] = [
     {
         accessorKey: 'actions',
         header: () => h('div', null, 'Actions'),
@@ -114,8 +114,12 @@ const columns: ColumnDef<DepartmentWithTasks>[] = [
                     icon: Users,
                 }),
                 h(ActionButton, {
-                    text: 'Tasks',
-                    href: route('plants.departments.tasks.index', { tenant: tenant?.id || '', plant: props.plant.id, department: department.id }),
+                    text: 'Operations',
+                    href: route('plants.departments.operations.index', {
+                        tenant: tenant?.id || '',
+                        plant: props.plant.id,
+                        department: department.id,
+                    }),
                     icon: ListTodo,
                 }),
                 h(
@@ -176,7 +180,7 @@ const columns: ColumnDef<DepartmentWithTasks>[] = [
     },
 ];
 
-const columnVisibility: VisibilityState<DepartmentWithTasks> = {
+const columnVisibility: VisibilityState<DepartmentWithOperations> = {
     id: false,
     description: false,
 };

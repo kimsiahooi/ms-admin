@@ -34,10 +34,10 @@ class DatabaseSeeder extends Seeder
             CustomerBranchSeeder::class,
             PlantSeeder::class,
             DepartmentSeeder::class,
-            TaskSeeder::class,
+            OperationSeeder::class,
             DepartmentTenantUserSeeder::class,
             RouteSeeder::class,
-            RouteTaskSeeder::class,
+            OperationRouteSeeder::class,
         ]);
     }
 }

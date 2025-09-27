@@ -39,12 +39,12 @@ class Route extends Model
         $query->where('status', Status::ACTIVE->value);
     }
 
-    public function tasks(): BelongsToMany
+    public function operations(): BelongsToMany
     {
-        return $this->belongsToMany(Task::class)
+        return $this->belongsToMany(Operation::class)
             ->withPivot(['id', 'tenant_id'])
             ->wherePivotNull('deleted_at')
             ->withTimestamps()
-            ->using(RouteTask::class);
+            ->using(OperationRoute::class);
     }
 }

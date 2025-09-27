@@ -8,7 +8,7 @@ use App\Http\Requests\Tenant\Route\StoreRouteRequest;
 use App\Http\Requests\Tenant\Route\UpdateRouteRequest;
 use App\Models\Tenant\Plant;
 use App\Models\Tenant\Route;
-use App\Models\Tenant\RouteTask;
+use App\Models\Tenant\OperationRoute;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
@@ -52,7 +52,7 @@ class RouteController extends Controller
         return inertia('Tenant/Routes/Create', [
             'plants' => Plant::active()
                 ->withWhereHas('departments', fn($query) =>
-                $query->active()->withWhereHas('tasks', fn($q) => $q->active()))
+                $query->active()->withWhereHas('operations', fn($q) => $q->active()))
                 ->get(),
             'options' => [
                 'switch' => [
@@ -73,9 +73,9 @@ class RouteController extends Controller
 
         $route = Route::create($validated);
 
-        $tasks = collect($validated['tasks'])->pluck('task_id');
+        $operations = collect($validated['operations'])->pluck('operation_id');
 
-        $route->tasks()->sync($tasks);
+        $route->operations()->sync($operations);
 
         return to_route('routes.index', ['tenant' => tenant('id')])
             ->with('success', 'Route created successfully.');
@@ -94,11 +94,11 @@ class RouteController extends Controller
      */
     public function edit(Request $request, Route $route)
     {
-        $route->load(['tasks.department.plant']);
+        $route->load(['operations.department.plant']);
 
-        $plantIds     = $route->tasks->pluck('department.plant_id')->filter()->unique();
-        $departmentIds = $route->tasks->pluck('department_id')->filter()->unique();
-        $taskIds      = $route->tasks->pluck('id');
+        $plantIds     = $route->operations->pluck('department.plant_id')->filter()->unique();
+        $departmentIds = $route->operations->pluck('department_id')->filter()->unique();
+        $operationIds      = $route->operations->pluck('id');
 
         return inertia('Tenant/Routes/Edit', [
             'route' => $route,
@@ -109,9 +109,9 @@ class RouteController extends Controller
                 $query->where(fn($query) =>
                 $query->active()->orWhere(fn($query) =>
                 $query->whereIn('id', $departmentIds)))
-                    ->withWhereHas('tasks', fn($query) =>
+                    ->withWhereHas('operations', fn($query) =>
                     $query->active()->orWhere(fn($query) =>
-                    $query->whereIn('id', $taskIds))))
+                    $query->whereIn('id', $operationIds))))
                 ->get(),
             'options' => [
                 'switch' => [
@@ -134,14 +134,14 @@ class RouteController extends Controller
 
         $route->update($validated);
 
-        $tasks = collect($validated['tasks'])->pluck('task_id');
+        $operations = collect($validated['operations'])->pluck('operation_id');
 
-        RouteTask::onlyTrashed()
+        OperationRoute::onlyTrashed()
             ->where('route_id', $route->id)
-            ->whereIn('task_id', $tasks)
+            ->whereIn('operation_id', $operations)
             ->restore();
 
-        $route->tasks()->sync($tasks);
+        $route->operations()->sync($operations);
 
         return to_route('routes.index', ['tenant' => tenant('id')])
             ->with('success', 'Route updated successfully.');

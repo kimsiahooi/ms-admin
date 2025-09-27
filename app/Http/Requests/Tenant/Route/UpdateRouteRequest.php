@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Tenant\Route;
 
 use App\Enums\Tenant\Plant\Department\Status as DepartmentStatus;
-use App\Enums\Tenant\Plant\Department\Task\Status as TaskStatus;
+use App\Enums\Tenant\Plant\Department\Operation\Status as OperationStatus;
 use App\Enums\Tenant\Plant\Status as PlantStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -38,27 +38,27 @@ class UpdateRouteRequest extends FormRequest
             ],
             'description' => ['nullable', 'string'],
             'status' => ['required', 'boolean'],
-            'tasks' => ['required', 'array'],
-            'tasks.*.plant_id' => [
+            'operations' => ['required', 'array'],
+            'operations.*.plant_id' => [
                 'required',
                 Rule::exists('plants', 'id')
                     ->withoutTrashed()
                     ->where('status', PlantStatus::ACTIVE->value)
                     ->where('tenant_id', tenant('id'))
             ],
-            'tasks.*.department_id' => [
+            'operations.*.department_id' => [
                 'required',
                 Rule::exists('departments', 'id')
                     ->withoutTrashed()
                     ->where('status', DepartmentStatus::ACTIVE->value)
                     ->where('tenant_id', tenant('id'))
             ],
-            'tasks.*.task_id' => [
+            'operations.*.operation_id' => [
                 'required',
                 'distinct',
-                Rule::exists('tasks', 'id')
+                Rule::exists('operations', 'id')
                     ->withoutTrashed()
-                    ->where('status', TaskStatus::ACTIVE->value)
+                    ->where('status', OperationStatus::ACTIVE->value)
                     ->where('tenant_id', tenant('id'))
             ],
         ];
@@ -67,9 +67,9 @@ class UpdateRouteRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'tasks.*.plant_id' => 'plant',
-            'tasks.*.department_id' => 'department',
-            'tasks.*.task_id' => 'task',
+            'operations.*.plant_id' => 'plant',
+            'operations.*.department_id' => 'department',
+            'operations.*.operation_id' => 'operation',
         ];
     }
 }

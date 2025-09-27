@@ -5,7 +5,7 @@ import { FormButton, FormInput, FormSwitch, FormTextarea } from '@/components/sh
 import { SwitchOption } from '@/components/shared/switch';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { PlantWithDepartmentsWithTasks, TaskFormDataType, TaskSelect } from '@/components/view/Tenant/Routes';
+import { OperationFormDataType, OperationSelect, PlantWithDepartmentsWithOperations } from '@/components/view/Tenant/Routes';
 import { useTenant } from '@/composables/useTenant';
 import { useUuid } from '@/composables/useUuid';
 import AppLayout from '@/layouts/Tenant/AppLayout.vue';
@@ -13,18 +13,18 @@ import AppMainLayout from '@/layouts/Tenant/AppMainLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import { Plant } from '@/types/Tenant/plants';
 import { Department } from '@/types/Tenant/plants/departments';
-import { Task } from '@/types/Tenant/plants/departments/tasks';
+import { Operation } from '@/types/Tenant/plants/departments/operations';
 import { Route, Status, StatusLabel } from '@/types/Tenant/routes';
 import { Head, useForm } from '@inertiajs/vue3';
 import { Plus } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 interface CustomRoute extends Route {
-    tasks: (Task & {
+    operations: (Operation & {
         pivot: {
             id: string;
             route_id: Route['id'];
-            task_id: Task['id'];
+            operation_id: Operation['id'];
             created_at: Date | null;
             updated_at: Date | null;
         };
@@ -44,7 +44,7 @@ defineOptions({
 
 const props = defineProps<{
     route: CustomRoute;
-    plants: PlantWithDepartmentsWithTasks[];
+    plants: PlantWithDepartmentsWithOperations[];
     options: {
         switch: {
             statuses: SwitchOption[];
@@ -78,21 +78,21 @@ const statusDisplay = computed(
     () => props.options.switch.statuses.find((status) => status.value === form.status)?.name ?? StatusLabel[Status.INACTIVE],
 );
 
-const routeTaskData = computed(() =>
-    props.route.tasks
-        .filter((task) => task.department?.plant)
-        .map((task) => ({
+const operationRouteData = computed(() =>
+    props.route.operations
+        .filter((operation) => operation.department?.plant)
+        .map((operation) => ({
             key: uuid(),
-            plant_id: task.department?.plant_id ?? undefined,
-            department_id: task.department_id ?? undefined,
-            task_id: task.id,
+            plant_id: operation.department?.plant_id ?? undefined,
+            department_id: operation.department_id ?? undefined,
+            operation_id: operation.id,
         })),
 );
 
-const defaultTaskData = {
+const defaultOperationData = {
     plant_id: '',
     department_id: '',
-    task_id: '',
+    operation_id: '',
 };
 
 const form = useForm<{
@@ -100,13 +100,13 @@ const form = useForm<{
     code: CustomRoute['code'];
     description?: Exclude<CustomRoute['description'], null>;
     status?: boolean;
-    tasks: TaskFormDataType[];
+    operations: OperationFormDataType[];
 }>({
     name: props.route.name,
     code: props.route.code,
     description: props.route.description ?? undefined,
     status: props.route.status.switch ?? undefined,
-    tasks: routeTaskData.value.length ? routeTaskData.value : [{ key: uuid(), ...defaultTaskData }],
+    operations: operationRouteData.value.length ? operationRouteData.value : [{ key: uuid(), ...defaultOperationData }],
 });
 
 const submit = () =>
@@ -116,17 +116,17 @@ const submit = () =>
     });
 
 const add = () => {
-    form.tasks = [
-        ...form.tasks,
+    form.operations = [
+        ...form.operations,
         {
             key: uuid(),
-            ...defaultTaskData,
+            ...defaultOperationData,
         },
     ];
 };
 
 const remove = (key: string) => {
-    form.tasks = form.tasks.filter((task) => task.key !== key);
+    form.operations = form.operations.filter((operation) => operation.key !== key);
 };
 </script>
 
@@ -142,22 +142,22 @@ const remove = (key: string) => {
                     <FormTextarea label="Description" :error="form.errors.description" v-model:model-value="form.description" />
                     <div class="space-y-3">
                         <div>
-                            <Label class="mb-1">Tasks:</Label>
+                            <Label class="mb-1">Operations:</Label>
                         </div>
                         <div class="space-y-3">
-                            <div v-for="(task, index) in form.tasks" :key="task.key" class="space-y-1">
-                                <TaskSelect
-                                    :key="task.key"
+                            <div v-for="(operation, index) in form.operations" :key="operation.key" class="space-y-1">
+                                <OperationSelect
+                                    :key="operation.key"
                                     :plants="plants"
-                                    :total-selected="form.tasks.length"
+                                    :total-selected="form.operations.length"
                                     :curr-index="index"
-                                    v-model:model-value="form.tasks[index]"
+                                    v-model:model-value="form.operations[index]"
                                     @remove="remove"
                                 />
                             </div>
                         </div>
                         <div class="flex items-center justify-center">
-                            <Button type="button" class="cursor-pointer" variant="outline" @click="add"><Plus /> Add Task</Button>
+                            <Button type="button" class="cursor-pointer" variant="outline" @click="add"><Plus /> Add Operation</Button>
                         </div>
                     </div>
                     <FormSwitch
