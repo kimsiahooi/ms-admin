@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\BomRouteController;
 use App\Http\Controllers\Tenant\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Tenant\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Tenant\Auth\EmailVerificationNotificationController;
@@ -174,7 +175,12 @@ Route::middleware([
 
         Route::prefix('routes/{route}')->name('routes.')->group(function () {
             Route::match(['put', 'patch'], 'toggleStatus', [RouteController::class, 'toggleStatus'])->name('toggleStatus');
+
+            Route::prefix('boms/{bom}')->name('boms.')->group(function () {
+                Route::match(['put', 'patch'], 'toggleStatus', [BomRouteController::class, 'toggleStatus'])->name('toggleStatus');
+            });
         });
         Route::resource('routes', RouteController::class)->except(['show']);
+        Route::resource('routes.boms', BomRouteController::class)->except(['create', 'show']);;
     });
 });

@@ -96,9 +96,9 @@ class RouteController extends Controller
     {
         $route->load(['operations.department.plant']);
 
-        $plantIds     = $route->operations->pluck('department.plant_id')->filter()->unique();
+        $plantIds = $route->operations->pluck('department.plant_id')->filter()->unique();
         $departmentIds = $route->operations->pluck('department_id')->filter()->unique();
-        $operationIds      = $route->operations->pluck('id');
+        $operationIds = $route->operations->pluck('id');
 
         return inertia('Tenant/Routes/Edit', [
             'route' => $route,

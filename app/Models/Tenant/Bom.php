@@ -3,6 +3,8 @@
 namespace App\Models\Tenant;
 
 use App\Enums\Tenant\Product\Bom\Status;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -32,6 +34,12 @@ class Bom extends Model
         );
     }
 
+    #[Scope]
+    protected function active(Builder $query): void
+    {
+        $query->where('status', Status::ACTIVE->value);
+    }
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
@@ -44,5 +52,14 @@ class Bom extends Model
             ->wherePivotNull('deleted_at')
             ->withTimestamps()
             ->using(BomMaterial::class);
+    }
+
+    public function routes(): BelongsToMany
+    {
+        return $this->belongsToMany(Route::class)
+            ->withPivot(['id', 'status', 'tenant_id'])
+            ->wherePivotNull('deleted_at')
+            ->withTimestamps()
+            ->using(BomRoute::class);
     }
 }

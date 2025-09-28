@@ -47,4 +47,13 @@ class Route extends Model
             ->withTimestamps()
             ->using(OperationRoute::class);
     }
+
+    public function boms(): BelongsToMany
+    {
+        return $this->belongsToMany(Bom::class)
+            ->withPivot(['id', 'status', 'tenant_id'])
+            ->wherePivotNull('deleted_at')
+            ->withTimestamps()
+            ->using(BomRoute::class);
+    }
 }

@@ -36,7 +36,7 @@ class DepartmentTenantUserController extends Controller
                 fn(Builder $query, $status) =>
                 $query->whereHas(
                     'departments',
-                    fn() => $query->whereIn('status', $status)
+                    fn() => $query->whereIn('department_tenant_user.status', $status)
                 )
             )
             ->orderByPivot('created_at', 'desc')

@@ -17,7 +17,7 @@ class TenantUserSeeder extends Seeder
         $tenants = Tenant::all();
 
         foreach ($tenants as $tenant) {
-            TenantUser::factory(9999)->create([
+            TenantUser::factory(20)->create([
                 'tenant_id' => $tenant->id,
             ]);
         }

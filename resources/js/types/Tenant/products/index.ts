@@ -1,4 +1,5 @@
 import type { BadgeVariants } from '@/components/shared/badge';
+import { ProductBom } from '@/types/Tenant/products/boms';
 
 export enum Status {
     ACTIVE = 'ACTIVE',
@@ -28,4 +29,8 @@ export interface Product {
     created_at: Date | null;
     updated_at: Date | null;
     deleted_at: Date | null;
+}
+
+export interface ProductWithBoms extends Product {
+    boms: ProductBom[];
 }

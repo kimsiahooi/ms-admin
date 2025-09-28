@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
             DepartmentTenantUserSeeder::class,
             RouteSeeder::class,
             OperationRouteSeeder::class,
+            BomRouteSeeder::class,
         ]);
     }
 }

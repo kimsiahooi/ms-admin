@@ -21,7 +21,7 @@ import { Route } from '@/types/Tenant/routes';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { pickBy } from 'lodash-es';
-import { Pencil, Trash2 } from 'lucide-vue-next';
+import { Pencil, ScrollText, Trash2 } from 'lucide-vue-next';
 import { computed, h } from 'vue';
 
 defineOptions({
@@ -86,6 +86,11 @@ const columns: ColumnDef<Route>[] = [
                     text: 'Edit',
                     href: route('routes.edit', { tenant: tenant?.id || '', route: routing.id }),
                     icon: Pencil,
+                }),
+                h(ActionButton, {
+                    text: 'Boms',
+                    href: route('routes.boms.index', { tenant: tenant?.id || '', route: routing.id }),
+                    icon: ScrollText,
                 }),
                 h(
                     DeleteDialog,
