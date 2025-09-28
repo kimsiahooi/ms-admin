@@ -7,6 +7,7 @@ use App\Models\Tenant\Plant;
 use App\Models\Tenant\PlantTenantUser;
 use App\Models\Tenant\TenantUser;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -53,7 +54,10 @@ class TenantUserController extends Controller
                 'email',
                 'max:255',
                 Rule::unique('tenant_users')
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('tenant_id', tenant('id'))
+                    )
             ],
             'password' => ['required', 'string', 'min:8', 'max:20', 'confirmed'],
         ]);
@@ -66,7 +70,7 @@ class TenantUserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(TenantUser $user)
+    public function show()
     {
         //
     }
@@ -94,7 +98,11 @@ class TenantUserController extends Controller
                 'max:255',
                 Rule::unique('tenant_users')
                     ->ignore($user->id)
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('tenant_id', $user->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    )
             ],
             'password' => ['nullable', 'string', 'min:8', 'max:20', 'confirmed'],
         ]);

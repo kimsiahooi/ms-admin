@@ -8,6 +8,7 @@ use App\Models\Tenant\Department;
 use App\Models\Tenant\Plant;
 use App\Models\Tenant\Operation;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -22,12 +23,12 @@ class OperationController extends Controller
 
         $operations = $department->operations()->when(
             $request->search,
-            fn(Builder $query, $search) =>
+            fn(Builder $query, string $search) =>
             $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
         )
             ->when(
                 $request->status,
-                fn(Builder $query, $status) =>
+                fn(Builder $query, array $status) =>
                 $query->whereIn('status', $status)
             )->latest()
             ->paginate($entries)
@@ -51,7 +52,7 @@ class OperationController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request, Plant $plant, Department $department)
+    public function create()
     {
         //
     }
@@ -69,10 +70,14 @@ class OperationController extends Controller
                 'alpha_dash',
                 'max:255',
                 Rule::unique('operations')
-                    ->where('department_id', $department->id)
-                    ->where('tenant_id', $plant->tenant_id)
-                    ->where('tenant_id', $department->tenant_id)
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('department_id', $department->id)
+                            ->where('tenant_id', $plant->tenant_id)
+                            ->where('tenant_id', $department->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    )
+
             ],
             'description' => ['nullable', 'string'],
             'status' => ['required', 'boolean'],
@@ -88,7 +93,7 @@ class OperationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, Plant $plant, Department $department, Operation $operation)
+    public function show()
     {
         //
     }
@@ -96,7 +101,7 @@ class OperationController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, Plant $plant, Department $department, Operation $operation)
+    public function edit(Plant $plant, Department $department, Operation $operation)
     {
         return inertia('Tenant/Plants/Departments/Operations/Edit', [
             'plant' => $plant,
@@ -124,11 +129,14 @@ class OperationController extends Controller
                 'max:255',
                 Rule::unique('operations')
                     ->ignore($operation->id)
-                    ->where('department_id', $department->id)
-                    ->where('tenant_id', $plant->tenant_id)
-                    ->where('tenant_id', $department->tenant_id)
-                    ->where('tenant_id', $operation->tenant_id)
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('department_id', $department->id)
+                            ->where('tenant_id', $plant->tenant_id)
+                            ->where('tenant_id', $department->tenant_id)
+                            ->where('tenant_id', $operation->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    )
             ],
             'description' => ['nullable', 'string'],
             'status' => ['sometimes', 'boolean'],
@@ -147,7 +155,7 @@ class OperationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Plant $plant, Department $department, Operation $operation)
+    public function destroy(Plant $plant, Department $department, Operation $operation)
     {
         $operation->delete();
 

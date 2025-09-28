@@ -5,6 +5,7 @@ namespace App\Http\Requests\Tenant\Product\Bom;
 use App\Enums\Tenant\Material\Status as MaterialStatus;
 use App\Enums\Tenant\Material\UnitType;
 use App\Models\Tenant\Material;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -33,9 +34,12 @@ class StoreBomRequest extends FormRequest
                 'string',
                 'max:255',
                 Rule::unique('boms')
-                    ->where('product_id', $this->product->id)
-                    ->where('tenant_id', $this->product->tenant_id)
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(Builder $query) =>
+                        $query->where('product_id', $this->product->id)
+                            ->where('tenant_id', $this->product->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    )
             ],
             'description' => ['nullable', 'string'],
             'status' => ['required', 'boolean'],
@@ -45,9 +49,12 @@ class StoreBomRequest extends FormRequest
                 'distinct',
                 Rule::exists('materials')
                     ->withoutTrashed()
-                    ->where('status', MaterialStatus::ACTIVE->value)
-                    ->where('tenant_id', $this->product->tenant_id)
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(Builder $query) =>
+                        $query->where('status', MaterialStatus::ACTIVE->value)
+                            ->where('tenant_id', $this->product->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    )
 
             ],
             'materials.*.quantity' => ['required', 'numeric', 'decimal:0,2', 'min:0.01', 'max:999999.99'],

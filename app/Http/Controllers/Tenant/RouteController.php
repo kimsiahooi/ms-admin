@@ -23,12 +23,12 @@ class RouteController extends Controller
 
         $routes = Route::when(
             $request->search,
-            fn(Builder $query, $search) =>
+            fn(Builder $query, string $search) =>
             $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
         )
             ->when(
                 $request->status,
-                fn(Builder $query, $status) =>
+                fn(Builder $query, array $status) =>
                 $query->whereIn('status', $status)
             )->latest()
             ->paginate($entries)
@@ -47,7 +47,7 @@ class RouteController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create()
     {
         return inertia('Tenant/Routes/Create', [
             'plants' => Plant::active()
@@ -84,7 +84,7 @@ class RouteController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Route $route)
+    public function show()
     {
         //
     }
@@ -92,7 +92,7 @@ class RouteController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, Route $route)
+    public function edit(Route $route)
     {
         $route->load(['operations.department.plant']);
 
@@ -102,16 +102,32 @@ class RouteController extends Controller
 
         return inertia('Tenant/Routes/Edit', [
             'route' => $route,
-            'plants' => Plant::where(fn($query) =>
-            $query->active()->orWhere(fn($query) =>
-            $query->whereIn('id', $plantIds)))
-                ->withWhereHas('departments', fn($query) =>
-                $query->where(fn($query) =>
-                $query->active()->orWhere(fn($query) =>
-                $query->whereIn('id', $departmentIds)))
-                    ->withWhereHas('operations', fn($query) =>
-                    $query->active()->orWhere(fn($query) =>
-                    $query->whereIn('id', $operationIds))))
+            'plants' => Plant::where(
+                fn(Builder $query) =>
+                $query->active()->orWhere(
+                    fn(Builder $query) =>
+                    $query->whereIn('id', $plantIds)
+                )
+            )
+                ->withWhereHas(
+                    'departments',
+                    fn($query) =>
+                    $query->where(
+                        fn($query) =>
+                        $query->active()->orWhere(
+                            fn($query) =>
+                            $query->whereIn('id', $departmentIds)
+                        )
+                    )
+                        ->withWhereHas(
+                            'operations',
+                            fn($query) =>
+                            $query->active()->orWhere(
+                                fn($query) =>
+                                $query->whereIn('id', $operationIds)
+                            )
+                        )
+                )
                 ->get(),
             'options' => [
                 'switch' => [

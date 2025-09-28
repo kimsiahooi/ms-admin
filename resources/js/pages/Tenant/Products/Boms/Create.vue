@@ -90,7 +90,7 @@ const form = useForm<{
     code: string;
     description: string;
     materials: {
-        key: string;
+        readonly key: string;
         id: Material['id'] | '';
         quantity: number | '';
         unit_type: Material['unit_type'] | '';

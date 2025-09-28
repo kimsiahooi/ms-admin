@@ -9,6 +9,7 @@ use App\Models\Tenant\DepartmentTenantUser;
 use App\Models\Tenant\Plant;
 use App\Models\Tenant\TenantUser;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -24,7 +25,7 @@ class DepartmentTenantUserController extends Controller
         $users = $department->users()
             ->when(
                 $request->search,
-                fn(Builder $query, $search) =>
+                fn(Builder $query, string $search) =>
                 $query->whereAny(
                     ['tenant_users.id', 'tenant_users.name', 'tenant_users.email'],
                     'like',
@@ -33,10 +34,11 @@ class DepartmentTenantUserController extends Controller
             )
             ->when(
                 $request->status,
-                fn(Builder $query, $status) =>
+                fn(Builder $query, array $status) =>
                 $query->whereHas(
                     'departments',
-                    fn() => $query->whereIn('department_tenant_user.status', $status)
+                    fn() =>
+                    $query->whereIn('department_tenant_user.status', $status)
                 )
             )
             ->orderByPivot('created_at', 'desc')
@@ -51,10 +53,12 @@ class DepartmentTenantUserController extends Controller
                 'select' => [
                     'statuses' => Status::selectOptions(),
                     'users' => TenantUser::all(['id', 'name'])
-                        ->map(fn(TenantUser $user) => [
-                            'name' => $user->name,
-                            'value' => $user->id,
-                        ])
+                        ->map(
+                            fn(TenantUser $user) => [
+                                'name' => $user->name,
+                                'value' => $user->id,
+                            ]
+                        )
                 ],
                 'switch' => [
                     'statuses' => Status::switchOptions(),
@@ -66,7 +70,7 @@ class DepartmentTenantUserController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request, Plant $plant, Department $department)
+    public function create()
     {
         //
     }
@@ -81,14 +85,20 @@ class DepartmentTenantUserController extends Controller
                 'required',
                 Rule::exists('tenant_users', 'id')
                     ->withoutTrashed()
-                    ->where('tenant_id', $plant->id)
-                    ->where('tenant_id', $department->id)
-                    ->where('tenant_id', tenant('id')),
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('tenant_id', $plant->tenant_id)
+                            ->where('tenant_id', $department->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    ),
                 Rule::unique('department_tenant_user', 'tuser_id')
-                    ->where('department_id', $department->id)
-                    ->where('tenant_id', $plant->id)
-                    ->where('tenant_id', $department->id)
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('department_id', $department->id)
+                            ->where('tenant_id', $plant->tenant_id)
+                            ->where('tenant_id', $department->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    )
             ],
             'status' => ['required', 'boolean'],
         ]);
@@ -107,7 +117,7 @@ class DepartmentTenantUserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, Plant $plant, Department $department, DepartmentTenantUser $user)
+    public function show()
     {
         //
     }
@@ -115,7 +125,7 @@ class DepartmentTenantUserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, Plant $plant, Department $department, DepartmentTenantUser $user)
+    public function edit(Plant $plant, Department $department, DepartmentTenantUser $user)
     {
         return inertia('Tenant/Plants/Departments/TenantUsers/Edit', [
             'plant' => $plant,
@@ -124,10 +134,12 @@ class DepartmentTenantUserController extends Controller
             'options' => [
                 'select' => [
                     'users' => TenantUser::all(['id', 'name'])
-                        ->map(fn(TenantUser $user) => [
-                            'name' => $user->name,
-                            'value' => $user->id,
-                        ])
+                        ->map(
+                            fn(TenantUser $user) => [
+                                'name' => $user->name,
+                                'value' => $user->id,
+                            ]
+                        )
                 ],
                 'switch' => [
                     'statuses' => Status::switchOptions(),
@@ -146,17 +158,23 @@ class DepartmentTenantUserController extends Controller
                 'required',
                 Rule::exists('tenant_users', 'id')
                     ->withoutTrashed()
-                    ->where('tenant_id', $plant->id)
-                    ->where('tenant_id', $department->id)
-                    ->where('tenant_id', $user->id)
-                    ->where('tenant_id', tenant('id')),
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('tenant_id', $plant->tenant_id)
+                            ->where('tenant_id', $department->tenant_id)
+                            ->where('tenant_id', $user->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    ),
                 Rule::unique('department_tenant_user', 'tuser_id')
                     ->ignore($user->id)
-                    ->where('department_id', $department->id)
-                    ->where('tenant_id', $plant->id)
-                    ->where('tenant_id', $department->id)
-                    ->where('tenant_id', $user->id)
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('department_id', $department->id)
+                            ->where('tenant_id', $plant->tenant_id)
+                            ->where('tenant_id', $department->tenant_id)
+                            ->where('tenant_id', $user->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    )
             ],
             'status' => ['sometimes', 'boolean'],
         ]);
@@ -177,7 +195,7 @@ class DepartmentTenantUserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Plant $plant, Department $department, DepartmentTenantUser $user)
+    public function destroy(Plant $plant, Department $department, DepartmentTenantUser $user)
     {
         $user->delete();
 

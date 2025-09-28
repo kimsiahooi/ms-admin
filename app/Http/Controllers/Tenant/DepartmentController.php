@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Tenant\Department;
 use App\Models\Tenant\Plant;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -21,12 +22,12 @@ class DepartmentController extends Controller
 
         $departments = $plant->departments()->with(['operations'])->when(
             $request->search,
-            fn(Builder $query, $search) =>
+            fn(Builder $query, string $search) =>
             $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
         )
             ->when(
                 $request->status,
-                fn(Builder $query, $status) =>
+                fn(Builder $query, array $status) =>
                 $query->whereIn('status', $status)
             )->latest()
             ->paginate($entries)
@@ -67,9 +68,12 @@ class DepartmentController extends Controller
                 'alpha_dash',
                 'max:255',
                 Rule::unique('departments')
-                    ->where('plant_id', $plant->id)
-                    ->where('tenant_id', $plant->tenant_id)
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('plant_id', $plant->id)
+                            ->where('tenant_id', $plant->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    )
             ],
             'description' => ['nullable', 'string'],
             'status' => ['required', 'boolean'],
@@ -85,7 +89,7 @@ class DepartmentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Plant $plant, Department $department)
+    public function show()
     {
         //
     }
@@ -120,10 +124,13 @@ class DepartmentController extends Controller
                 'max:255',
                 Rule::unique('departments')
                     ->ignore($department->id)
-                    ->where('plant_id', $plant->id)
-                    ->where('tenant_id', $plant->tenant_id)
-                    ->where('tenant_id', $department->tenant_id)
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('plant_id', $plant->id)
+                            ->where('tenant_id', $plant->tenant_id)
+                            ->where('tenant_id', $department->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    )
             ],
             'description' => ['nullable', 'string'],
             'status' => ['sometimes', 'boolean'],

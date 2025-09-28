@@ -25,12 +25,12 @@ class BomController extends Controller
 
         $boms = $product->boms()->when(
             $request->search,
-            fn(Builder $query, $search) =>
+            fn(Builder $query, string $search) =>
             $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
         )
             ->when(
                 $request->status,
-                fn(Builder $query, $status) =>
+                fn(Builder $query, array $status) =>
                 $query->whereIn('status', $status)
             )->latest()
             ->paginate($entries)
@@ -50,7 +50,7 @@ class BomController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request, Product $product)
+    public function create(Product $product)
     {
         $materials = Material::active()->get(['id', 'name', 'unit_type']);
 
@@ -80,12 +80,14 @@ class BomController extends Controller
         $bom = $product->boms()->create($validated);
 
         $materials = collect($validated['materials'])
-            ->mapWithKeys(fn($m) => [
-                $m['id'] => [
-                    'unit_type' => $m['unit_type'],
-                    'quantity'  => $m['quantity'],
-                ],
-            ])->toArray();
+            ->mapWithKeys(
+                fn($m) => [
+                    $m['id'] => [
+                        'unit_type' => $m['unit_type'],
+                        'quantity'  => $m['quantity'],
+                    ],
+                ]
+            )->toArray();
 
         $bom->materials()->sync($materials);
 
@@ -104,12 +106,15 @@ class BomController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, Product $product, Bom $bom)
+    public function edit(Product $product, Bom $bom)
     {
         $materialIds = $bom->materials()->pluck('material_id');
 
         $materials = Material::active()
-            ->orWhere(fn($query) => $query->whereIn('id', $materialIds))
+            ->orWhere(
+                fn(Builder $query) =>
+                $query->whereIn('id', $materialIds)
+            )
             ->get(['id', 'name', 'unit_type']);
 
         return inertia('Tenant/Products/Boms/Edit', [
@@ -141,12 +146,14 @@ class BomController extends Controller
         $bom->update($validated);
 
         $materials = collect($validated['materials'])
-            ->mapWithKeys(fn($m) => [
-                $m['id'] => [
-                    'unit_type' => $m['unit_type'],
-                    'quantity'  => $m['quantity'],
-                ],
-            ])->toArray();
+            ->mapWithKeys(
+                fn($m) => [
+                    $m['id'] => [
+                        'unit_type' => $m['unit_type'],
+                        'quantity'  => $m['quantity'],
+                    ],
+                ]
+            )->toArray();
 
         BomMaterial::onlyTrashed()
             ->where('bom_id', $bom->id)

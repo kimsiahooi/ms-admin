@@ -6,6 +6,7 @@ use App\Enums\Tenant\Customer\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Customer;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -20,12 +21,12 @@ class CustomerController extends Controller
 
         $customers = Customer::when(
             $request->search,
-            fn(Builder $query, $search) =>
+            fn(Builder $query, string $search) =>
             $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
         )
             ->when(
                 $request->status,
-                fn(Builder $query, $status) =>
+                fn(Builder $query, array $status) =>
                 $query->whereIn('status', $status)
             )
             ->latest()
@@ -66,7 +67,10 @@ class CustomerController extends Controller
                 'alpha_dash',
                 'max:255',
                 Rule::unique('customers')
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('tenant_id', tenant('id'))
+                    )
             ],
             'description' => ['nullable', 'string'],
             'status' => ['required', 'boolean'],
@@ -116,7 +120,11 @@ class CustomerController extends Controller
                 'max:255',
                 Rule::unique('customers')
                     ->ignore($customer->id)
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('tenant_id', $customer->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    )
             ],
             'description' => ['nullable', 'string'],
             'status' => ['sometimes', 'boolean'],

@@ -11,6 +11,7 @@ use App\Models\Tenant\Machine;
 use App\Models\Tenant\Product;
 use App\Models\Tenant\ProductPreset;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -25,12 +26,12 @@ class ProductPresetController extends Controller
 
         $presets = $product->presets()->when(
             $request->search,
-            fn(Builder $query, $search) =>
+            fn(Builder $query, string $search) =>
             $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
         )
             ->when(
                 $request->status,
-                fn(Builder $query, $status) =>
+                fn(Builder $query, array $status) =>
                 $query->whereIn('status', $status)
             )->latest()
             ->paginate($entries)
@@ -74,15 +75,24 @@ class ProductPresetController extends Controller
                 'max:255',
                 'alpha_dash',
                 Rule::unique('product_presets')
-                    ->where('product_id', $product->id)
-                    ->where('tenant_id', $product->tenant_id)
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('product_id', $product->id)
+                            ->where('tenant_id', $product->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    )
             ],
             'description' => ['nullable', 'string'],
             'quantity' => ['required', 'numeric', 'decimal:0,2', 'min:0.01', 'max:999999.99'],
-            'product_type' => ['required', Rule::enum(ProductType::class)],
+            'product_type' => [
+                'required',
+                Rule::enum(ProductType::class)
+            ],
             'cycle_time' => ['required', 'numeric', 'decimal:0,2', 'min:0.01', 'max:999999.99'],
-            'cycle_time_type' => ['required', Rule::enum(CycleTimeType::class)],
+            'cycle_time_type' => [
+                'required',
+                Rule::enum(CycleTimeType::class)
+            ],
             'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type',  'numeric', 'decimal:0,2', 'min:0.01', 'max:999999.99'],
             'shelf_life_type' => [
                 'nullable',
@@ -142,17 +152,31 @@ class ProductPresetController extends Controller
                 'alpha_dash',
                 Rule::unique('product_presets')
                     ->ignore($preset->id)
-                    ->where('product_id', $product->id)
-                    ->where('tenant_id', $product->tenant_id)
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('product_id', $product->id)
+                            ->where('tenant_id', $product->tenant_id)
+                            ->where('tenant_id', $preset->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    )
             ],
             'description' => ['nullable', 'string'],
             'quantity' => ['required', 'numeric', 'decimal:0,2', 'min:0.01', 'max:999999.99'],
-            'product_type' => ['required', Rule::enum(ProductType::class)],
+            'product_type' => [
+                'required',
+                Rule::enum(ProductType::class)
+            ],
             'cycle_time' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:999999.99'],
-            'cycle_time_type' => ['required', Rule::enum(CycleTimeType::class)],
+            'cycle_time_type' => [
+                'required',
+                Rule::enum(CycleTimeType::class)
+            ],
             'shelf_life_duration' => ['nullable', 'required_with:shelf_life_type', 'numeric', 'decimal:0,2', 'min:0.01', 'max:999999.99'],
-            'shelf_life_type' => ['nullable', 'required_with:shelf_life_duration', Rule::enum(ShelfLifeType::class)],
+            'shelf_life_type' => [
+                'nullable',
+                'required_with:shelf_life_duration',
+                Rule::enum(ShelfLifeType::class)
+            ],
             'status' => ['sometimes', 'boolean'],
         ]);
 

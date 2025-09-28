@@ -6,6 +6,7 @@ use App\Enums\Tenant\Plant\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Plant;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -20,12 +21,12 @@ class PlantController extends Controller
 
         $plants = Plant::with(['departments'])->when(
             $request->search,
-            fn(Builder $query, $search) =>
+            fn(Builder $query, string $search) =>
             $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
         )
             ->when(
                 $request->status,
-                fn(Builder $query, $status) =>
+                fn(Builder $query, array $status) =>
                 $query->whereIn('status', $status)
             )->latest()
             ->paginate($entries)
@@ -65,7 +66,11 @@ class PlantController extends Controller
                 'alpha_dash',
                 'max:255',
                 Rule::unique('plants')
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('tenant_id', tenant('id'))
+                    )
+
             ],
             'description' => ['nullable', 'string'],
             'address' => ['required', 'string'],
@@ -82,7 +87,7 @@ class PlantController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Plant $plant)
+    public function show()
     {
         //
     }
@@ -116,7 +121,10 @@ class PlantController extends Controller
                 'max:255',
                 Rule::unique('plants')
                     ->ignore($plant->id)
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('tenant_id', tenant('id'))
+                    )
             ],
             'description' => ['nullable', 'string'],
             'address' => ['required', 'string'],

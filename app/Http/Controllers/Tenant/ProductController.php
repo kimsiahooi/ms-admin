@@ -6,6 +6,7 @@ use App\Enums\Tenant\Product\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Product;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -20,12 +21,12 @@ class ProductController extends Controller
 
         $products = Product::when(
             $request->search,
-            fn(Builder $query, $search) =>
+            fn(Builder $query, string $search) =>
             $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
         )
             ->when(
                 $request->status,
-                fn(Builder $query, $status) =>
+                fn(Builder $query, array $status) =>
                 $query->whereIn('status', $status)
             )->latest()
             ->paginate($entries)
@@ -65,7 +66,10 @@ class ProductController extends Controller
                 'alpha_dash',
                 'max:255',
                 Rule::unique('products')
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('tenant_id', tenant('id'))
+                    )
             ],
             'description' => ['nullable', 'string'],
             'status' => ['required', 'boolean'],
@@ -81,7 +85,7 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Product $product)
+    public function show()
     {
         //
     }
@@ -115,7 +119,10 @@ class ProductController extends Controller
                 'max:255',
                 Rule::unique('products')
                     ->ignore($product->id, 'id')
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('tenant_id', tenant('id'))
+                    )
             ],
             'description' => ['nullable', 'string'],
             'status' => ['sometimes', 'boolean'],

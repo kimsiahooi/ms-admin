@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Tenant\Customer;
 use App\Models\Tenant\CustomerBranch;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -21,12 +22,12 @@ class CustomerBranchController extends Controller
 
         $branches = $customer->branches()->when(
             $request->search,
-            fn(Builder $query, $search) =>
+            fn(Builder $query, string $search) =>
             $query->whereAny(['id', 'name', 'code'], 'like', "%{$search}%")
         )
             ->when(
                 $request->status,
-                fn(Builder $query, $status) =>
+                fn(Builder $query, array $status) =>
                 $query->whereIn('status', $status)
             )->latest()
             ->paginate($entries)
@@ -67,9 +68,12 @@ class CustomerBranchController extends Controller
                 'alpha_dash',
                 'max:255',
                 Rule::unique('customer_branches')
-                    ->where('customer_id', $customer->id)
-                    ->where('tenant_id', $customer->tenant_id)
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('customer_id', $customer->id)
+                            ->where('tenant_id', $customer->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    )
             ],
             'description' => ['nullable', 'string'],
             'address' => ['required', 'string'],
@@ -86,7 +90,7 @@ class CustomerBranchController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(CustomerBranch $branch)
+    public function show()
     {
         //
     }
@@ -94,7 +98,7 @@ class CustomerBranchController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, Customer $customer, CustomerBranch $branch)
+    public function edit(Customer $customer, CustomerBranch $branch)
     {
         return inertia('Tenant/Customers/Branches/Edit', [
             'customer' => $customer,
@@ -121,9 +125,13 @@ class CustomerBranchController extends Controller
                 'max:255',
                 Rule::unique('customer_branches')
                     ->ignore($branch->id)
-                    ->where('customer_id', $customer->id)
-                    ->where('tenant_id', $customer->tenant_id)
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('customer_id', $customer->id)
+                            ->where('tenant_id', $customer->tenant_id)
+                            ->where('tenant_id', $branch->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    )
             ],
             'description' => ['nullable', 'string'],
             'address' => ['required', 'string'],

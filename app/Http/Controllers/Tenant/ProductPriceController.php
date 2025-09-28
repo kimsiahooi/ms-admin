@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Tenant\Product;
 use App\Models\Tenant\ProductPrice;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -22,12 +23,12 @@ class ProductPriceController extends Controller
 
         $prices = $product->prices()->when(
             $request->search,
-            fn(Builder $query, $search) =>
+            fn(Builder $query, string $search) =>
             $query->whereAny(['id', 'currency'], 'like', "%{$search}%")
         )
             ->when(
                 $request->status,
-                fn(Builder $query, $status) =>
+                fn(Builder $query, array $status) =>
                 $query->whereIn('status', $status)
             )->latest()
             ->paginate($entries)
@@ -66,9 +67,13 @@ class ProductPriceController extends Controller
                 'required',
                 Rule::enum(Currency::class),
                 Rule::unique('product_prices')
-                    ->where('product_id', $product->id)
-                    ->where('tenant_id', $product->tenant_id)
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('product_id', $product->id)
+                            ->where('tenant_id', $product->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    )
+
             ],
             'amount' => ['required', 'min:0.01', 'decimal:0,2', 'numeric', 'max:999999.99'],
             'status' => ['required', 'boolean'],
@@ -84,7 +89,7 @@ class ProductPriceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show()
     {
         //
     }
@@ -92,7 +97,7 @@ class ProductPriceController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, Product $product, ProductPrice $price)
+    public function edit(Product $product, ProductPrice $price)
     {
         return inertia('Tenant/Products/Prices/Edit', [
             'product' => $product,
@@ -119,9 +124,13 @@ class ProductPriceController extends Controller
                 Rule::enum(Currency::class),
                 Rule::unique('product_prices')
                     ->ignore($price->id, 'id')
-                    ->where('product_id', $product->id)
-                    ->where('tenant_id', $product->tenant_id)
-                    ->where('tenant_id', tenant('id'))
+                    ->where(
+                        fn(QueryBuilder $query) =>
+                        $query->where('product_id', $product->id)
+                            ->where('tenant_id', $product->tenant_id)
+                            ->where('tenant_id', $price->tenant_id)
+                            ->where('tenant_id', tenant('id'))
+                    )
             ],
             'amount' => ['required', 'min:0.01', 'decimal:0,2', 'numeric', 'max:999999.99'],
             'status' => ['sometimes', 'boolean'],
