@@ -6,16 +6,12 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { useFormatDateTime } from '@/composables/useFormatDateTime';
 import { CalendarDate, type DateValue } from '@internationalized/date';
 import { CalendarIcon } from 'lucide-vue-next';
-import { computed, watch } from 'vue';
+import { computed } from 'vue';
 
 const hours = Array.from({ length: 12 }, (_, i) => i + 1).reverse();
 const minutes = Array.from({ length: 60 }, (_, i) => i);
 
-const model = defineModel<Date | undefined>();
-
-const emit = defineEmits<{
-    'update:value': [value: Date];
-}>();
+const model = defineModel<Date>();
 
 const { formatDateTime } = useFormatDateTime();
 
@@ -71,12 +67,6 @@ const dateResult = computed(() => (model.value ? formatDateTime(model.value, 'YY
 const calendarDate = computed(() =>
     model.value ? new CalendarDate(model.value.getFullYear(), model.value.getMonth() + 1, model.value.getDate()) : undefined,
 );
-
-watch(model, (newVal) => {
-    if (newVal) {
-        emit('update:value', newVal);
-    }
-});
 </script>
 
 <template>
