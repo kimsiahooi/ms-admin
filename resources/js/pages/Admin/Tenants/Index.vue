@@ -209,7 +209,7 @@ watch(
                     />
                 </FilterCard>
                 <div class="flex flex-wrap items-center justify-end gap-2">
-                    <Dialog title="Create Customer" v-model:open="setting.create.dialogIsOpen">
+                    <Dialog title="Create Tenant" v-model:open="setting.create.dialogIsOpen">
                         <form @submit.prevent="submit" class="space-y-4">
                             <FormInput label="Name" :error="form.errors.name" v-model:model-value="form.name" />
                             <FormInput label="ID" :error="form.errors.id" v-model:model-value="form.id" />

@@ -57,7 +57,7 @@ class TenantController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'id' => ['required', 'string', 'max:255', 'alpha_dash', 'unique:tenants,id'],
+            'id' => ['required', 'string', 'lowercase', 'max:255', 'alpha_dash', 'unique:tenants,id', 'not_in:admin'],
             'status' => ['required', 'boolean'],
         ]);
 
