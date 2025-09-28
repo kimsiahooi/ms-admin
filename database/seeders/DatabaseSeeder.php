@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
             RouteSeeder::class,
             OperationRouteSeeder::class,
             BomRouteSeeder::class,
+            OrderSeeder::class,
         ]);
     }
 }
