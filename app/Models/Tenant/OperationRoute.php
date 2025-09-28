@@ -12,7 +12,7 @@ class OperationRoute extends Pivot
 {
     use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;
 
-    protected $fillable = ['route_id', 'operation_id', 'tenant_id'];
+    protected $fillable = ['route_id', 'operation_id', 'sequence', 'tenant_id'];
 
     protected $hidden = ['tenant_id'];
 }

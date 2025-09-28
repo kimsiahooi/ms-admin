@@ -19,12 +19,13 @@ class OperationRouteSeeder extends Seeder
         $routes = Route::all();
 
         foreach ($routes as $route) {
-            $operations = Operation::where('tenant_id', $route->tenant_id)->inRandomOrder()->limit(rand(1, 2))->get();
+            $operations = Operation::where('tenant_id', $route->tenant_id)->inRandomOrder()->limit(rand(2, 4))->get();
 
-            foreach ($operations as $operation) {
+            foreach ($operations as $i => $operation) {
                 OperationRoute::factory()->state(new Sequence(fn() => [
                     'route_id' => $route->id,
                     'operation_id' => $operation->id,
+                    'sequence' => $i,
                     'tenant_id' => $operation->tenant_id,
                 ]))->create();
             }

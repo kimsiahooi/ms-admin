@@ -25,6 +25,7 @@ class OperationRouteFactory extends Factory
         return [
             'route_id' => $route->id,
             'operation_id' => $operation->id,
+            'sequence' => fake()->numberBetween(0, 9),
             'tenant_id' => $operation->tenant_id,
         ];
     }

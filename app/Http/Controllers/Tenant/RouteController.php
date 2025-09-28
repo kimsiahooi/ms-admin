@@ -10,6 +10,7 @@ use App\Models\Tenant\Plant;
 use App\Models\Tenant\Route;
 use App\Models\Tenant\OperationRoute;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 
 class RouteController extends Controller
@@ -73,7 +74,14 @@ class RouteController extends Controller
 
         $route = Route::create($validated);
 
-        $operations = collect($validated['operations'])->pluck('operation_id');
+        $operations = collect($validated['operations'])
+            ->mapWithKeys(
+                fn(array $operation, int $key) => [
+                    $operation['operation_id'] => [
+                        'sequence' => $key
+                    ]
+                ]
+            );
 
         $route->operations()->sync($operations);
 
@@ -94,7 +102,12 @@ class RouteController extends Controller
      */
     public function edit(Route $route)
     {
-        $route->load(['operations.department.plant']);
+        $route->load([
+            'operations' =>
+            fn(BelongsToMany $query) =>
+            $query->orderBy('sequence'),
+            'operations.department.plant'
+        ]);
 
         $plantIds = $route->operations->pluck('department.plant_id')->filter()->unique();
         $departmentIds = $route->operations->pluck('department_id')->filter()->unique();
@@ -150,11 +163,18 @@ class RouteController extends Controller
 
         $route->update($validated);
 
-        $operations = collect($validated['operations'])->pluck('operation_id');
+        $operations = collect($validated['operations'])
+            ->mapWithKeys(
+                fn(array $operation, int $key) => [
+                    $operation['operation_id'] => [
+                        'sequence' => $key
+                    ]
+                ]
+            )->toArray();
 
         OperationRoute::onlyTrashed()
             ->where('route_id', $route->id)
-            ->whereIn('operation_id', $operations)
+            ->whereIn('operation_id', array_keys($operations))
             ->restore();
 
         $route->operations()->sync($operations);

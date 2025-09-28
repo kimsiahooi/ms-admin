@@ -22,9 +22,10 @@ import { computed } from 'vue';
 interface CustomRoute extends Route {
     operations: (Operation & {
         pivot: {
-            id: string;
+            readonly id: string;
             route_id: Route['id'];
             operation_id: Operation['id'];
+            sequence: number;
             created_at: Date | null;
             updated_at: Date | null;
         };

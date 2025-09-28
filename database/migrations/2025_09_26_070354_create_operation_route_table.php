@@ -18,6 +18,7 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->foreignIdFor(Route::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Operation::class)->constrained()->cascadeOnDelete();
+            $table->integer('sequence');
             $table->foreignIdFor(Tenant::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();

@@ -42,7 +42,7 @@ class Route extends Model
     public function operations(): BelongsToMany
     {
         return $this->belongsToMany(Operation::class)
-            ->withPivot(['id', 'tenant_id'])
+            ->withPivot(['id', 'sequence', 'tenant_id'])
             ->wherePivotNull('deleted_at')
             ->withTimestamps()
             ->using(OperationRoute::class);
