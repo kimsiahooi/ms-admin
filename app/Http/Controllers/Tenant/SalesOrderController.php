@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
-use App\Models\Tenant\Order;
+use App\Models\Tenant\SalesOrder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
-class OrderController extends Controller
+class SalesOrderController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,7 +16,7 @@ class OrderController extends Controller
     {
         $entries = $request->input('entries', 10);
 
-        $orders = Order::when(
+        $orders = SalesOrder::when(
             $request->search,
             fn(Builder $query, string $search) =>
             $query->whereAny(['id', 'code'], 'like', "%{$search}%")
@@ -25,7 +25,7 @@ class OrderController extends Controller
             ->paginate($entries)
             ->withQueryString();
 
-        return inertia('Tenant/Orders/Index', [
+        return inertia('Tenant/SalesOrders/Index', [
             'orders' => $orders,
         ]);
     }
@@ -49,7 +49,7 @@ class OrderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Order $order)
+    public function show(SalesOrder $order)
     {
         //
     }
@@ -57,7 +57,7 @@ class OrderController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Order $order)
+    public function edit(SalesOrder $order)
     {
         //
     }
@@ -65,7 +65,7 @@ class OrderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Order $order)
+    public function update(Request $request, SalesOrder $order)
     {
         //
     }
@@ -73,7 +73,7 @@ class OrderController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Order $order)
+    public function destroy(SalesOrder $order)
     {
         //
     }

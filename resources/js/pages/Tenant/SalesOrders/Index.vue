@@ -45,13 +45,13 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
         href: route('dashboard', { tenant: tenant?.id || '' }),
     },
     {
-        title: 'Orders',
-        href: route('orders.index', { tenant: tenant?.id || '' }),
+        title: 'Sales Orders',
+        href: route('sales-orders.index', { tenant: tenant?.id || '' }),
     },
 ]);
 
 const search = () =>
-    router.visit(route('orders.index', { ...pickBy(filter.data()), tenant: tenant?.id || '' }), {
+    router.visit(route('sales-orders.index', { ...pickBy(filter.data()), tenant: tenant?.id || '' }), {
         preserveScroll: true,
         preserveState: true,
     });
@@ -70,14 +70,14 @@ const columns: ColumnDef<Order>[] = [
             return h('div', { class: 'flex items-center gap-2' }, [
                 h(ActionButton, {
                     text: 'Edit',
-                    href: route('orders.edit', { tenant: tenant?.id || '', order: order.id }),
+                    href: route('sales-orders.edit', { tenant: tenant?.id || '', order: order.id }),
                     icon: Pencil,
                 }),
                 h(
                     DeleteDialog,
                     {
                         title: `Delete Order ID: ${order.id}`,
-                        route: route('orders.destroy', { tenant: tenant?.id || '', order: order.id }),
+                        route: route('sales-orders.destroy', { tenant: tenant?.id || '', order: order.id }),
                         asChild: false,
                     },
                     () =>
@@ -134,7 +134,7 @@ const columnVisibility: VisibilityState<Order> = {
 </script>
 
 <template>
-    <Head title="Orders" />
+    <Head title="Sales Orders" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Layout>

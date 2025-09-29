@@ -14,7 +14,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('sales_orders', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->string('code');
             $table->enum('currency', array_column(Currency::cases(), 'value'));
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('sales_orders');
     }
 };

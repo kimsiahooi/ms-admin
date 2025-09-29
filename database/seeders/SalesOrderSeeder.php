@@ -2,16 +2,16 @@
 
 namespace Database\Seeders;
 
-use App\Models\Tenant\Order;
+use App\Models\Tenant\SalesOrder;
 use Illuminate\Database\Seeder;
 
-class OrderSeeder extends Seeder
+class SalesOrderSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        Order::factory(200)->create();
+        SalesOrder::factory(200)->create();
     }
 }

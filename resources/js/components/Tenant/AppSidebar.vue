@@ -60,10 +60,10 @@ const mainNavItems: NavItem[] = [
         isActive: route().current('routes.*', { tenant: tenant?.id || '' }),
     },
     {
-        title: 'Orders',
-        href: route('orders.index', { tenant: tenant?.id || '' }),
+        title: 'Sales Orders',
+        href: route('sales-orders.index', { tenant: tenant?.id || '' }),
         icon: SendToBack,
-        isActive: route().current('orders.*', { tenant: tenant?.id || '' }),
+        isActive: route().current('sales-orders.*', { tenant: tenant?.id || '' }),
     },
 ];
 

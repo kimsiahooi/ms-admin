@@ -26,7 +26,7 @@ use App\Http\Controllers\Tenant\RouteController;
 use App\Http\Controllers\Tenant\Settings\PasswordController;
 use App\Http\Controllers\Tenant\Settings\ProfileController;
 use App\Http\Controllers\Tenant\OperationController;
-use App\Http\Controllers\Tenant\OrderController;
+use App\Http\Controllers\Tenant\SalesOrderController;
 use App\Http\Controllers\Tenant\TenantUserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -183,6 +183,6 @@ Route::middleware([
         });
         Route::resource('routes', RouteController::class)->except(['show']);
         Route::resource('routes.boms', BomRouteController::class)->except(['create', 'show']);
-        Route::resource('orders', OrderController::class)->except(['show']);
+        Route::resource('sales-orders', SalesOrderController::class)->except(['show'])->parameters(['sales-orders' => 'order']);
     });
 });

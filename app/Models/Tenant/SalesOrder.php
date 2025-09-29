@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
-class Order extends Model
+class SalesOrder extends Model
 {
     /** @use HasFactory<\Database\Factories\Tenant\OrderFactory> */
     use HasFactory, SoftDeletes, BelongsToTenant, HasUlids;

@@ -39,8 +39,8 @@ class CustomerBranch extends Model
         $query->where('status', Status::ACTIVE->value);
     }
 
-    public function orders(): HasMany
+    public function salesOrders(): HasMany
     {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(SalesOrder::class);
     }
 }
