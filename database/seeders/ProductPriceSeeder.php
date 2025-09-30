@@ -16,9 +16,10 @@ class ProductPriceSeeder extends Seeder
     public function run(): void
     {
         $products = Product::all();
-        $currencies = Currency::cases();
 
         foreach ($products as $product) {
+            $currencies = fake()->randomElements(Currency::cases(), 20);
+
             foreach ($currencies as $currency) {
                 ProductPrice::factory()->create([
                     'product_id' => $product->id,

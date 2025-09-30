@@ -24,7 +24,7 @@ class ProductPriceFactory extends Factory
         return [
             'currency' => fake()->randomElement(Currency::cases()),
             'amount' => fake()->randomFloat(2, 10, 99),
-            'status' => Status::ACTIVE->value,
+            'status' => fake()->randomElement(Status::cases()),
             'product_id' => $product,
             'tenant_id' => $product->tenant_id,
         ];
